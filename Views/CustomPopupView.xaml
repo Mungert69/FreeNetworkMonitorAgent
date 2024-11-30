@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NetworkMonitorAgent.Views.CustomPopupView"
              xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
-             IsVisible="{Binding IsPopupVisible}">
+             IsVisible="{Binding IsPopupVisible}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
 
     <Frame Padding="10"
-           BackgroundColor="White"
            CornerRadius="10">
         <Grid>
             <!-- Define rows -->
@@ -23,7 +23,9 @@
             <Button Text="Ok" 
                     Command="{Binding ClosePopupCommand}" 
                     HorizontalOptions="Center"
-                    Grid.Row="1"/>
+                    Grid.Row="1"
+                      BackgroundColor="{DynamicResource PrimaryButtonColor}"
+                    TextColor="{DynamicResource PrimaryButtonTextColor}"/>
         </Grid>
     </Frame>
 </ContentView>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NetworkMonitorAgent.Controls"
+             x:Class="NetworkMonitorAgent.ConfigPage"
+             xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
+             x:DataType="vm:ConfigPageViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="5" VerticalOptions="Center">
+
+            <!-- Logo and App Title -->
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="10">
+                    <Image Source="logo.png" SemanticProperties.Description="Free Network Monitor Agent Logo. " HeightRequest="100" HorizontalOptions="Center" />
+                    <Label Text="Free Network Monitor Agent" FontSize="22" HorizontalOptions="Center" TextColor="#607466" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Config Header -->
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
+                <Label Text="Free Network Monitor Agent Agent Config" FontSize="16" HorizontalOptions="Center" />
+            </Frame>
+
+            <!-- Config Fields -->
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="10">
+
+                    <!-- Field Names with Alternate Background Colors -->
+                    <Label Text="Owner ID:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding Owner}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="Monitor Location:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding MonitorLocation}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="Base Fusion Auth URL:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding BaseFusionAuthURL}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="Client ID:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding ClientId}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="App ID:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding AppID}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="Max Task Queue Size:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding MaxTaskQueueSize}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="Client Auth URL:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding ClientAuthUrl}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Label Text="Auth Key:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+                    <Label Text="{Binding AuthKey}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,147 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup Label="Globals">
+        <WebView2UseWinRT>False</WebView2UseWinRT>
+        <WebView2EnableCsWinRTProjection>True</WebView2EnableCsWinRTProjection>
+        <WebView2LoaderPreference>Static</WebView2LoaderPreference>
+    </PropertyGroup>
+
+    <PropertyGroup>
+
+        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0-windows10.0.19041.0</TargetFrameworks>
+        <IsWindows Condition="'$(TargetFramework)' == 'net9.0-windows10.0.19041.0'">true</IsWindows>
+
+
+        <OutputType>Exe</OutputType>
+        <RootNamespace>NetworkMonitorAgent</RootNamespace>
+        <UseMaui>true</UseMaui>
+        <SingleProject>true</SingleProject>
+        <SelfContained>true</SelfContained>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <!-- Display name -->
+        <ApplicationTitle>Free Network Monitor Agent</ApplicationTitle>
+
+        <!-- App Identifier -->
+        <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
+
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <PackageCertificateThumbprint>F13A020884C94F4309A40BD2B922FBB8FACABC45</PackageCertificateThumbprint>
+        <IncludeSymbols>True</IncludeSymbols>
+        <!-- https://github.com/CommunityToolkit/Maui/issues/2205 -->
+        <NoWarn>XC0103</NoWarn>
+        <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+        <WindowsPackageType>MSIX</WindowsPackageType>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+
+
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release-Dev'">
+        <DefineConstants>DEV</DefineConstants>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- App Icon -->
+
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
+
+        <MauiIcon Include="Resources\Splash\splash.svg">
+            <Color>#FFFFFF</Color>
+            <ForegroundFile>Resources\AppIcon\appiconfg.svg</ForegroundFile>
+        </MauiIcon>
+
+        <!-- Splash Screen -->
+
+        <!-- Images -->
+        <MauiImage Include="Resources\Images\*" />
+        <MauiImage Update="Resources\Images\dotneplaceholder.png" Resize="True" BaseSize="300,185" />
+
+        <!-- Custom Fonts -->
+        <MauiFont Include="Resources\Fonts\*" />
+
+        <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+        <MauiAsset Include="Resources\Raw\appsettings.json" />
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <MauiAsset Include="Resources\Raw\openssl-3.3.1-windows\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+        <PackageReference Include="MetroLog.Maui" Version="2.1.0" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj" />
+        <ProjectReference Include="..\NetworkMonitor\NetworkMonitor-Maui.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <MauiXaml Update="MainPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="ConfigPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="DataViewPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="DetailsPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="LogsPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="ScanPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="SetupGuidePage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="Views\CustomPopupView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="Views\ProcessorStatesView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="Views\ShowDetailsPopup.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Services\AndroidBackgroundService.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+
+</Project>

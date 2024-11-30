@@ -1,0 +1,19 @@
+# android.toolchain.cmake
+
+# Set Android as the target system
+set(CMAKE_SYSTEM_NAME Android)
+
+# Specify the Android API level
+set(CMAKE_SYSTEM_VERSION 21)
+
+# Specify the Android ABI (adjust this based on your target ABI)
+set(CMAKE_ANDROID_ARCH_ABI armeabi-v7a)
+
+# Path to the Android NDK
+set(CMAKE_ANDROID_NDK /opt/android-ndk-r26d)
+
+
+# Compiler settings
+set(CMAKE_C_COMPILER ${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang)
+set(CMAKE_CXX_COMPILER ${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++)
+

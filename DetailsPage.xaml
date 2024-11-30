@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NetworkMonitorAgent.DetailsPage"
+             xmlns:controls="clr-namespace:NetworkMonitorAgent.Controls"
+            >
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="5">
+              <!-- Title -->
+            <Label Text="Host Monitoring Details" FontSize="24" HorizontalOptions="Center" />
+            
+            <!-- Details -->
+            <StackLayout Spacing="10" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+              <Label Text="Address:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.Address}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Port:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.Port}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="UserID:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.UserID}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Username:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.Username}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Password:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.Password}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="EndPointType:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.EndPointType}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Monitor Status Message:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.Message}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Monitor Status IsUp:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.IsUp}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Monitor Status DownCount:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.DownCount}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Monitor Status AlertFlag:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.AlertFlag}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Monitor Status AlertSent:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.AlertSent}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Connections Initiated:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.PacketsSent}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Connections Successful:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.PacketsRecieved}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Connections Failed:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.PacketsLost}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Connections Failed Percentage:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.PacketsLostPercentage, StringFormat='{0:F2}%'}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Round Trip Time Maximum:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeMaximum}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Round Trip Time Average:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeAverage, StringFormat='{0:F2}'}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Round Trip Time Total:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeTotal}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Round Trip Time Minimum:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeMinimum}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Date Started:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.DateStarted}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+<Label Text="Date Ended:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
+<Label Text="{Binding SelectedMonitorPingInfo.DateEnded}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+</StackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

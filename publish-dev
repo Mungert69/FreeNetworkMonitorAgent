@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Check if the keypass file exists
+if [ ! -f ~/code/securefiles/keypass ]; then
+    echo "Error: keypass file not found at ~/code/securefiles/keypass"
+    exit 1
+fi
+
+# Source the keypass file to set environment variables
+. ~/code/securefiles/keypass
+
+# Proceed with the rest of the commands
+dotnet clean NetworkMonitorAgent-Android.csproj
+cp ./Resources/Raw/appsettings-dev.json ./Resources/Raw/appsettings.json
+dotnet build -c Release-Dev -f net9.0-android NetworkMonitorAgent-Android.csproj

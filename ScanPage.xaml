@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NetworkMonitorAgent.Controls"
+             xmlns:view="clr-namespace:NetworkMonitorAgent.Views"
+             xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
+             x:Class="NetworkMonitorAgent.ScanPage"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+
+       <ScrollView>
+              <VerticalStackLayout Spacing="20"
+                                   Padding="20">
+                     <!-- Logo and Title -->
+                     <Image Source="logo.png"
+                            SemanticProperties.Description="Free Network Monitor Agent Logo"
+                            HeightRequest="100"
+                            HorizontalOptions="Center"/>
+                     <Label Text="Free Network Monitor Agent"
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            HorizontalOptions="Center"
+                            TextColor="{DynamicResource Primary}"/>
+
+                     <!-- Conditional Content -->
+                     <StackLayout x:Name="ScanView">
+                            <!-- Scan Section -->
+                            <StackLayout x:Name="ScanSection"
+                                         Spacing="10">
+                                   <Label Text="Scan For Local Hosts"
+                                          FontSize="20"
+                                          HorizontalOptions="Center"
+                                          TextColor="{DynamicResource Secondary}"/>
+                                   <Picker x:Name="EndpointTypePicker"
+                                           Title="Select Default Endpoint Type"
+                                           ItemsSource="{Binding EndpointTypes}"
+                                           SelectedItem="{Binding DefaultEndpointType}"/>
+                                   <Picker x:Name="NetworkInterfacePicker"
+                                           Title="Select Network Interface"
+                                           ItemsSource="{Binding NetworkInterfaces}"
+                                           SelectedItem="{Binding SelectedNetworkInterface}"
+                                           ItemDisplayBinding="{Binding .}"/>
+                                   <StackLayout Orientation="Horizontal"
+                                                HorizontalOptions="Center">
+                                          <CheckBox x:Name="UseDefaultEndpointTypeCheckBox"
+                                                    IsChecked="{Binding UseDefaultEndpointType}"/>
+                                          <Label Text="Use Default Endpoint Type"
+                                                 VerticalOptions="Center"/>
+                                   </StackLayout>
+                                   <StackLayout Orientation="Horizontal"
+                                                HorizontalOptions="Center">
+
+                                          <StackLayout Orientation="Horizontal"
+                                                       HorizontalOptions="Center">
+                                                 <CheckBox x:Name="UseFastScanCheckBox"
+                                                           IsChecked="{Binding UseFastScan}"/>
+                                                 <Label Text="Use Fast Scan"
+                                                        VerticalOptions="Center"/>
+                                          </StackLayout>
+                                          <StackLayout Orientation="Horizontal"
+                                                       HorizontalOptions="Center">
+                                                 <CheckBox x:Name="LimitPortsCheckBox"
+                                                           IsChecked="{Binding LimitPorts}"/>
+                                                 <Label Text="Limit Ports"
+                                                        VerticalOptions="Center"/>
+                                          </StackLayout>
+                                   </StackLayout>
+
+                                   <Button x:Name="ScanButton"
+                                           Text="Scan"
+                                           Clicked="OnScanClicked"
+                                           HorizontalOptions="Center"
+                                           WidthRequest="200"/>
+                            </StackLayout>
+
+                            <!-- Loading Indicator -->
+                            <StackLayout x:Name="LoadingSection"
+                                         IsVisible="false"
+                                         Spacing="10">
+                                   <ActivityIndicator x:Name="ProgressIndicator"
+                                                      IsRunning="True"
+                                                      HorizontalOptions="Center"/>
+                                   <Button x:Name="CancelButton"
+                                           Text="Cancel"
+                                           Clicked="OnCancelClicked"
+                                           HorizontalOptions="Center"
+                                           WidthRequest="200"/>
+                            </StackLayout>
+
+                            <!-- Results Section -->
+                            <StackLayout x:Name="ResultsSection"
+                                         IsVisible="false"
+                                         Spacing="10">
+                                   <Label Text="Select the hosts you want to add:"
+                                          FontSize="18"
+                                          TextColor="{DynamicResource Secondary}"/>
+                                   <CollectionView x:Name="HostsCollectionView"
+                                                   SelectionMode="Multiple"
+                                                   SelectionChanged="OnHostsSelectionChanged">
+                                          <CollectionView.ItemTemplate>
+                                                 <DataTemplate>
+                                                        <StackLayout Orientation="Vertical">
+                                                               <Label Text="{Binding Address}"/>
+                                                               <Label Text="{Binding EndPointType}"
+                                                                      FontSize="Small"
+                                                                      TextColor="Gray"/>
+                                                               <Label Text="{Binding MessageForUser}"
+                                                                      FontSize="Small"
+                                                                      TextColor="Gray"/>
+                                                        </StackLayout>
+                                                 </DataTemplate>
+                                          </CollectionView.ItemTemplate>
+                                   </CollectionView>
+                                   <Button x:Name="CheckButton"
+                                           Text="Check Services"
+                                           Clicked="OnCheckServicesClicked"
+                                           HorizontalOptions="Center"
+                                           WidthRequest="200"/>
+                                   <Button x:Name="AddButton"
+                                           Text="Monitor Services"
+                                           Clicked="OnAddServicesClicked"
+                                           HorizontalOptions="Center"
+                                           WidthRequest="200"/>
+                                   <Button x:Name="ClearButton"
+                                           Text="Clear Services"
+                                           Clicked="OnClearServicesClicked"
+                                           HorizontalOptions="Center"
+                                           WidthRequest="200"/>
+
+                            </StackLayout>
+                            <StackLayout Spacing="10"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center">
+                                   <Label Text="Result Output"
+                                          FontSize="18"
+                                          TextColor="{DynamicResource Secondary}"
+                                          HorizontalOptions="Center"
+                                          HorizontalTextAlignment="Center"/>
+                                   <view:CustomPopupView x:Name="CustomPopupView"
+                                                         AbsoluteLayout.LayoutBounds="0,0,1,1"
+                                                         AbsoluteLayout.LayoutFlags="All"/>
+                            </StackLayout>
+
+                     </StackLayout>
+
+                     <!-- Agent Disabled Message -->
+                     <StackLayout x:Name="AgentDisabledMessage">
+                            <StackLayout Spacing="10"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center">
+                                   <Label Text="The Agent must be enabled and authorized to add scanned host services"
+                                          FontSize="18"
+                                          TextColor="{DynamicResource Secondary}"
+                                          HorizontalOptions="Center"
+                                          HorizontalTextAlignment="Center"/>
+                                   <Button Text="Go to Home"
+                                           Clicked="OnGoHomeClicked"
+                                           HorizontalOptions="Center"
+                                           WidthRequest="200"/>
+                            </StackLayout>
+                     </StackLayout>
+
+              </VerticalStackLayout>
+       </ScrollView>
+</ContentPage>

@@ -1,0 +1,34 @@
+install android ndk
+  sudo apt install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind
+
+ export ANDROID_NDK_ROOT=/opt/android-ndk-r26d
+PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+not sure if this is needed /setenv-android-ndk
+unzip openssl-3.3.1.zip
+rename openssl-3.3.1-android
+cd openssl-3.3.1-android
+export CFLAGS="-fPIC"
+export CXXFLAGS="-fPIC"
+./Configure android-arm -D__ANDROID_API__=21
+sed -E -i -e '/[.]hidden.*OPENSSL_armcap_P/d' -e '/[.]extern.*OPENSSL_armcap_P/ {p; s/extern/hidden/; }' crypto/*arm*pl crypto/*/asm/*arm*pl
+make
+
+
+unzip liboqs 
+cd to it
+cd liboqs
+mkdir build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=android.toolchain.cmake-liboqs -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DOQS_USE_OPENSSL=OFF ..
+make
+make install DESTDIR=~/liboqs-android
+
+unzip  oqs-provider dir
+cd to it
+cmake -S . -B _build \
+  -DCMAKE_TOOLCHAIN_FILE=android.toolchain.cmake \
+  -DOPENSSL_ROOT_DIR=/home/mahadeva/openssl-3.3.1-android \
+  -DOPENSSL_CRYPTO_LIBRARY=/home/mahadeva/openssl-3.3.1-android/libcrypto.a \
+  -DOPENSSL_SSL_LIBRARY=/home/mahadeva/openssl-3.3.1-android/libssl.a \
+  -DOPENSSL_INCLUDE_DIR=/home/mahadeva/openssl-3.3.1-android/include \
+  -Dliboqs_DIR=/home/mahadeva/liboqs-android/usr/local/lib/cmake/liboqs
+cmake --build _build

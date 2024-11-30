@@ -1,0 +1,25 @@
+openssl
+sudo apt install mingw-w64
+./Configure mingw64 --cross-compile-prefix=x86_64-w64-mingw32-
+
+liboqs
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=windows.toolchain.cmake-liboqs -DOQS_USE_OPENSSL=OFF ..
+make install DESTDIR=~/liboqs-windows
+
+oqs-provider
+cmake -S . -B _build \
+  -DCMAKE_TOOLCHAIN_FILE=windows.toolchain.cmake \
+  -DOPENSSL_ROOT_DIR=/home/mahadeva/openssl-3.3.1-windows \
+  -DOPENSSL_CRYPTO_LIBRARY=/home/mahadeva/openssl-3.3.1-windows/libcrypto-3-x64.dll \
+  -DOPENSSL_SSL_LIBRARY=/home/mahadeva/openssl-3.3.1-windows/libssl-3-x64.dll \
+  -DOPENSSL_INCLUDE_DIR=/home/mahadeva/openssl-3.3.1-windows/include \
+  -Dliboqs_DIR=/home/mahadeva/liboqs-windows/usr/local/lib/cmake/liboqs
+  
+  this will fail but after it has built the lib so its fine
+
+
+
+
+

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NetworkMonitorAgent.Controls"
+             x:Class="NetworkMonitorAgent.DateViewPage"
+             x:Name="ThisPage">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15"
+                Padding="5"
+                VerticalOptions="Center">
+
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="10"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="10">
+                    <Image Source="logo.png"
+                            SemanticProperties.Description="Free Network Monitor Agent Logo. "
+                            HeightRequest="100"
+                            HorizontalOptions="Center"/>
+                    <Label Text="Free Network Monitor Agent"
+                            FontSize="22"
+                            HorizontalOptions="Center"
+                            TextColor="#607466"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="10"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand"
+                    Margin="0,0,0,10">
+                <Label Text="Free Network Monitor Agent Agent Data"
+                        FontSize="16"
+                        HorizontalOptions="Center"/>
+            </Frame>
+
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="0"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand"
+                    IsVisible="{Binding HasData}">
+                <StackLayout Orientation="Horizontal"
+                        HorizontalOptions="CenterAndExpand">
+                    <Label Text="Toggle Animations"
+                            VerticalOptions="Center"/>
+                    <Switch  IsToggled="{Binding IsAnimationOn}"
+                            VerticalOptions="Center"/>
+                </StackLayout>
+            </Frame>
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="10"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand"
+                    IsVisible="{Binding HasNoData}">
+                <Label Text="Waiting for data. Add monitored hosts to see data here."
+                        HorizontalOptions="Center"
+                        HorizontalTextAlignment="Center"/>
+            </Frame>
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="5"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand">
+
+                <AbsoluteLayout x:Name="circleLayout"
+                                WidthRequest="300"
+                                HeightRequest="250"
+                                BindableLayout.ItemsSource="{Binding MPIndicators}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <ContentView AbsoluteLayout.LayoutBounds="{Binding ., Converter={StaticResource BoundsConverter}}"
+                                         AbsoluteLayout.LayoutFlags="PositionProportional">
+                                <controls:StatusIndicator IsUp="{Binding MonitorStatus.IsUp}"
+                                                          PacketsLostPercentage="{Binding PacketsLostPercentage}"
+                                                          RoundTripTimeAverage="{Binding RoundTripTimeAverage}"
+                                                          DiameterPixels="{Binding DiameterPixels}"
+                                                          IsAnimated="{Binding IsAnimated}">
+                                    <controls:StatusIndicator.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnStatusIndicatorTapped"/>
+
+                                    </controls:StatusIndicator.GestureRecognizers>
+                                </controls:StatusIndicator>
+                            </ContentView>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </AbsoluteLayout>
+
+            </Frame>
+
+
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

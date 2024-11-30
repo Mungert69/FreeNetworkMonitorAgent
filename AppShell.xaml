@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell x:Class="NetworkMonitorAgent.AppShell"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:local="clr-namespace:NetworkMonitorAgent"  Title="NetworkMonitorAgent">
+    <FlyoutItem Title="Home" Route="Home">
+        <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+    </FlyoutItem>
+     <FlyoutItem Title="Check a Host" Route="Check">
+        <ShellContent ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Scan Local Network" Route="Scan">
+        <ShellContent ContentTemplate="{DataTemplate local:ScanPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Monitored Hosts" Route="Data">
+        <ShellContent ContentTemplate="{DataTemplate local:DateViewPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Show Config" Route="Config">
+        <ShellContent ContentTemplate="{DataTemplate local:ConfigPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Setup Guide" Route="SetupGuide">
+        <ShellContent ContentTemplate="{DataTemplate local:SetupGuidePage}" />
+    </FlyoutItem>
+
+     <FlyoutItem Title="Logs" Route="Logs">
+        <ShellContent ContentTemplate="{DataTemplate local:LogsPage}" />
+    </FlyoutItem>
+
+<ShellContent Route="DetailsPage" ContentTemplate="{DataTemplate local:DetailsPage}" />
+
+
+</Shell>

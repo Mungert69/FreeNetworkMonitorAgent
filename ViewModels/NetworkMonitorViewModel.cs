@@ -84,7 +84,7 @@ namespace NetworkMonitorAgent.ViewModels
         {
             _apiService = apiService;
             // Initialize the EndpointTypes collection with friendly names
-            EndpointTypes = new ObservableCollection<string>(EndPointTypeFactory.GetTypesFriendlyName());
+            EndpointTypes = new ObservableCollection<string>(EndPointTypeFactory.GetFriendlyNames());
 
             TestConnectionCommand = new Command(async () => await TestConnection());
         }

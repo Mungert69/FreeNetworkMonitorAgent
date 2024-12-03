@@ -43,6 +43,13 @@ public partial class MainPage : ContentPage
         }
 
     }
+    private void OnSwitchToggled(object sender, ToggledEventArgs e)
+    {
+        if (_mainPageViewModel != null)
+        {
+            _ = _mainPageViewModel.SetServiceStartedAsync(e.Value); // Use `_` for fire-and-forget async call
+        }
+    }
 
 
     private async void Authorize()

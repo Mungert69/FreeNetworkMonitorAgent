@@ -29,9 +29,8 @@
                 <VerticalStackLayout Spacing="10">
                     <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                         <Label Text="Enable Agent" VerticalOptions="Center" TextColor="{DynamicResource Primary}"/>
-                        <Switch IsToggled="{Binding IsServiceStarted}" 
-        Command="{Binding ToggleServiceCommand}" 
-        CommandParameter="{Binding IsToggled, Source={RelativeSource Self}}"/>
+                        <Switch IsToggled="{Binding IsServiceStarted}" Toggled="OnSwitchToggled"/>
+
                     </StackLayout>
                     <Label Text="{Binding ServiceMessage}" VerticalOptions="Center" HorizontalOptions="StartAndExpand" TextColor="{DynamicResource Primary}"/>
                 </VerticalStackLayout>

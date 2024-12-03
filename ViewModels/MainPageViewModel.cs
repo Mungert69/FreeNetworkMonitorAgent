@@ -33,7 +33,7 @@ namespace NetworkMonitorAgent.ViewModels
 
 
 
-        private async Task SetServiceStartedAsync(bool value)
+        public async Task SetServiceStartedAsync(bool value)
         {
             try
             {
@@ -212,9 +212,9 @@ namespace NetworkMonitorAgent.ViewModels
                         break;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError($"Error in OnAgentUserFlowPropertyChanged : {e.Message}");
+                _logger.LogError($"Error in OnAgentUserFlowPropertyChanged : {ex.Message}");
 
             }
 

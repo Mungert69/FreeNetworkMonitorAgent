@@ -18,13 +18,12 @@ namespace NetworkMonitorAgent.ViewModels
         public Action? AuthorizeAction;
         public Action? LoginAction;
         public Action? AddHostsAction;
+        public ICommand ToggleServiceCommand { get; }
         public event EventHandler<bool> ShowLoadingMessage;
 
 
         public ObservableCollection<TaskItem> Tasks { get; set; }
 
-        //public ICommand ToggleServiceCommand { get; }
-        public ICommand CloseAppCommand { get; }
         private bool _isPolling;
         public bool IsPolling
         {
@@ -52,19 +51,6 @@ namespace NetworkMonitorAgent.ViewModels
             }
         }
 
-        public bool IsServiceStarted
-        {
-            get => _platformService.IsServiceStarted;
-            set
-            {
-                if (_platformService.IsServiceStarted != value)
-                {
-                    // Fire and forget the async call
-                    SetServiceStartedAsync(value).ConfigureAwait(false);
-                }
-            }
-        }
-
 
         private bool _showToggle = true;
         public bool ShowToggle
@@ -83,11 +69,13 @@ namespace NetworkMonitorAgent.ViewModels
         {
             get
             {
-                if (_platformService.DisableAgentOnServiceShutdown) return _showTasks && _platformService.IsServiceStarted;
-                return _platformService.IsServiceStarted;
+                if (_platformService?.DisableAgentOnServiceShutdown == true)
+                    return _showTasks && _platformService.IsServiceStarted;
+                return _platformService?.IsServiceStarted ?? false;
             }
             set => SetProperty(ref _showTasks, value);
         }
+
 
 
         private async Task ChangeServiceAsync(bool state)
@@ -97,75 +85,107 @@ namespace NetworkMonitorAgent.ViewModels
                 ShowToggle = false;
                 ShowLoadingMessage?.Invoke(this, true);
                 await Task.Delay(200); // A short delay, adjust as necessary
-                await Task.Run(async () => await _platformService.ChangeServiceState(state));
+                await _platformService.ChangeServiceState(state);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error in ChangeServiceAsync : {e.Message}");
             }
             finally
             {
                 try
                 {
                     ShowLoadingMessage?.Invoke(this, false);
+                    ShowToggle = true;
                 }
-                catch { }
-                ShowToggle = true;
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error in ChangeServiceAsync : {ex.Message}");
+                }
+
             }
         }
 
 
 
-        public string ServiceMessage
-        {
-            get => _platformService.ServiceMessage;
-        }
+        public string ServiceMessage => _platformService?.ServiceMessage ?? "No Service Message";
+
 
         public MainPageViewModel(NetConnectConfig netConfig, IPlatformService platformService, ILogger logger)
         {
             _netConfig = netConfig;
             _platformService = platformService;
             _logger = logger;
-            CloseAppCommand = new Command(CloseApp);
-            //ToggleServiceCommand = new Command(async () => await ToggleServiceAsync());
-            _platformService.ServiceStateChanged += PlatformServiceStateChanged;
-            _netConfig.AgentUserFlow.PropertyChanged += OnAgentUserFlowPropertyChanged;
+            if (_platformService != null)
+            {
+                _platformService.ServiceStateChanged += PlatformServiceStateChanged;
+            }
+            else
+            {
+                _logger.LogError("_platformService is null in MainPageViewModel constructor.");
+            }
+
+            if (_netConfig?.AgentUserFlow != null)
+            {
+                _netConfig.AgentUserFlow.PropertyChanged += OnAgentUserFlowPropertyChanged;
+            }
+            else
+            {
+                _logger.LogError("_netConfig.AgentUserFlow is null in MainPageViewModel constructor.");
+            }
+            ToggleServiceCommand = new Command<bool>(async (value) => await SetServiceStartedAsync(value));
 
         }
 
         public void SetupTasks()
         {
-            Action wrappedAuthorizeAction = () =>
-                           {
-                               try
-                               {
-                                   if (!IsPolling)
-                                   {
-                                       IsPolling = true;
-                                       AuthorizeAction?.Invoke();
-                                   }
-                               }
-                               catch (Exception ex)
-                               {
-                                   _logger.LogError($"Error executing authorize action: {ex}");
-                                   // Handle failure (e.g., reset polling status, notify user)
-                               }
-                           };
-            Tasks = new ObservableCollection<TaskItem>
+            try
+            {
+                Action wrappedAuthorizeAction = () =>
+                         {
+                             try
+                             {
+                                 if (!IsPolling)
+                                 {
+                                     IsPolling = true;
+                                     if (AuthorizeAction != null)
+                                     {
+                                         AuthorizeAction.Invoke();
+                                     }
+                                     else
+                                     {
+                                         _logger.LogWarning("AuthorizeAction is null.");
+                                     }
+
+                                 }
+
+                             }
+                             catch (Exception ex)
+                             {
+                                 _logger.LogError($"Error executing authorize action: {ex}");
+                                 // Handle failure (e.g., reset polling status, notify user)
+                             }
+                         };
+                Tasks = new ObservableCollection<TaskItem>
             {
                 new TaskItem { TaskDescription = "Authorize Agent", IsCompleted = _netConfig.AgentUserFlow.IsAuthorized, TaskAction = new Command(wrappedAuthorizeAction) },
                 new TaskItem { TaskDescription = "Login Free Network Monitor", IsCompleted = _netConfig.AgentUserFlow.IsLoggedInWebsite, TaskAction = new Command(LoginAction) },
                 new TaskItem { TaskDescription = "Scan for Hosts", IsCompleted = _netConfig.AgentUserFlow.IsHostsAdded, TaskAction = new Command(AddHostsAction) }
             };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error in SetupTasks : {e.Message}");
+
+            }
+
         }
 
-        public void CloseApp()
-        {
-            //var activity = (Activity)Microsoft.Maui.Application.Current.Context;
-            //activity.FinishAffinity();
-        }
 
         private void PlatformServiceStateChanged(object? sender, EventArgs e)
         {
             try
             {
-                OnPropertyChanged(nameof(IsServiceStarted));
                 OnPropertyChanged(nameof(ServiceMessage));
                 OnPropertyChanged(nameof(ShowTasks));
                 OnPropertyChanged(nameof(ShowToggle));
@@ -177,18 +197,28 @@ namespace NetworkMonitorAgent.ViewModels
         }
         private void OnAgentUserFlowPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
+            try
             {
-                case nameof(AgentUserFlow.IsAuthorized):
-                    UpdateTaskCompletion("Authorize Agent", _netConfig.AgentUserFlow.IsAuthorized);
-                    break;
-                case nameof(AgentUserFlow.IsLoggedInWebsite):
-                    UpdateTaskCompletion("Login Free Network Monitor", _netConfig.AgentUserFlow.IsLoggedInWebsite);
-                    break;
-                case nameof(AgentUserFlow.IsHostsAdded):
-                    UpdateTaskCompletion("Scan for Hosts", _netConfig.AgentUserFlow.IsHostsAdded);
-                    break;
+                switch (e.PropertyName)
+                {
+                    case nameof(AgentUserFlow.IsAuthorized):
+                        UpdateTaskCompletion("Authorize Agent", _netConfig.AgentUserFlow.IsAuthorized);
+                        break;
+                    case nameof(AgentUserFlow.IsLoggedInWebsite):
+                        UpdateTaskCompletion("Login Free Network Monitor", _netConfig.AgentUserFlow.IsLoggedInWebsite);
+                        break;
+                    case nameof(AgentUserFlow.IsHostsAdded):
+                        UpdateTaskCompletion("Scan for Hosts", _netConfig.AgentUserFlow.IsHostsAdded);
+                        break;
+                }
             }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error in OnAgentUserFlowPropertyChanged : {e.Message}");
+
+            }
+
+
         }
 
         public void UpdateTaskCompletion(string taskDescription, bool isCompleted)
@@ -204,7 +234,7 @@ namespace NetworkMonitorAgent.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating task completion for {taskDescription}: {ex}");
+                _logger.LogError($"Error updating task completion for {taskDescription}: {ex.Message}");
                 // Handle or log the error
             }
         }
@@ -213,19 +243,31 @@ namespace NetworkMonitorAgent.ViewModels
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+           
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+         
+
         }
 
         protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
         {
-            if (Equals(storage, value))
+            try
             {
+                if (Equals(storage, value))
+                {
+                    return false;
+                }
+
+                storage = value;
+                OnPropertyChanged(propertyName);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error in SetProperty: {e.Message}");
                 return false;
             }
 
-            storage = value;
-            OnPropertyChanged(propertyName);
-            return true;
         }
     }
 
@@ -233,25 +275,33 @@ namespace NetworkMonitorAgent.ViewModels
     {
         private bool _isCompleted;
         public string TaskDescription { get; set; } = "";
-        public string ButtonText => IsCompleted ? $"{TaskDescription} (Completed)" : TaskDescription;
+        public string ButtonText => IsCompleted ? $"{TaskDescription ?? "Task"} (Completed)" : TaskDescription ?? "Task";
         public Color ButtonBackgroundColor
         {
             get
             {
-                if (_isCompleted)
+                try
                 {
-                    if (App.Current?.RequestedTheme == AppTheme.Dark)
+                    if (_isCompleted)
                     {
-                        return ColorResource.GetResourceColor("Grey(950");
+                        if (App.Current?.RequestedTheme == AppTheme.Dark)
+                        {
+                            return ColorResource.GetResourceColor("Grey(950)");
+                        }
+                        else
+                        {
+                            return Colors.White;
+                        }
                     }
                     else
                     {
-                        return Colors.White;
+                        return ColorResource.GetResourceColor("Warning");
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    return ColorResource.GetResourceColor("Warning");
+
+                    return Colors.White;
                 }
 
             }
@@ -260,11 +310,20 @@ namespace NetworkMonitorAgent.ViewModels
         {
             get
             {
-                if (_isCompleted)
+                try
                 {
-                    return ColorResource.GetResourceColor("Primary");
+                    if (_isCompleted)
+                    {
+                        return ColorResource.GetResourceColor("Primary");
+                    }
+                    else { return Colors.White; }
                 }
-                else { return Colors.White; }
+                catch (Exception e)
+                {
+
+                    return Colors.White;
+                }
+
             }
         }
         public bool IsCompleted
@@ -272,28 +331,49 @@ namespace NetworkMonitorAgent.ViewModels
             get => _isCompleted;
             set
             {
-                _isCompleted = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(ButtonText));
-                OnPropertyChanged(nameof(ButtonBackgroundColor));
-                OnPropertyChanged(nameof(ButtonTextColor));
+                try
+                {
+                    _isCompleted = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ButtonText));
+                    OnPropertyChanged(nameof(ButtonBackgroundColor));
+                    OnPropertyChanged(nameof(ButtonTextColor));
+                }
+                catch (Exception e)
+                {
+                }
+
             }
         }
         public ICommand TaskAction { get; set; }
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            try
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            catch (Exception e)
+            {
+            }
+
         }
 
         protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
         {
-            if (Equals(storage, value))
+            try
             {
-                return;
+                if (Equals(storage, value))
+                {
+                    return;
+                }
+
+                storage = value;
+                OnPropertyChanged(propertyName);
+            }
+            catch (Exception e)
+            {
             }
 
-            storage = value;
-            OnPropertyChanged(propertyName);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

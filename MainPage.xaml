@@ -29,8 +29,9 @@
                 <VerticalStackLayout Spacing="10">
                     <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                         <Label Text="Enable Agent" VerticalOptions="Center" TextColor="{DynamicResource Primary}"/>
-                        <Switch  IsToggled="{Binding IsServiceStarted}" VerticalOptions="Center"/>
-
+                        <Switch IsToggled="{Binding IsServiceStarted}" 
+        Command="{Binding ToggleServiceCommand}" 
+        CommandParameter="{Binding IsToggled, Source={RelativeSource Self}}"/>
                     </StackLayout>
                     <Label Text="{Binding ServiceMessage}" VerticalOptions="Center" HorizontalOptions="StartAndExpand" TextColor="{DynamicResource Primary}"/>
                 </VerticalStackLayout>
@@ -45,7 +46,7 @@
                             <ViewCell>
                                 <StackLayout Orientation="Horizontal" Padding="10">
                                     <CheckBox IsChecked="{Binding IsCompleted}" IsEnabled="False" />
-                                    <controls:AnimatedButton Text="{Binding ButtonText}" Command="{Binding TaskAction}" BackgroundColor="{Binding ButtonBackgroundColor}}" TextColor="{Binding ButtonTextColor}" CornerRadius="5" Padding="10" FontSize="16"/>
+                                    <controls:AnimatedButton Text="{Binding ButtonText}" Command="{Binding TaskAction}" BackgroundColor="{Binding ButtonBackgroundColor}" TextColor="{Binding ButtonTextColor}" CornerRadius="5" Padding="10" FontSize="16"/>
                                 </StackLayout>
                             </ViewCell>
                         </DataTemplate>

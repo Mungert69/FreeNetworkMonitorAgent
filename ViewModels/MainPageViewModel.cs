@@ -31,27 +31,6 @@ namespace NetworkMonitorAgent.ViewModels
             set => SetProperty(ref _isPolling, value);
         }
 
-
-
-        public async Task SetServiceStartedAsync(bool value)
-        {
-            try
-            {
-                await ChangeServiceAsync(value);
-
-                // Update the ShowToggle property based on the service state
-                if (_platformService.IsServiceStarted && !value && _platformService.DisableAgentOnServiceShutdown)
-                {
-                    ShowToggle = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error changing service state: {ex.Message}");
-            }
-        }
-
-
         private bool _showToggle = true;
         public bool ShowToggle
         {
@@ -64,51 +43,6 @@ namespace NetworkMonitorAgent.ViewModels
             }
         }
         private bool _showTasks = true;
-
-        public bool ShowTasks
-        {
-            get
-            {
-                if (_platformService?.DisableAgentOnServiceShutdown == true)
-                    return _showTasks && _platformService.IsServiceStarted;
-                return _platformService?.IsServiceStarted ?? false;
-            }
-            set => SetProperty(ref _showTasks, value);
-        }
-
-
-
-        private async Task ChangeServiceAsync(bool state)
-        {
-            try
-            {
-                ShowToggle = false;
-                ShowLoadingMessage?.Invoke(this, true);
-                await Task.Delay(200); // A short delay, adjust as necessary
-                await _platformService.ChangeServiceState(state);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Error in ChangeServiceAsync : {e.Message}");
-            }
-            finally
-            {
-                try
-                {
-                    ShowLoadingMessage?.Invoke(this, false);
-                    ShowToggle = true;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error in ChangeServiceAsync : {ex.Message}");
-                }
-
-            }
-        }
-
-
-
-        public string ServiceMessage => _platformService?.ServiceMessage ?? "No Service Message";
 
 
         public MainPageViewModel(NetConnectConfig netConfig, IPlatformService platformService, ILogger logger)
@@ -136,6 +70,77 @@ namespace NetworkMonitorAgent.ViewModels
             ToggleServiceCommand = new Command<bool>(async (value) => await SetServiceStartedAsync(value));
 
         }
+
+
+
+
+        public async Task SetServiceStartedAsync(bool value)
+        {
+            try
+            {
+                await ChangeServiceAsync(value);
+
+                // Update the ShowToggle property based on the service state
+                if (_platformService.IsServiceStarted && !value && _platformService.DisableAgentOnServiceShutdown)
+                {
+                    ShowToggle = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error changing service state: {ex.Message}");
+            }
+        }
+
+
+
+        public bool ShowTasks
+        {
+            get
+            {
+                if (_platformService?.DisableAgentOnServiceShutdown == true) return _showTasks && _platformService.IsServiceStarted;
+                return _platformService?.IsServiceStarted ?? false;
+            }
+            set => SetProperty(ref _showTasks, value);
+        }
+
+
+
+        private async Task ChangeServiceAsync(bool state)
+        {
+            try
+            {
+                ShowToggle = false;
+                ShowLoadingMessage?.Invoke(this, true);
+                await Task.Delay(200); // A short delay, adjust as necessary
+                await _platformService.ChangeServiceState(state);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error in ChangeServiceAsync : {e.Message}");
+            }
+            finally
+            {
+                try
+                {
+                  
+                       ShowLoadingMessage?.Invoke(this, false);
+                       ShowToggle = true;
+                   
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error in ChangeServiceAsync : {ex.Message}");
+                }
+
+            }
+        }
+
+
+
+        public string ServiceMessage => _platformService?.ServiceMessage ?? "No Service Message";
+
+
 
         public void SetupTasks()
         {
@@ -166,12 +171,15 @@ namespace NetworkMonitorAgent.ViewModels
                                  // Handle failure (e.g., reset polling status, notify user)
                              }
                          };
-                Tasks = new ObservableCollection<TaskItem>
-            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        Tasks = new ObservableCollection<TaskItem>
+ {
                 new TaskItem { TaskDescription = "Authorize Agent", IsCompleted = _netConfig.AgentUserFlow.IsAuthorized, TaskAction = new Command(wrappedAuthorizeAction) },
                 new TaskItem { TaskDescription = "Login Free Network Monitor", IsCompleted = _netConfig.AgentUserFlow.IsLoggedInWebsite, TaskAction = new Command(LoginAction) },
                 new TaskItem { TaskDescription = "Scan for Hosts", IsCompleted = _netConfig.AgentUserFlow.IsHostsAdded, TaskAction = new Command(AddHostsAction) }
-            };
+ };
+                    });
             }
             catch (Exception e)
             {
@@ -184,11 +192,15 @@ namespace NetworkMonitorAgent.ViewModels
 
         private void PlatformServiceStateChanged(object? sender, EventArgs e)
         {
+
             try
             {
-                OnPropertyChanged(nameof(ServiceMessage));
-                OnPropertyChanged(nameof(ShowTasks));
-                OnPropertyChanged(nameof(ShowToggle));
+                MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        OnPropertyChanged(nameof(ServiceMessage));
+                        OnPropertyChanged(nameof(ShowTasks));
+                        OnPropertyChanged(nameof(ShowToggle));
+                    });
             }
             catch (Exception ex)
             {
@@ -199,18 +211,21 @@ namespace NetworkMonitorAgent.ViewModels
         {
             try
             {
-                switch (e.PropertyName)
-                {
-                    case nameof(AgentUserFlow.IsAuthorized):
-                        UpdateTaskCompletion("Authorize Agent", _netConfig.AgentUserFlow.IsAuthorized);
-                        break;
-                    case nameof(AgentUserFlow.IsLoggedInWebsite):
-                        UpdateTaskCompletion("Login Free Network Monitor", _netConfig.AgentUserFlow.IsLoggedInWebsite);
-                        break;
-                    case nameof(AgentUserFlow.IsHostsAdded):
-                        UpdateTaskCompletion("Scan for Hosts", _netConfig.AgentUserFlow.IsHostsAdded);
-                        break;
-                }
+                MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        switch (e.PropertyName)
+                        {
+                            case nameof(AgentUserFlow.IsAuthorized):
+                                UpdateTaskCompletion("Authorize Agent", _netConfig.AgentUserFlow.IsAuthorized);
+                                break;
+                            case nameof(AgentUserFlow.IsLoggedInWebsite):
+                                UpdateTaskCompletion("Login Free Network Monitor", _netConfig.AgentUserFlow.IsLoggedInWebsite);
+                                break;
+                            case nameof(AgentUserFlow.IsHostsAdded):
+                                UpdateTaskCompletion("Scan for Hosts", _netConfig.AgentUserFlow.IsHostsAdded);
+                                break;
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -243,9 +258,9 @@ namespace NetworkMonitorAgent.ViewModels
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-           
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-         
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
 
         }
 

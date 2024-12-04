@@ -26,53 +26,69 @@ public partial class DateViewPage : ContentPage
     private IMonitorPingInfoView _monitorPingInfoView;
     public DateViewPage(IMonitorPingInfoView monitorPingInfoView)
     {
-        InitializeComponent();
-        _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<DateViewPage>>();
-        _monitorPingInfoView = monitorPingInfoView;
-        BindingContext = monitorPingInfoView;
+        try
+        {
+            InitializeComponent();
+            _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<DateViewPage>>();
+            _monitorPingInfoView = monitorPingInfoView;
+            BindingContext = monitorPingInfoView;
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : Unable to load DataViewPage. Error was: {ex.Message}");
+        }
 
     }
 
     private async void OnStatusIndicatorTapped(object sender, EventArgs e)
     {
-        if (sender is View view && view.BindingContext is MPIndicator mpIndicator)
+        try
         {
-            var monitorPingInfoView = BindingContext as IMonitorPingInfoView;
-            monitorPingInfoView?.SelectMonitorPingInfo(mpIndicator.MonitorIPID);
-
-            var monitorPingInfo = monitorPingInfoView?.SelectedMonitorPingInfo;
-            if (monitorPingInfo != null)
+            if (sender is View view && view.BindingContext is MPIndicator mpIndicator)
             {
-                await ShowDetailsPopup(monitorPingInfo);
+                var monitorPingInfoView = BindingContext as IMonitorPingInfoView;
+                monitorPingInfoView?.SelectMonitorPingInfo(mpIndicator.MonitorIPID);
+
+                var monitorPingInfo = monitorPingInfoView?.SelectedMonitorPingInfo;
+                if (monitorPingInfo != null)
+                {
+                    await ShowDetailsPopup(monitorPingInfo);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : in OnStatusIndicatorTapped on DataViewPage. Error was: {ex.Message}");
         }
     }
 
-    private async Task  ShowDetailsPopup(MonitorPingInfo info)
+    private async Task ShowDetailsPopup(MonitorPingInfo info)
     {
-        var popup = new StatusDetailsPopup
+        try
         {
-            BindingContext = info
-        };
-
-         var result = await this.ShowPopupAsync(popup, CancellationToken.None);
-
-        if (result is bool boolResult)
-        {
-            if (boolResult)
+            var popup = new StatusDetailsPopup
             {
-                 try
+                BindingContext = info
+            };
+
+            var result = await this.ShowPopupAsync(popup, CancellationToken.None);
+
+            if (result is bool boolResult)
+            {
+                if (boolResult)
                 {
-                    var detailsPage = new DetailsPage(_monitorPingInfoView);
+
+                    var detailsPage = new DetailsPage(_logger,_monitorPingInfoView);
                     await Shell.Current.Navigation.PushAsync(detailsPage);
+
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError($" Error: Could not navigate to page {nameof(DetailsPage)}. Error was: {e.ToString()}");
-                }// Yes was tapped
+
             }
-           
         }
+        catch (Exception e)
+        {
+            _logger.LogError($" Error: Could not navigate to page {nameof(DetailsPage)}. Error was: {e.ToString()}");
+        }// Yes was tapped
     }
 }
 

@@ -1,19 +1,35 @@
 using NetworkMonitor.Objects;
 using NetworkMonitorAgent.ViewModels;
 using NetworkMonitor.DTOs;
+using Microsoft.Extensions.Logging;
 namespace NetworkMonitorAgent;
 public partial class DetailsPage : ContentPage
 {
-    public DetailsPage(IMonitorPingInfoView monitorPingInfoView)
+
+    private ILogger _logger;
+    public DetailsPage(ILogger logger,IMonitorPingInfoView monitorPingInfoView)
     {
-        InitializeComponent();
-        BindingContext = monitorPingInfoView;
+        try
+        {
+            InitializeComponent();
+            _logger=logger;
+            BindingContext = monitorPingInfoView;
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : Unable to load DetailsPage. Error was: {ex.Message}");
+        }
     }
 
- private async  void OnBackButton_Clicked(object sender, EventArgs e)
+    private async void OnBackButton_Clicked(object sender, EventArgs e)
     {
+        try {
         // Navigate back to the previous page
-             await Shell.Current.Navigation.PopAsync();
+        await Shell.Current.Navigation.PopAsync();}
+         catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : in OnBackButton_Clicked on DetailsPage. Error was: {ex.Message}");
+        }
     }
-          
+
 }

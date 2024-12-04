@@ -15,10 +15,17 @@ public partial class LogsPage : ContentPage
     private LogController _logController;
     public LogsPage()
     {
-        InitializeComponent();
-        _logController = new LogController();
-        BindingContext = _logController;
-        _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<ConfigPage>>();
+        try
+        {
+            InitializeComponent();
+            _logController = new LogController();
+            BindingContext = _logController;
+            _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<ConfigPage>>();
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : Unable to load LogsPage. Error was: {ex.Message}");
+        }
     }
     private async void ViewLogsButton_Clicked(object sender, EventArgs e)
     {

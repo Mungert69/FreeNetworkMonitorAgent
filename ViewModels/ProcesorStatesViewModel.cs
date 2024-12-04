@@ -12,7 +12,7 @@ namespace NetworkMonitorAgent.ViewModels
         private LocalProcessorStates _processorStates;
         public ICommand ShowPopupCommand { get; private set; }
         private ILogger _logger;
-        private string _popupMessageType="";
+        private string _popupMessageType = "";
 
         public ProcessorStatesViewModel(ILogger logger, LocalProcessorStates processorStates)
         {
@@ -20,7 +20,7 @@ namespace NetworkMonitorAgent.ViewModels
             {
                 // _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<ProcessorStatesViewModel>>();
                 // _processorStates = MauiProgram.ServiceProvider.GetRequiredService<LocalProcessorStates>();
-                _logger = logger; _processorStates=processorStates;
+                _logger = logger; _processorStates = processorStates;
                 _processorStates.PropertyChanged += OnProcessorStatesChanged;
 
                 ShowPopupCommand = new Command<string>(ShowPopupWithMessage);
@@ -46,13 +46,16 @@ namespace NetworkMonitorAgent.ViewModels
 
         private void OnProcessorStatesChanged(object? sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(e.PropertyName);
+            MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        OnPropertyChanged(e.PropertyName);
 
-            if (IsPopupVisible)
-            {
-                // Update PopupMessage based on the changed property
-                UpdatePopupMessage(e.PropertyName);
-            }
+                        if (IsPopupVisible)
+                        {
+                            // Update PopupMessage based on the changed property
+                            UpdatePopupMessage(e.PropertyName);
+                        }
+                    });
         }
 
         private void UpdatePopupMessage(string? propertyName)
@@ -61,27 +64,27 @@ namespace NetworkMonitorAgent.ViewModels
             switch (propertyName)
             {
                 case nameof(RunningMessage):
-                    if (_popupMessageType=="RunningMessage") PopupMessage = $"Running Message: {RunningMessage}";
+                    if (_popupMessageType == "RunningMessage") PopupMessage = $"Running Message: {RunningMessage}";
                     break;
                 case nameof(ConnectRunningMessage):
-                    if (_popupMessageType=="ConnectRunningMessage") PopupMessage = $"Monitor Message: {ConnectRunningMessage}";
+                    if (_popupMessageType == "ConnectRunningMessage") PopupMessage = $"Monitor Message: {ConnectRunningMessage}";
 
                     break;
                 case nameof(SetupMessage):
-                    if (_popupMessageType=="SetupMessage") PopupMessage = $"Running Message: {RunningMessage}";
-                   PopupMessage = $"Setup Message: {SetupMessage}";
+                    if (_popupMessageType == "SetupMessage") PopupMessage = $"Running Message: {RunningMessage}";
+                    PopupMessage = $"Setup Message: {SetupMessage}";
                     break;
                 case nameof(RabbitSetupMessage):
-                     if (_popupMessageType=="RabbitSetupMessage") PopupMessage = $"Rabbit Setup Message: {RabbitSetupMessage}";
+                    if (_popupMessageType == "RabbitSetupMessage") PopupMessage = $"Rabbit Setup Message: {RabbitSetupMessage}";
                     break;
                     // Add additional cases as needed
             }
         }
 
 
-        private  void ShowPopupWithMessage(string messageType)
+        private void ShowPopupWithMessage(string messageType)
         {
-           _popupMessageType=messageType;
+            _popupMessageType = messageType;
             switch (messageType)
             {
                 case "RunningMessage":

@@ -17,15 +17,22 @@ public partial class ScanPage : ContentPage
 
     public ScanPage(ILogger logger, ScanProcessorStatesViewModel scanProcessorStatesViewModel, IPlatformService platformService)
     {
-        InitializeComponent();
-        _scanProcessorStatesViewModel = scanProcessorStatesViewModel;
-        _logger = logger;
-        _platformService = platformService;
-        CustomPopupView.BindingContext = scanProcessorStatesViewModel;
-        BindingContext = scanProcessorStatesViewModel;
-        EndpointTypePicker.SelectedIndexChanged += OnEndpointTypePickerSelectedIndexChanged;
+        try
+        {
+            InitializeComponent();
+            _scanProcessorStatesViewModel = scanProcessorStatesViewModel;
+            _logger = logger;
+            _platformService = platformService;
+            CustomPopupView.BindingContext = scanProcessorStatesViewModel;
+            BindingContext = scanProcessorStatesViewModel;
+            EndpointTypePicker.SelectedIndexChanged += OnEndpointTypePickerSelectedIndexChanged;
 
-        UpdateVisibility();
+            UpdateVisibility();
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : Unable to load ScanPage. Error was: {ex.Message}");
+        }
 
     }
 
@@ -36,17 +43,35 @@ public partial class ScanPage : ContentPage
         UpdateVisibility();
     }
 
-    private void UpdateVisibility()
+    public void UpdateVisibility()
     {
-        ScanView.IsVisible = _platformService.IsServiceStarted;
-        AgentDisabledMessage.IsVisible = !_platformService.IsServiceStarted;
+        try
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+                     {
+                         ScanView.IsVisible = _platformService.IsServiceStarted;
+                         AgentDisabledMessage.IsVisible = !_platformService.IsServiceStarted;
+                     });
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : in UpdateVisibility on ScanPage. Error was: {ex.Message}");
+        }
+
     }
 
     private void OnEndpointTypePickerSelectedIndexChanged(object? sender, EventArgs e)
     {
-        if (EndpointTypePicker.SelectedItem is string selectedEndpointType)
+        try
         {
-            _scanProcessorStatesViewModel.DefaultEndpointType = selectedEndpointType;
+            if (EndpointTypePicker.SelectedItem is string selectedEndpointType)
+            {
+                _scanProcessorStatesViewModel.DefaultEndpointType = selectedEndpointType;
+            }
+        }
+          catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : in OnEndpointTypePickerSelectedIndexChanged on ScanPage. Error was: {ex.Message}");
         }
     }
 
@@ -163,17 +188,31 @@ public partial class ScanPage : ContentPage
             _logger.LogError($"Could not complete Cancel click. Error was: {ex}");
         }
     }
-    private  void OnHostsSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void OnHostsSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        try {
         var selectedHosts = e.CurrentSelection.Cast<MonitorIP>().ToList();
         if (selectedHosts != null && selectedHosts.Count > 0)
         {
-             _scanProcessorStatesViewModel.AddSelectedHosts(selectedHosts);
+            _scanProcessorStatesViewModel.AddSelectedHosts(selectedHosts);
         }
+        }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : in OnHostsSelectionChanged on ScanPage. Error was: {ex.Message}");
+        }
+
+        
     }
     private async void OnGoHomeClicked(object sender, EventArgs e)
     {
+        try {
         await Shell.Current.GoToAsync("//Home");
+    }
+        catch (Exception ex)
+        {
+            if (_logger != null) _logger.LogError($" Error : in OnGoHomeClicked on LogsPage. Error was: {ex.Message}");
+        }
     }
 }
 

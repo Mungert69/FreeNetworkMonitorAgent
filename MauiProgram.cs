@@ -36,7 +36,13 @@ namespace NetworkMonitorAgent
 #endif
 
             var builder = MauiApp.CreateBuilder();
-
+            builder
+                .UseMauiApp<App>().UseMauiCommunityToolkit()
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                });
             // Add Maui Loggers
             try
             {
@@ -93,26 +99,69 @@ namespace NetworkMonitorAgent
             {
                 Console.WriteLine($" Error could not load appsetting.json . Error was : {ex.Message}");
             }
-            builder.Services.AddSingleton(provider =>
-           {
-               return new LocalProcessorStates();
-           });
-           
-            builder.Services.AddSingleton<IApiService>(provider =>
-          {
-              var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-              var configuration = provider.GetRequiredService<IConfiguration>();
-             var cmdProcessorProvider=provider.GetRequiredService<ICmdProcessorProvider>();
-                   
-              return new ApiService(loggerFactory, configuration, cmdProcessorProvider, FileSystem.AppDataDirectory);
-          });
 
-
-
-            builder.Services.AddSingleton<IMonitorPingInfoView>(provider =>
+            try
             {
-                return new MonitorPingInfoView();
-            });
+                BuildRepoAndConfig(builder);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in BuildRepoAndConfig: {e}");
+            }
+
+            try
+            {
+                BuildServices(builder);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in BuildServices: {e}");
+            }
+
+            try
+            {
+                BuildViewModels(builder);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in BuildViewModels: {e}");
+            }
+
+            try
+            {
+                BuildPages(builder);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error in BuildPages: {e}");
+            }
+            try
+            {
+                builder.Services.AddSingleton(provider =>
+                        {
+                            var logger = provider.GetRequiredService<ILogger<AppShell>>();
+                            var platformService = provider.GetRequiredService<IPlatformService>();
+                            return new AppShell(logger, platformService);
+                        });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error creating AppShell: {e}");
+            }
+
+
+
+            var app = builder.Build();
+            ServiceProvider = app.Services;
+            return app;
+        }
+
+        private static void BuildRepoAndConfig(MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton(provider =>
+         {
+             return new LocalProcessorStates();
+         });
 
             builder.Services.AddSingleton<IFileRepo>(provider =>
             {
@@ -134,28 +183,45 @@ namespace NetworkMonitorAgent
                 }
 
             });
+            builder.Services.AddSingleton<IRabbitRepo>(provider =>
+           {
+               var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
+               var netConfig = provider.GetRequiredService<NetConnectConfig>();
+               // Choose the appropriate constructor
+               return new RabbitRepo(logger, netConfig);
+           });
+
+
             builder.Services.AddSingleton<NetConnectConfig>(provider =>
             {
                 // Assuming Configuration is properly set up
                 var configuration = provider.GetRequiredService<IConfiguration>();
                 var appDataDirectory = FileSystem.AppDataDirectory;
-                return new NetConnectConfig(configuration,appDataDirectory);
+                return new NetConnectConfig(configuration, appDataDirectory);
             });
-            builder.Services.AddSingleton<IRabbitRepo>(provider =>
-            {
-                var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
-                var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                // Choose the appropriate constructor
-                return new RabbitRepo(logger, netConfig);
-            });
+
+
+        }
+
+        private static void BuildServices(MauiAppBuilder builder)
+        {
+
+            builder.Services.AddSingleton<IApiService>(provider =>
+    {
+        var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+        var configuration = provider.GetRequiredService<IConfiguration>();
+        var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
+
+        return new ApiService(loggerFactory, configuration, cmdProcessorProvider, FileSystem.AppDataDirectory);
+    });
             builder.Services.AddSingleton<IAuthService>(provider =>
-            {
-                var logger = provider.GetRequiredService<ILogger<AuthService>>();
-                var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
-                var processorStates = provider.GetRequiredService<LocalProcessorStates>();
-                return new AuthService(logger, netConfig, rabbitRepo, processorStates);
-            });
+         {
+             var logger = provider.GetRequiredService<ILogger<AuthService>>();
+             var netConfig = provider.GetRequiredService<NetConnectConfig>();
+             var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
+             var processorStates = provider.GetRequiredService<LocalProcessorStates>();
+             return new AuthService(logger, netConfig, rabbitRepo, processorStates);
+         });
             builder.Services.AddSingleton<ICmdProcessorProvider>
                 (provider =>
                 {
@@ -163,8 +229,8 @@ namespace NetworkMonitorAgent
                     var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                     var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
                     var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                   
-                    return new CmdProcessorFactory(loggerFactory, rabbitRepo, netConfig );
+
+                    return new CmdProcessorFactory(loggerFactory, rabbitRepo, netConfig);
 
 
                 });
@@ -205,54 +271,39 @@ namespace NetworkMonitorAgent
 
                 });
 #endif
-            builder
-                .UseMauiApp<App>().UseMauiCommunityToolkit()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+
+
+        }
+
+        private static void BuildViewModels(MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton<IMonitorPingInfoView>(provider =>
+           {
+               return new MonitorPingInfoView();
+           });
             builder.Services.AddSingleton(provider =>
-            {
-                var logger = provider.GetRequiredService<ILogger<ProcessorStatesViewModel>>();
-                var processorStates = provider.GetRequiredService<LocalProcessorStates>();
-                // Choose the appropriate constructor
-                return new ProcessorStatesViewModel(logger, processorStates);
-            });
+                        {
+                            var logger = provider.GetRequiredService<ILogger<ProcessorStatesViewModel>>();
+                            var processorStates = provider.GetRequiredService<LocalProcessorStates>();
+                            // Choose the appropriate constructor
+                            return new ProcessorStatesViewModel(logger, processorStates);
+                        });
             builder.Services.AddSingleton(provider =>
            {
                var logger = provider.GetRequiredService<ILogger<ScanProcessorStatesViewModel>>();
                var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
                var nmapCmdProcessorStates = cmdProcessorProvider.GetProcessorStates("Nmap");
-                var netConfig = provider.GetRequiredService<NetConnectConfig>();
-               var apiService = provider.GetRequiredService<IApiService>();
-               return new ScanProcessorStatesViewModel(logger, nmapCmdProcessorStates, apiService,netConfig);
-           });
-
-            builder.Services.AddSingleton(provider =>
-            {
-                var logger = provider.GetRequiredService<ILogger<AppShell>>();
-                var platformService = provider.GetRequiredService<IPlatformService>();
-                return new AppShell(logger, platformService);
-            });
-
-            builder.Services.AddSingleton(provider =>
-            {
-                var authService = provider.GetRequiredService<IAuthService>();
-                var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                var logger = provider.GetRequiredService<ILogger<MainPage>>();
-                var processorStatesViewModel = provider.GetRequiredService<ProcessorStatesViewModel>();
-                var mainPageViewModel = provider.GetRequiredService<MainPageViewModel>();
-                return new MainPage(authService, netConfig, logger, mainPageViewModel, processorStatesViewModel);
-            });
-
-            builder.Services.AddSingleton(provider =>
-           {
                var netConfig = provider.GetRequiredService<NetConnectConfig>();
-               var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
-               var platformService = provider.GetRequiredService<IPlatformService>();
-               return new MainPageViewModel(netConfig, platformService, logger);
+               var apiService = provider.GetRequiredService<IApiService>();
+               return new ScanProcessorStatesViewModel(logger, nmapCmdProcessorStates, apiService, netConfig);
            });
+            builder.Services.AddSingleton(provider =>
+          {
+              var netConfig = provider.GetRequiredService<NetConnectConfig>();
+              var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
+              var platformService = provider.GetRequiredService<IPlatformService>();
+              return new MainPageViewModel(netConfig, platformService, logger);
+          });
 
             builder.Services.AddSingleton(provider =>
             {
@@ -260,63 +311,36 @@ namespace NetworkMonitorAgent
                 var logger = provider.GetRequiredService<ILogger<ConfigPageViewModel>>();
                 return new ConfigPageViewModel(logger, netConfig);
             });
-            builder.Services.AddSingleton(provider =>
-            {
-                var scanProcessorStatesViewModel = provider.GetRequiredService<ScanProcessorStatesViewModel>();
-                var logger = provider.GetRequiredService<ILogger<ScanPage>>();
-                var platformService = provider.GetRequiredService<IPlatformService>();
 
-                return new ScanPage(logger, scanProcessorStatesViewModel, platformService);
-            });
+        }
+        private static void BuildPages(MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton(provider =>
+                        {
+                            var scanProcessorStatesViewModel = provider.GetRequiredService<ScanProcessorStatesViewModel>();
+                            var logger = provider.GetRequiredService<ILogger<ScanPage>>();
+                            var platformService = provider.GetRequiredService<IPlatformService>();
+
+                            return new ScanPage(logger, scanProcessorStatesViewModel, platformService);
+                        });
+           
             builder.Services.AddSingleton(provider =>
            {
                var apiService = provider.GetRequiredService<IApiService>();
                return new NetworkMonitorPage(apiService);
            });
+            builder.Services.AddSingleton(provider =>
+           {
+               var authService = provider.GetRequiredService<IAuthService>();
+               var netConfig = provider.GetRequiredService<NetConnectConfig>();
+               var logger = provider.GetRequiredService<ILogger<MainPage>>();
+               var processorStatesViewModel = provider.GetRequiredService<ProcessorStatesViewModel>();
+               var mainPageViewModel = provider.GetRequiredService<MainPageViewModel>();
+               return new MainPage(authService, netConfig, logger, mainPageViewModel, processorStatesViewModel);
+           });
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DateViewPage>();
-            var app = builder.Build();
-            ServiceProvider = app.Services;
-            return app;
         }
-
-
-#if WINDOWS
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern bool CreateSymbolicLink(
-            string lpSymlinkFileName,
-            string lpTargetFileName,
-            int dwFlags);
-
-        const int SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1;
-
-        private static void CreateSymbolicLinkWindows(string symlinkPath, string targetPath, bool isDirectory)
-        {
-            bool result = CreateSymbolicLink(symlinkPath, targetPath, isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
-            if (!result)
-            {
-                throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-            }
-        }
-        private static void ProcessFileForSymbolicLink(string filePath)
-        {
-            // Check if the file path ends with .exe
-            if (filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-            {
-                // Remove the .exe extension
-                string targetPath = Path.ChangeExtension(filePath, null);
-
-                // Create a symbolic link
-                CreateSymbolicLinkWindows(filePath, targetPath, false);
-            }
-            else
-            {
-                // Handle cases where the file does not end with .exe if needed
-                Console.WriteLine($"File does not end with .exe: {filePath}");
-            }
-        }
-#endif
-
         private static async Task CopyAssetsToLocalStorage(string directoryName)
         {
             try
@@ -342,7 +366,7 @@ namespace NetworkMonitorAgent
                         localFilePath = Path.Combine(localPath, assetFile);
                         string? localFileDirectory = Path.GetDirectoryName(localFilePath);
 
-                        if (localFileDirectory!=null && !Directory.Exists(localFileDirectory))
+                        if (localFileDirectory != null && !Directory.Exists(localFileDirectory))
                             Directory.CreateDirectory(localFileDirectory);
 
                         using (var fileStream = new FileStream(localFilePath, FileMode.Create, FileAccess.Write))
@@ -389,7 +413,7 @@ namespace NetworkMonitorAgent
             string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
             return trimmedPath.EndsWith("/nmap", StringComparison.OrdinalIgnoreCase);
         }
-           private static bool IsCurlBinary(string assetFile)
+        private static bool IsCurlBinary(string assetFile)
         {
             string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
             return trimmedPath.EndsWith("/curl", StringComparison.OrdinalIgnoreCase);
@@ -409,7 +433,7 @@ namespace NetworkMonitorAgent
             string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
             return trimmedPath.EndsWith("/nmap.exe", StringComparison.OrdinalIgnoreCase);
         }
-          private static bool IsWindowsCurlBinary(string assetFile)
+        private static bool IsWindowsCurlBinary(string assetFile)
         {
             string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
             return trimmedPath.EndsWith("/curl.exe", StringComparison.OrdinalIgnoreCase);
@@ -464,6 +488,43 @@ namespace NetworkMonitorAgent
                 Console.WriteLine($"Failed to set executable permission for {filePath}: {ex.Message}");
             }
         }
+
+#if WINDOWS
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern bool CreateSymbolicLink(
+            string lpSymlinkFileName,
+            string lpTargetFileName,
+            int dwFlags);
+
+        const int SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1;
+
+        private static void CreateSymbolicLinkWindows(string symlinkPath, string targetPath, bool isDirectory)
+        {
+            bool result = CreateSymbolicLink(symlinkPath, targetPath, isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
+            if (!result)
+            {
+                throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+            }
+        }
+        private static void ProcessFileForSymbolicLink(string filePath)
+        {
+            // Check if the file path ends with .exe
+            if (filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+            {
+                // Remove the .exe extension
+                string targetPath = Path.ChangeExtension(filePath, null);
+
+                // Create a symbolic link
+                CreateSymbolicLinkWindows(filePath, targetPath, false);
+            }
+            else
+            {
+                // Handle cases where the file does not end with .exe if needed
+                Console.WriteLine($"File does not end with .exe: {filePath}");
+            }
+        }
+#endif
+
 
         private static void SetLDLibraryPath(string libraryPath)
         {

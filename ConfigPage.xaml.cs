@@ -14,8 +14,15 @@ public partial class ConfigPage : ContentPage
 {
     public ConfigPage(ConfigPageViewModel configPageViewModel)
     {
-        InitializeComponent();
-        BindingContext = configPageViewModel;
+        try
+        {
+            InitializeComponent();
+            BindingContext = configPageViewModel;
+        }
+        catch (Exception ex)
+        {
+           
+        }
     }
 }
 

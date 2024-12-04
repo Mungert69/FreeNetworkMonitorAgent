@@ -28,6 +28,8 @@ namespace NetworkMonitorAgent.ViewModels
         {
             try
             {
+                 MainThread.BeginInvokeOnMainThread(() =>
+                   {
                 switch (e.PropertyName)
                 {
                     case nameof(NetConnectConfig.BaseFusionAuthURL):
@@ -64,7 +66,7 @@ namespace NetworkMonitorAgent.ViewModels
                         // If the property name does not match any known properties, you might choose to log this or handle it as needed.
                         // This could be useful for debugging or if you're expecting other properties to change that are not listed here.
                         break;
-                }
+                }});
             }
             catch (Exception ex)
             {

@@ -32,7 +32,7 @@ namespace NetworkMonitorAgent.ViewModels
         }
 
 
-        public ScanProcessorStatesViewModel(ILogger logger, ILocalCmdProcessorStates cmdProcessorStates, IApiService apiService, NetConnectConfig netConfig)
+        public ScanProcessorStatesViewModel(ILogger logger, ILocalCmdProcessorStates cmdProcessorStates, IApiService apiService,NetConnectConfig netConfig)
         {
             try
             {
@@ -58,12 +58,13 @@ namespace NetworkMonitorAgent.ViewModels
         public List<MonitorIP> SelectedDevices => _cmdProcessorStates.SelectedDevices.ToList();
         public void LoadNetworkInterfaces()
         {
-            if (_cmdProcessorStates != null) { 
-                 _cmdProcessorStates.AvailableNetworkInterfaces = NetworkUtils.GetSuitableNetworkInterfaces(_logger, _cmdProcessorStates);
-            if (_cmdProcessorStates.AvailableNetworkInterfaces!=null && _cmdProcessorStates.AvailableNetworkInterfaces.Count>0) _cmdProcessorStates.SelectedNetworkInterface = _cmdProcessorStates.AvailableNetworkInterfaces.First();
-      
+            if (_cmdProcessorStates != null)
+            {
+                _cmdProcessorStates.AvailableNetworkInterfaces = NetworkUtils.GetSuitableNetworkInterfaces(_logger, _cmdProcessorStates);
+                if (_cmdProcessorStates.AvailableNetworkInterfaces != null && _cmdProcessorStates.AvailableNetworkInterfaces.Count > 0) _cmdProcessorStates.SelectedNetworkInterface = _cmdProcessorStates.AvailableNetworkInterfaces.First();
+
             }
-                 
+
         }
         public async Task Scan()
         {
@@ -94,7 +95,7 @@ namespace NetworkMonitorAgent.ViewModels
                 OnPropertyChanged();
             }
         }
-          public bool UseFastScan
+        public bool UseFastScan
         {
             get => _cmdProcessorStates.UseFastScan;
             set
@@ -103,7 +104,7 @@ namespace NetworkMonitorAgent.ViewModels
                 OnPropertyChanged();
             }
         }
-         public bool LimitPorts
+        public bool LimitPorts
         {
             get => _cmdProcessorStates.LimitPorts;
             set
@@ -115,12 +116,15 @@ namespace NetworkMonitorAgent.ViewModels
 
         private void OnProcessorStatesChanged(object? sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(e.PropertyName);
+            MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        OnPropertyChanged(e.PropertyName);
 
-            if (IsPopupVisible)
-            {
-                UpdatePopupMessage(e.PropertyName);
-            }
+                        if (IsPopupVisible)
+                        {
+                            UpdatePopupMessage(e.PropertyName);
+                        }
+                    });
         }
 
         private void UpdatePopupMessage(string? propertyName)
@@ -141,7 +145,7 @@ namespace NetworkMonitorAgent.ViewModels
         {
             // Reset any previous state
             IsPopupVisible = true;
-            await _cmdProcessorStates.Scan().ConfigureAwait(false);
+            await _cmdProcessorStates.Scan();
 
             // Return the detected hosts
             return _cmdProcessorStates.ActiveDevices.ToList();
@@ -149,7 +153,7 @@ namespace NetworkMonitorAgent.ViewModels
 
         public async Task AddServices()
         {
-            await _cmdProcessorStates.AddServices().ConfigureAwait(false);
+            await _cmdProcessorStates.AddServices();
         }
 
         public void AddSelectedHosts(List<MonitorIP> selectedServices)
@@ -194,7 +198,7 @@ namespace NetworkMonitorAgent.ViewModels
             }
 
             // Use the ApiService to check the connections
-            var results = await _apiService.CheckConnections(connectionObjects).ConfigureAwait(false);
+            var results = await _apiService.CheckConnections(connectionObjects);
             _cmdProcessorStates.CompletedMessage += "\n\nChecking status of selected services...\n\n";
             // Handle the results (e.g., display them or log them)
             foreach (var result in results)

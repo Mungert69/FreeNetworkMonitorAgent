@@ -12,10 +12,10 @@ public partial class MainPage : ContentPage
 {
     private IAuthService _authService;
     private string _authUrl;
-    private string _monitorLocation;
     private ILogger _logger;
     private CancellationTokenSource _cancellationTokenSource;
     private MainPageViewModel _mainPageViewModel;
+    private NetConnectConfig _netConfig;
 
 
     public MainPage(IAuthService authService, NetConnectConfig netConfig, ILogger logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
@@ -24,8 +24,7 @@ public partial class MainPage : ContentPage
         {
             InitializeComponent();
             _authService = authService;
-            _authUrl = netConfig.ClientAuthUrl;
-            _monitorLocation = netConfig.MonitorLocation;
+            _netConfig = netConfig;
             _logger = logger;
             //Application.Current.UserAppTheme = AppTheme.Dark;
             _mainPageViewModel = mainPageViewModel;
@@ -66,7 +65,7 @@ public partial class MainPage : ContentPage
 
     private async void Authorize()
     {
-        string authUrl = "not set";
+       // string authUrl = "not set";
         try
         {
 
@@ -88,15 +87,15 @@ public partial class MainPage : ContentPage
             }
 
 
-
-            _logger.LogInformation($" authUrl is {authUrl}");
-            if (!string.IsNullOrWhiteSpace(authUrl))
+            _authUrl = _netConfig.ClientAuthUrl;
+            _logger.LogInformation($" _authUrl is {_authUrl}");
+            if (!string.IsNullOrWhiteSpace(_authUrl))
             {
 
                 PollForTokenInBackground();
-                //await Launcher.OpenAsync(authUrl);
+                //await Launcher.OpenAsync(_authUrl);
 
-                await Browser.Default.OpenAsync(authUrl, BrowserLaunchMode.SystemPreferred);
+                await Browser.Default.OpenAsync(_authUrl, BrowserLaunchMode.SystemPreferred);
 
 
             }
@@ -111,8 +110,8 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             // Handle any exceptions
-            await DisplayAlert("Error", $"Could not authorize with requested authUrl {authUrl} . Errro was : {ex.Message}", "OK");
-            _logger.LogError($" Error : Could not authorize with requested authUrl {authUrl} . Errro was : {ex.ToString()}");
+            await DisplayAlert("Error", $"Could not authorize with requested authUrl {_authUrl} . Error was : {ex.Message}", "OK");
+            _logger.LogError($" Error : Could not authorize with requested authUrl {_authUrl} . Error was : {ex.ToString()}");
             _mainPageViewModel.IsPolling = false; // Reset the flag
         }
     }
@@ -127,8 +126,8 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             // Handle any exceptions
-            await DisplayAlert("Error", $"Could not open browser . Errro was : {ex.Message}", "OK");
-            _logger.LogError($"Could not open browser. Errro was : {ex.ToString()}");
+            await DisplayAlert("Error", $"Could not open browser . Error was : {ex.Message}", "OK");
+            _logger.LogError($"Could not open browser. Error was : {ex.ToString()}");
 
         }
 
@@ -160,8 +159,8 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             // Handle any exceptions
-            DisplayAlert("Error", $"Could not complete Cancel click . Errro was : {ex.Message}", "OK");
-            _logger.LogError($"Could not complete Cancel click. Errro was : {ex.ToString()}");
+            DisplayAlert("Error", $"Could not complete Cancel click . Error was : {ex.Message}", "OK");
+            _logger.LogError($"Could not complete Cancel click. Error was : {ex.ToString()}");
 
         }
 
@@ -209,7 +208,7 @@ public partial class MainPage : ContentPage
 
             if (result.Success)
             {
-                await DisplayAlert("Success", $"Authorization successful! Now login to Free Network Monitor and add hosts to monitor from your device. choose '{_monitorLocation}' as the monitor location . ", "OK");
+                await DisplayAlert("Success", $"Authorization successful! Now login to Free Network Monitor and add hosts to monitor from your device. choose '{_netConfig.MonitorLocation}' as the monitor location . ", "OK");
 
             }
             else

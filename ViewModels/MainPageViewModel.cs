@@ -123,10 +123,10 @@ namespace NetworkMonitorAgent.ViewModels
             {
                 try
                 {
-                  
-                       ShowLoadingMessage?.Invoke(this, false);
-                       ShowToggle = true;
-                   
+
+                    ShowLoadingMessage?.Invoke(this, false);
+                    ShowToggle = true;
+
                 }
                 catch (Exception ex)
                 {
@@ -295,28 +295,34 @@ namespace NetworkMonitorAgent.ViewModels
         {
             get
             {
+                Color color = Colors.White;
                 try
                 {
-                    if (_isCompleted)
+                    MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        if (App.Current?.RequestedTheme == AppTheme.Dark)
+
+                        if (_isCompleted)
                         {
-                            return ColorResource.GetResourceColor("Grey950");
+                            if (App.Current?.RequestedTheme == AppTheme.Dark)
+                            {
+                                color= ColorResource.GetResourceColor("Grey950");
+                            }
+                            else
+                            {
+                                color= Colors.White;
+                            }
                         }
                         else
                         {
-                            return Colors.White;
+                            color= ColorResource.GetResourceColor("Warning");
                         }
-                    }
-                    else
-                    {
-                        return ColorResource.GetResourceColor("Warning");
-                    }
+                    });
+                    return color;
                 }
                 catch (Exception e)
                 {
 
-                    return Colors.White;
+                    return color;
                 }
 
             }
@@ -348,11 +354,14 @@ namespace NetworkMonitorAgent.ViewModels
             {
                 try
                 {
-                    _isCompleted = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(ButtonText));
-                    OnPropertyChanged(nameof(ButtonBackgroundColor));
-                    OnPropertyChanged(nameof(ButtonTextColor));
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        _isCompleted = value;
+                        OnPropertyChanged();
+                        OnPropertyChanged(nameof(ButtonText));
+                        OnPropertyChanged(nameof(ButtonBackgroundColor));
+                        OnPropertyChanged(nameof(ButtonTextColor));
+                    });
                 }
                 catch (Exception e)
                 {
@@ -363,31 +372,23 @@ namespace NetworkMonitorAgent.ViewModels
         public ICommand TaskAction { get; set; }
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            try
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            catch (Exception e)
-            {
-            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
 
         }
 
         protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
         {
-            try
-            {
-                if (Equals(storage, value))
-                {
-                    return;
-                }
 
-                storage = value;
-                OnPropertyChanged(propertyName);
-            }
-            catch (Exception e)
+            if (Equals(storage, value))
             {
+                return;
             }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
 
         }
 

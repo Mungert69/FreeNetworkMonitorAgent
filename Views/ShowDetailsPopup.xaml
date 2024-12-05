@@ -29,8 +29,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Text="Close" Clicked="OnCloseButtonClicked" HorizontalOptions="FillAndExpand" Margin="5" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray800}}" />
-            <Button Grid.Column="1" Text="More Details" Clicked="OnDetailsButtonClicked" HorizontalOptions="FillAndExpand" Margin="5" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray800}}" />
+            <Button Grid.Column="0" Text="Close" Clicked="OnCloseButtonClicked" HorizontalOptions="FillAndExpand" Margin="5" />
+            <Button Grid.Column="1" Text="More Details" Clicked="OnDetailsButtonClicked" HorizontalOptions="FillAndExpand" Margin="5"  />
         </Grid>
     </Grid>
 </toolkit:Popup>

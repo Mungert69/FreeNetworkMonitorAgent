@@ -302,7 +302,8 @@ namespace NetworkMonitorAgent
               var netConfig = provider.GetRequiredService<NetConnectConfig>();
               var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
               var platformService = provider.GetRequiredService<IPlatformService>();
-              return new MainPageViewModel(netConfig, platformService, logger);
+              var authService = provider.GetRequiredService<IAuthService>();
+              return new MainPageViewModel(netConfig, platformService, logger, authService);
           });
 
             builder.Services.AddSingleton(provider =>
@@ -331,12 +332,11 @@ namespace NetworkMonitorAgent
            });
             builder.Services.AddSingleton(provider =>
            {
-               var authService = provider.GetRequiredService<IAuthService>();
-               var netConfig = provider.GetRequiredService<NetConnectConfig>();
-               var logger = provider.GetRequiredService<ILogger<MainPage>>();
+              
+                var logger = provider.GetRequiredService<ILogger<MainPage>>();
                var processorStatesViewModel = provider.GetRequiredService<ProcessorStatesViewModel>();
                var mainPageViewModel = provider.GetRequiredService<MainPageViewModel>();
-               return new MainPage(authService, netConfig, logger, mainPageViewModel, processorStatesViewModel);
+               return new MainPage( logger, mainPageViewModel, processorStatesViewModel);
            });
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DateViewPage>();

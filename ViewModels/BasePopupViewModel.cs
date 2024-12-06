@@ -39,7 +39,7 @@ namespace NetworkMonitorAgent.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
+        protected virtual void SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(storage, value))
             {

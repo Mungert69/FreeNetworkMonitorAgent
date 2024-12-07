@@ -4,7 +4,7 @@
              xmlns:controls="clr-namespace:NetworkMonitorAgent.Controls"
              xmlns:view="clr-namespace:NetworkMonitorAgent.Views"
              x:Class="NetworkMonitorAgent.Views.ProcessorStatesView"
-             x:DataType="vm:ProcessorStatesViewModel">
+             >
 
  
     <Frame Padding="10" CornerRadius="10" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">

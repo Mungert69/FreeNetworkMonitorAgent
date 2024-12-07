@@ -41,7 +41,7 @@
             <Frame  IsVisible="{Binding ShowTasks}" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="0" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
                 <ListView x:Name="TaskListView" ItemsSource="{Binding Tasks}" HasUnevenRows="true">
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="vm:TaskItem">
+                        <DataTemplate >
                             <ViewCell>
                                 <StackLayout Orientation="Horizontal" Padding="10">
                                     <CheckBox IsChecked="{Binding IsCompleted}" IsEnabled="False" />

@@ -235,20 +235,20 @@ namespace NetworkMonitorAgent
 
                 });
 
-            builder.Services.AddSingleton<IDialogService>(provider => { return new DialogService(); });
+           
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
 #if ANDROID
-				   var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
+				 /*  var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
 				   var dialogService = provider.GetRequiredService<IDialogService>();
-				   return new AndroidPlatformService(dialogService, logger);
+				   return new AndroidPlatformService(dialogService, logger);*/
 #endif
 
 #if WINDOWS
                 var logger = provider.GetRequiredService<ILogger<WindowsPlatformService>>();
-                var dialogService = provider.GetRequiredService<IDialogService>();
+                //var dialogService = provider.GetRequiredService<IDialogService>();
                 var backgroundService = provider.GetRequiredService<IBackgroundService>();
-                return new WindowsPlatformService(backgroundService, dialogService, logger);
+                return new WindowsPlatformService(backgroundService, logger);
 #endif
                 // throw new NotImplementedException("Unsupported platform");
             });

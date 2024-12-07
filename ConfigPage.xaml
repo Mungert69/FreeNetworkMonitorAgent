@@ -4,7 +4,7 @@
              xmlns:controls="clr-namespace:NetworkMonitorAgent.Controls"
              x:Class="NetworkMonitorAgent.ConfigPage"
              xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
-             x:DataType="vm:ConfigPageViewModel">
+             >
 
     <ScrollView>
         <VerticalStackLayout Spacing="15" Padding="5" VerticalOptions="Center">

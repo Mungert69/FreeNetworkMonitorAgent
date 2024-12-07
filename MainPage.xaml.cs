@@ -16,11 +16,32 @@ public partial class MainPage : ContentPage
         _logger = logger; // Store the logger
 
         _mainPageViewModel = mainPageViewModel;
-        _mainPageViewModel.ShowLoadingMessage += (sender, show) => ShowLoadingNoCancel(show);
-        _mainPageViewModel.AuthorizeAction += Authorize;
-        _mainPageViewModel.LoginAction += OpenLoginWebsite;
-        _mainPageViewModel.AddHostsAction += ScanHosts;
-        _mainPageViewModel.SetupTasks();
+        _cancellationTokenSource = new CancellationTokenSource();
+        _mainPageViewModel.PollingCts = _cancellationTokenSource;
+        _mainPageViewModel.ShowLoadingMessage += (sender, args) => ShowLoadingNoCancel(args);
+       
+       // _mainPageViewModel.SetupTasks();
+        // Subscribe to VM events
+        _mainPageViewModel.ShowAlertRequested += (sender, args) =>
+        {
+            Device.BeginInvokeOnMainThread(async () =>
+                await DisplayAlert(args.Title, args.Message, "OK"));
+        };
+
+        _mainPageViewModel.OpenBrowserRequested += (sender, url) =>
+        {
+            Device.BeginInvokeOnMainThread(async() =>
+                await Browser.Default.OpenAsync(url, BrowserLaunchMode.SystemPreferred));
+        };
+
+        _mainPageViewModel.NavigateRequested += (sender, route) =>
+        {
+            Device.BeginInvokeOnMainThread(async () =>
+                await Shell.Current.GoToAsync(route));
+        };
+
+
+        TaskListView.ItemsSource = _mainPageViewModel.Tasks;
 
         BindingContext = _mainPageViewModel;
         CustomPopupView.BindingContext = processorStatesViewModel;
@@ -43,88 +64,16 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async void Authorize()
-    {
-        try
-        {
-            var result = await _mainPageViewModel.AuthorizeAsync();
-            if (!result.Success)
-            {
-                await DisplayAlert("Error", result.Message, "OK");
-                _mainPageViewModel.IsPolling = false;
-                return;
-            }
-
-            if (!string.IsNullOrWhiteSpace(_mainPageViewModel.AuthUrl))
-            {
-                PollForTokenInBackground();
-                await Browser.Default.OpenAsync(_mainPageViewModel.AuthUrl, BrowserLaunchMode.SystemPreferred);
-            }
-            else
-            {
-                await DisplayAlert("Error", "Authorization URL is not available.", "OK");
-                _logger.LogError("Authorization URL is not available");
-                _mainPageViewModel.IsPolling = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Could not authorize. Error: {ex.Message}", "OK");
-            _logger.LogError(ex, "Could not authorize");
-            _mainPageViewModel.IsPolling = false;
-        }
-    }
-
-    private async void OpenLoginWebsite()
-    {
-        try
-        {
-            var result = await _mainPageViewModel.OpenLoginWebsiteAsync();
-            if (result.Success && !string.IsNullOrWhiteSpace(result.Message))
-            {
-                await Browser.Default.OpenAsync(result.Message, BrowserLaunchMode.SystemPreferred);
-            }
-            else
-            {
-                await DisplayAlert("Error", "Login URL is not available.", "OK");
-                _logger.LogError("Login URL is not available");
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Could not open login website. Error: {ex.Message}", "OK");
-            _logger.LogError(ex, "Could not open login website");
-        }
-    }
-
-    private async void ScanHosts()
-    {
-        try
-        {
-            var result = await _mainPageViewModel.ScanHostsAsync();
-            if (result.Success && !string.IsNullOrWhiteSpace(result.Message))
-            {
-                await Shell.Current.GoToAsync(result.Message);
-            }
-            else
-            {
-                await DisplayAlert("Error", "Navigation URL is not available.", "OK");
-                _logger.LogError("Navigation URL is not available");
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Could not navigate to scan page. Error: {ex.Message}", "OK");
-            _logger.LogError(ex, "Could not navigate to scan page");
-        }
-    }
-
+   
     private void OnCancelClicked(object sender, EventArgs e)
     {
         try
         {
             _mainPageViewModel.IsPolling = false;
+            // Cancel polling and reset CancellationTokenSource
             _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
+            _mainPageViewModel.PollingCts = _cancellationTokenSource;
             CancelButton.IsVisible = false;
             ShowLoading(false);
         }
@@ -150,13 +99,14 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void ShowLoadingNoCancel(bool show)
+    private void ShowLoadingNoCancel((bool show, bool showCancel) args)
     {
         try
         {
+            (bool show, bool showCancel) = args;
             ProgressIndicator.IsVisible = show;
             ProgressIndicator.IsRunning = show;
-            CancelButton.IsVisible = false;
+            CancelButton.IsVisible = showCancel;
         }
         catch (Exception ex)
         {
@@ -165,35 +115,4 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async void PollForTokenInBackground()
-    {
-        try
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-            ShowLoading(true);
-            var result = await _mainPageViewModel.PollForTokenAsync(_cancellationTokenSource.Token);
-            ShowLoading(false);
-            _mainPageViewModel.IsPolling = false;
-
-            if (result.Success)
-            {
-                await DisplayAlert("Success", $"Authorization successful! Now login and add hosts using '{_mainPageViewModel.MonitorLocation}' as the monitor location.", "OK");
-            }
-            else
-            {
-                await DisplayAlert("Fail", result.Message, "OK");
-                _logger.LogError($"PollForToken failed: {result.Message}");
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Error while polling for token: {ex.Message}", "OK");
-            _logger.LogError(ex, "Error while polling for token");
-            _mainPageViewModel.IsPolling = false;
-        }
-        finally
-        {
-            _cancellationTokenSource?.Dispose();
-        }
-    }
 }

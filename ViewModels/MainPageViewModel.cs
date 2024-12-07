@@ -23,9 +23,13 @@ namespace NetworkMonitorAgent.ViewModels
         public Action? LoginAction;
         public Action? AddHostsAction;
         public ICommand ToggleServiceCommand { get; }
-        public event EventHandler<bool> ShowLoadingMessage;
+        public event EventHandler<(bool show ,bool showCancel)> ShowLoadingMessage;
+        public event EventHandler<(string Title, string Message)> ShowAlertRequested;
+        public event EventHandler<string> OpenBrowserRequested;
+        public event EventHandler<string> NavigateRequested;
 
-        public ObservableCollection<TaskItem> Tasks { get; set; }
+
+        public ObservableCollection<TaskItem> Tasks { get; set; } = new ObservableCollection<TaskItem>();
 
         // Property to hold the authorization URL previously handled in MainPage
         private string _authUrl;
@@ -93,7 +97,7 @@ namespace NetworkMonitorAgent.ViewModels
             {
                 _logger.LogError("_netConfig.AgentUserFlow is null in MainPageViewModel constructor.");
             }
-
+            SetupTasks();
             ToggleServiceCommand = new Command<bool>(async (value) => await SetServiceStartedAsync(value));
         }
 
@@ -112,54 +116,7 @@ namespace NetworkMonitorAgent.ViewModels
             get => _serviceMessage;
             private set => SetProperty(ref _serviceMessage, value);
         }
-
-        public void SetupTasks()
-        {
-            try
-            {
-                Action wrappedAuthorizeAction = () =>
-                {
-                    try
-                    {
-                        if (!IsPolling)
-                        {
-                            IsPolling = true;
-                            AuthorizeAction?.Invoke(); // This will now call the ViewModel's AuthorizeAsync indirectly from MainPage
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Error executing authorize action: {ex}");
-                    }
-                };
-
-                Tasks = new ObservableCollection<TaskItem>
-                {
-                    new TaskItem
-                    {
-                        TaskDescription = "Authorize Agent",
-                        IsCompleted = _agentUserFlow.IsAuthorized,
-                        TaskAction = new Command(wrappedAuthorizeAction)
-                    },
-                    new TaskItem
-                    {
-                        TaskDescription = "Login Free Network Monitor",
-                        IsCompleted = _agentUserFlow.IsLoggedInWebsite,
-                        TaskAction = new Command(LoginAction)
-                    },
-                    new TaskItem
-                    {
-                        TaskDescription = "Scan for Hosts",
-                        IsCompleted = _agentUserFlow.IsHostsAdded,
-                        TaskAction = new Command(AddHostsAction)
-                    }
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Error in SetupTasks : {e.Message}");
-            }
-        }
+        public CancellationTokenSource? PollingCts { get => _pollingCts; set => _pollingCts = value; }
 
         public async Task SetServiceStartedAsync(bool value)
         {
@@ -183,7 +140,7 @@ namespace NetworkMonitorAgent.ViewModels
             try
             {
                 ShowToggle = false;
-                ShowLoadingMessage?.Invoke(this, true);
+                ShowLoadingMessage?.Invoke(this, (true,false));
                 await Task.Delay(200);
                 await _platformService.ChangeServiceState(state);
             }
@@ -199,7 +156,7 @@ namespace NetworkMonitorAgent.ViewModels
                     _disableAgentOnServiceShutdown = _platformService?.DisableAgentOnServiceShutdown ?? false;
                     _serviceMessage = _platformService?.ServiceMessage ?? "No Service Message";
 
-                    ShowLoadingMessage?.Invoke(this, false);
+                    ShowLoadingMessage?.Invoke(this, (false,false));
                     ShowToggle = true;
                     OnPropertyChanged(nameof(ServiceMessage));
                     OnPropertyChanged(nameof(ShowTasks));
@@ -279,6 +236,132 @@ namespace NetworkMonitorAgent.ViewModels
             }
         }
 
+
+        public void SetupTasks()
+        {
+            try
+            {
+                Tasks = new ObservableCollection<TaskItem>
+        {
+            new TaskItem
+            {
+                TaskDescription = "Authorize Agent",
+                IsCompleted = _agentUserFlow.IsAuthorized,
+                TaskAction = new Command(async () =>
+                {
+                    try
+                    {
+                        if (!IsPolling)
+                        {
+                            IsPolling = true;
+                            await ExecuteAuthorizeAsync();
+                            IsPolling = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Error executing authorize action: {ex}");
+                        IsPolling = false; // Ensure we reset the flag even if there's an error
+                    }
+                })
+            },
+            new TaskItem
+            {
+                TaskDescription = "Login Free Network Monitor",
+                IsCompleted = _agentUserFlow.IsLoggedInWebsite,
+                TaskAction = new Command(async () => await ExecuteLoginAsync())
+            },
+            new TaskItem
+            {
+                TaskDescription = "Scan for Hosts",
+                IsCompleted = _agentUserFlow.IsHostsAdded,
+                TaskAction = new Command(async () => await ExecuteScanHostsAsync())
+            }
+        };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error in SetupTasks : {e.Message}");
+            }
+        }
+
+        private async Task ExecuteAuthorizeAsync()
+        {
+            var result = await AuthorizeAsync();
+            if (!result.Success)
+            {
+                // Raise an event to show an alert
+                ShowAlertRequested?.Invoke(this, ("Error", result.Message));
+                IsPolling = false;
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(AuthUrl))
+            {
+                // If we need to open a browser, raise an event.
+                OpenBrowserRequested?.Invoke(this, AuthUrl);
+
+                // Also, if you need to start polling in the background, do it here:
+                await PollForTokenInBackgroundAsync();
+            }
+            else
+            {
+                ShowAlertRequested?.Invoke(this, ("Error", "Authorization URL is not available."));
+                _logger.LogError("Authorization URL is not available");
+                IsPolling = false;
+            }
+        }
+
+        private async Task ExecuteLoginAsync()
+        {
+            var result = await OpenLoginWebsiteAsync();
+            if (result.Success && !string.IsNullOrWhiteSpace(result.Message))
+            {
+                OpenBrowserRequested?.Invoke(this, result.Message);
+            }
+            else
+            {
+                ShowAlertRequested?.Invoke(this, ("Error", "Login URL is not available."));
+                _logger.LogError("Login URL is not available");
+            }
+        }
+
+        private async Task ExecuteScanHostsAsync()
+        {
+            var result = await ScanHostsAsync();
+            if (result.Success && !string.IsNullOrWhiteSpace(result.Message))
+            {
+                NavigateRequested?.Invoke(this, result.Message);
+            }
+            else
+            {
+                ShowAlertRequested?.Invoke(this, ("Error", "Navigation URL is not available."));
+                _logger.LogError("Navigation URL is not available");
+            }
+        }
+
+        private async Task PollForTokenInBackgroundAsync()
+        {
+            IsPolling = true;
+            
+            ShowLoadingMessage?.Invoke(this, (true,true));
+            var result = await PollForTokenAsync(_pollingCts.Token);
+            ShowLoadingMessage?.Invoke(this, (false,false));
+            IsPolling = false;
+
+            if (result.Success)
+            {
+                ShowAlertRequested?.Invoke(this, ("Success", $"Authorization successful! Now login and add hosts using '{MonitorLocation}' as the monitor location."));
+            }
+            else
+            {
+                ShowAlertRequested?.Invoke(this, ("Fail", result.Message));
+                _logger.LogError($"PollForToken failed: {result.Message}");
+            }
+        }
+
+
+
         // New Methods that encapsulate logic originally in MainPage:
 
         public async Task<ResultObj> AuthorizeAsync()
@@ -310,7 +393,7 @@ namespace NetworkMonitorAgent.ViewModels
         public async Task<ResultObj> OpenLoginWebsiteAsync()
         {
             // Just return a successful result along with the URL
-            return new ResultObj     { Success = true, Message = "https://freenetworkmonitor.click/dashboard" };
+            return new ResultObj { Success = true, Message = "https://freenetworkmonitor.click/dashboard" };
         }
 
         public async Task<ResultObj> ScanHostsAsync()
@@ -359,24 +442,23 @@ namespace NetworkMonitorAgent.ViewModels
                 Color color = Colors.White;
                 try
                 {
-                    MainThread.BeginInvokeOnMainThread(() =>
+
+                    if (_isCompleted)
                     {
-                        if (_isCompleted)
+                        if (App.Current?.RequestedTheme == AppTheme.Dark)
                         {
-                            if (App.Current?.RequestedTheme == AppTheme.Dark)
-                            {
-                                color = ColorResource.GetResourceColor("Grey950");
-                            }
-                            else
-                            {
-                                color = Colors.White;
-                            }
+                            color = ColorResource.GetResourceColor("Grey950");
                         }
                         else
                         {
-                            color = ColorResource.GetResourceColor("Warning");
+                            color = Colors.White;
                         }
-                    });
+                    }
+                    else
+                    {
+                        color = ColorResource.GetResourceColor("Warning");
+                    }
+
                     return color;
                 }
                 catch
@@ -410,22 +492,21 @@ namespace NetworkMonitorAgent.ViewModels
             get => _isCompleted;
             set
             {
-                try
+                if (_isCompleted != value)
                 {
+                    _isCompleted = value;
+                    // If needed, ensure we're on the main thread before firing PropertyChanged
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        _isCompleted = value;
                         OnPropertyChanged();
                         OnPropertyChanged(nameof(ButtonText));
                         OnPropertyChanged(nameof(ButtonBackgroundColor));
                         OnPropertyChanged(nameof(ButtonTextColor));
                     });
                 }
-                catch
-                {
-                }
             }
         }
+
         public ICommand TaskAction { get; set; }
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {

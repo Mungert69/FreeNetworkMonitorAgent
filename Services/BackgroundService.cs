@@ -102,7 +102,7 @@ namespace NetworkMonitorAgent.Services
             try
             {
                 _logger.LogInformation("Shutting down RabbitRepo.");
-                _rabbitRepo.ShutdownRepo();
+                await _rabbitRepo.ShutdownRepo();
                 result.Message += " Success : Shutdown RabbitRepo.";
             }
             catch (Exception e)

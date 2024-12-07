@@ -28,7 +28,7 @@ namespace NetworkMonitorAgent.Services
     public class PlatformService
     {
         protected ILogger _logger;
-        protected IDialogService _dialogService;
+        //protected IDialogService _dialogService;
         protected bool _isServiceStarted;
         protected string _serviceMessage;
         protected bool _disableAgentOnServiceShutdown = false;
@@ -54,9 +54,9 @@ namespace NetworkMonitorAgent.Services
         }
 
 
-        public PlatformService(IDialogService dialogService, ILogger logger)
+        public PlatformService( ILogger logger)
         {
-            _dialogService = dialogService;
+            //_dialogService = dialogService;
 
             _logger = logger;
         }
@@ -109,7 +109,7 @@ namespace NetworkMonitorAgent.Services
         private TaskCompletionSource<bool> _serviceOperationCompletionSource;
 
 
-        public AndroidPlatformService(IDialogService dialogService, ILogger<AndroidPlatformService> logger) : base(dialogService, logger)
+        public AndroidPlatformService( ILogger<AndroidPlatformService> logger) : base( logger)
         {
             try
             {
@@ -340,7 +340,7 @@ var powerService=Context.PowerService;
     {
         private IBackgroundService _backgroundService;
 
-        public WindowsPlatformService(IBackgroundService backgroundService, IDialogService dialogService, ILogger<WindowsPlatformService> logger) : base(dialogService, logger)
+        public WindowsPlatformService(IBackgroundService backgroundService, ILogger<WindowsPlatformService> logger) : base( logger)
         {
             _backgroundService = backgroundService;
         }

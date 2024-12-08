@@ -65,31 +65,45 @@ public const string ServiceMessageExtra = "ServiceMessage";
             _backgroundService = new BackgroundService(_logger, _netConfig, _loggerFactory, _rabbitRepo, _fileRepo,_processorStates, _monitorPingInfoView, _cmdProcessorProvider );
 
         }
-        private async Task StartAsync()
+        private async Task<ResultObj> StartAsync()
         {
+            var result=new ResultObj();
             try
             {
-                var result = await _backgroundService.Start();
-               _platformService.OnUpdateServiceState(result, true);
+                result = await _backgroundService.Start();
+                _platformService.OnUpdateServiceState(result, _backgroundService.IsRunning);
+               
 
             }
             catch (Exception ex)
-            {
-               _logger.LogError($"Error initializing background service: {ex.Message}");
+            {   
+               result.Success=false;
+               result.Message=$"Error initializing background service: {ex.Message}";
+                 _logger.LogError(result.Message);
+                  _platformService.OnUpdateServiceState(result, _backgroundService.IsRunning);
+               
             }
+            return result;
         }
 
-        private async Task StopAsync()
+        private async Task<ResultObj> StopAsync()
         {
+              var result=new ResultObj();
             try
             {
-            var result = await _backgroundService.Stop();
-            _platformService.OnUpdateServiceState(result,false);
+            result = await _backgroundService.Stop();
+               _platformService.OnUpdateServiceState(result, _backgroundService.IsRunning);
+               
             }
             catch (Exception ex)
             {
-            _logger.LogError($"Error stopping background service: {ex.Message}");
+            result.Success=false;
+               result.Message=$"Error stopping background service: {ex.Message}";
+                 _logger.LogError(result.Message);
+                  _platformService.OnUpdateServiceState(result, _backgroundService.IsRunning);
+               
             }
+            return result;
         }
 
         private PendingIntent? GetViewAppPendingIntent()
@@ -111,11 +125,17 @@ public const string ServiceMessageExtra = "ServiceMessage";
 
                 Task.Run(async () =>
                     {
+                        
+                      
 #pragma warning disable CA1422
                         StopForeground(true);
                     //StopBackgroundService(true);
 #pragma warning restore CA1422
-                        await StopAsync();
+
+                        
+                    var result= await StopAsync();
+             
+                       
                     }, _cts.Token);
                 return StartCommandResult.Sticky;
                 
@@ -124,12 +144,15 @@ public const string ServiceMessageExtra = "ServiceMessage";
             }
             catch (Exception e){
                 var result=new ResultObj(){Message=$" Error : Failed to Stop service . Error was : {e.Message}",Success=false};
-                _platformService.OnUpdateServiceState(result,false);
+            _platformService.OnUpdateServiceState(result, _backgroundService.IsRunning);
+               return StartCommandResult.Sticky;
             }                          
             try
             {
                  Task.Run(async () =>
                 {
+                
+               
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
                 {
 #pragma warning disable CA1416, CA1422
@@ -185,12 +208,14 @@ public const string ServiceMessageExtra = "ServiceMessage";
                     StartForeground(SERVICE_RUNNING_NOTIFICATION_ID, notification);
 #pragma warning restore CS0618
                 }
-                await StartAsync();
+               var result=await StartAsync();
+               if (!result.Success) ;//TODO close the notification
+                
                 }, _cts.Token);
             }
            catch (Exception e){
              var result=new ResultObj(){Message=$" Error : Failed to Start service . Error was : {e.Message}",Success=false};
-             _platformService.OnUpdateServiceState(result,true);
+             _platformService.OnUpdateServiceState(result, _backgroundService.IsRunning);
             }
             return StartCommandResult.Sticky;
         }

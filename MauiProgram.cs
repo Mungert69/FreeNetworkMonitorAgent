@@ -239,9 +239,9 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
 #if ANDROID
-				 /*  var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
-				   var dialogService = provider.GetRequiredService<IDialogService>();
-				   return new AndroidPlatformService(dialogService, logger);*/
+				  var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
+				   //var dialogService = provider.GetRequiredService<IDialogService>();
+				   return new AndroidPlatformService(logger);
 #endif
 
 #if WINDOWS

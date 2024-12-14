@@ -14,8 +14,8 @@
                 <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
                 <ApplicationIdGuid>d4f21b0e-2c97-4c50-b003-dca43bd9a888</ApplicationIdGuid>
                 <!-- Versions -->
-                <ApplicationDisplayVersion>0.2.25</ApplicationDisplayVersion>
-                <ApplicationVersion>225</ApplicationVersion>
+                <ApplicationDisplayVersion>0.2.26</ApplicationDisplayVersion>
+                <ApplicationVersion>226</ApplicationVersion>
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
@@ -69,6 +69,9 @@
                 <ProjectReference Include="..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj" />
                 <ProjectReference Include="..\NetworkMonitor\NetworkMonitor-Maui.csproj" />
         </ItemGroup>
-
+<ItemGroup>
+  <!-- Exclude all .cs files in Resources/Raw and its subdirectories -->
+  <Compile Remove="Resources/Raw\**\*.cs" />
+</ItemGroup>
 </Project>
 

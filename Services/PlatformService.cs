@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Service.Services.OpenAI;
 
-namespace NetworkMonitorAgent.Services
+namespace NetworkMonitor.Maui.Services
 {
     public interface IPlatformService
     {

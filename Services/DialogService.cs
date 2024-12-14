@@ -1,4 +1,4 @@
-namespace NetworkMonitorAgent.Services;
+namespace NetworkMonitor.Maui.Services;
 
 public interface IDialogService
 {

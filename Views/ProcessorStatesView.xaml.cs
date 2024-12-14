@@ -1,7 +1,7 @@
 using MetroLog.Maui;
 using NetworkMonitor.Processor.Services;
-using NetworkMonitorAgent.Services;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Connection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls;

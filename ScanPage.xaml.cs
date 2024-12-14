@@ -1,6 +1,6 @@
 
-using NetworkMonitorAgent.Services;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui.ViewModels;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Objects;
 

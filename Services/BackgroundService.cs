@@ -9,7 +9,7 @@ using NetworkMonitor.Objects;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Runtime.InteropServices;
-namespace NetworkMonitorAgent.Services
+namespace NetworkMonitor.Maui.Services
 {
     public interface IBackgroundService
     {

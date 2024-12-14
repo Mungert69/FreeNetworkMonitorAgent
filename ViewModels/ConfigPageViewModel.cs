@@ -4,7 +4,7 @@ using NetworkMonitor.Connection;
 using NetworkMonitor.Objects;
 using Microsoft.Extensions.Logging;
 
-namespace NetworkMonitorAgent.ViewModels
+namespace NetworkMonitor.Maui.ViewModels
 {
     public class ConfigPageViewModel : INotifyPropertyChanged
     {

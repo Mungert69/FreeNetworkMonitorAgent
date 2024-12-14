@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using NetworkMonitor.Utils;
 using NetworkMonitor.Api.Services;
-namespace NetworkMonitorAgent.ViewModels
+namespace NetworkMonitor.Maui.ViewModels
 {
     public class ScanProcessorStatesViewModel : BasePopupViewModel
     {

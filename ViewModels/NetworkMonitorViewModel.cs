@@ -6,7 +6,7 @@ using NetworkMonitor.Api.Services;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Objects.Factory;
 
-namespace NetworkMonitorAgent.ViewModels
+namespace NetworkMonitor.Maui.ViewModels
 {
     public class NetworkMonitorViewModel : INotifyPropertyChanged
     {

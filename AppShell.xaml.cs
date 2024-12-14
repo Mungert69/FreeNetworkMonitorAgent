@@ -4,7 +4,7 @@ using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Objects.Repository;
 using NetworkMonitor.Objects.ServiceMessage;
 using NetworkMonitor.Utils.Helpers;
-using NetworkMonitorAgent.Services;
+using NetworkMonitor.Maui.Services;
 using MetroLog.Maui;
 namespace NetworkMonitorAgent;
 public partial class AppShell : Shell

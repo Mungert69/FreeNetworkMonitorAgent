@@ -8,7 +8,7 @@ using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Api.Services;
 using NetworkMonitor.Objects.ServiceMessage;
 using NetworkMonitor.Objects;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.ViewModels;
 using CommunityToolkit.Maui;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Storage;
@@ -89,7 +89,6 @@ public class CopyAssetsHelper
 
                 outputStr.AppendLine($"Directory copied to: {localPath}");
                 outputStr.Append(ListCopiedFiles(assetDir));
-
 
                 outputStr.AppendLine($"Starting cs-asset copy from : {csAssetDirectoryName}");
 

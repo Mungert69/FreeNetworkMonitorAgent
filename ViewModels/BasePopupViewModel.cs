@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-namespace NetworkMonitorAgent.ViewModels
+namespace NetworkMonitor.Maui.ViewModels
 {
     public class BasePopupViewModel: INotifyPropertyChanged
     {

@@ -1,6 +1,6 @@
 ﻿using MetroLog.Maui;
-using NetworkMonitorAgent.Services;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui.ViewModels;
 using Microsoft.Extensions.Logging;
 namespace NetworkMonitorAgent;
 

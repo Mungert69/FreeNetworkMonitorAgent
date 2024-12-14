@@ -1,5 +1,5 @@
 using NetworkMonitor.Objects;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.DTOs;
 using Microsoft.Extensions.Logging;
 namespace NetworkMonitorAgent;

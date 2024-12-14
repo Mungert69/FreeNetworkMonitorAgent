@@ -1,6 +1,6 @@
 ﻿using Microsoft.Maui.Controls;
 using System.Windows.Input;
-namespace NetworkMonitorAgent.ViewModels
+namespace NetworkMonitor.Maui.ViewModels
 {
     public class EventToCommandBehavior : Behavior<Switch>
     {

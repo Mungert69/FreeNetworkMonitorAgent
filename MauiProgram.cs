@@ -6,10 +6,11 @@ using NetworkMonitor.DTOs;
 using NetworkMonitor.Objects.Repository;
 using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Api.Services;
-using NetworkMonitorAgent.Services;
+using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui;
 using NetworkMonitor.Objects.ServiceMessage;
 using NetworkMonitor.Objects;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.ViewModels;
 using CommunityToolkit.Maui;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Storage;
@@ -209,6 +210,8 @@ namespace NetworkMonitorAgent
 
         private static void BuildServices(MauiAppBuilder builder)
         {
+            builder.Services.AddSingleton<IRootNamespaceService, RootNamespaceService>();
+
 
             builder.Services.AddSingleton<IApiService>(provider =>
     {
@@ -307,7 +310,8 @@ namespace NetworkMonitorAgent
               var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
               var platformService = provider.GetRequiredService<IPlatformService>();
               var authService = provider.GetRequiredService<IAuthService>();
-              return new MainPageViewModel(netConfig, platformService, logger, authService);
+               var rootNamespaceService = provider.GetRequiredService<IRootNamespaceService>();
+              return new MainPageViewModel(netConfig, platformService, logger, authService,rootNamespaceService);
           });
 
             builder.Services.AddSingleton(provider =>
@@ -346,5 +350,5 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<DateViewPage>();
         }
 
-    } 
+    }
 }

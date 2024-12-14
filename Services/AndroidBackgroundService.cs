@@ -15,11 +15,11 @@ using AndroidX.Core.App;
 
 
 
-namespace NetworkMonitorAgent.Services
+namespace NetworkMonitor.Maui.Services
 {
 
-    [Service(ForegroundServiceType = global::Android.Content.PM.ForegroundService.TypeConnectedDevice)]
-    public class AndroidBackgroundService : Service
+    [Android.App.Service(ForegroundServiceType = global::Android.Content.PM.ForegroundService.TypeConnectedDevice)]
+    public class AndroidBackgroundService : Android.App.Service
     {
         private CancellationTokenSource _cts;
         // This is any integer value unique to the application.
@@ -53,15 +53,15 @@ public const string ServiceMessageExtra = "ServiceMessage";
             base.OnCreate();
              _cts = new CancellationTokenSource();
 
-            _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<AndroidBackgroundService>>();
-            _netConfig = MauiProgram.ServiceProvider.GetRequiredService<NetConnectConfig>();
-            _loggerFactory = MauiProgram.ServiceProvider.GetRequiredService<ILoggerFactory>();
-            _fileRepo = MauiProgram.ServiceProvider.GetRequiredService<IFileRepo>();
-            _rabbitRepo = MauiProgram.ServiceProvider.GetRequiredService<IRabbitRepo>();
-            _monitorPingInfoView = MauiProgram.ServiceProvider.GetRequiredService<IMonitorPingInfoView>();
-            _processorStates=MauiProgram.ServiceProvider.GetRequiredService<LocalProcessorStates>();
-            _cmdProcessorProvider=MauiProgram.ServiceProvider.GetRequiredService<ICmdProcessorProvider>();
-            _platformService= MauiProgram.ServiceProvider.GetRequiredService<IPlatformService>();
+            _logger = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<ILogger<AndroidBackgroundService>>();
+            _netConfig = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<NetConnectConfig>();
+            _loggerFactory = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<ILoggerFactory>();
+            _fileRepo = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IFileRepo>();
+            _rabbitRepo = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IRabbitRepo>();
+            _monitorPingInfoView = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IMonitorPingInfoView>();
+            _processorStates=NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<LocalProcessorStates>();
+            _cmdProcessorProvider=NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<ICmdProcessorProvider>();
+            _platformService= NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IPlatformService>();
             _backgroundService = new BackgroundService(_logger, _netConfig, _loggerFactory, _rabbitRepo, _fileRepo,_processorStates, _monitorPingInfoView, _cmdProcessorProvider );
 
         }
@@ -108,7 +108,7 @@ public const string ServiceMessageExtra = "ServiceMessage";
 
         private PendingIntent? GetViewAppPendingIntent()
         {
-            var viewAppIntent = new Intent(this, typeof(MainActivity)); // Replace 'MainActivity' with your main activity class
+            var viewAppIntent = new Intent(this, typeof(NetworkMonitorAgent.MainActivity)); // Replace 'MainActivity' with your main activity class
             viewAppIntent.SetAction(Intent.ActionMain);
             viewAppIntent.AddCategory(Intent.CategoryLauncher);
             return PendingIntent.GetActivity(this, 0, viewAppIntent, 0);

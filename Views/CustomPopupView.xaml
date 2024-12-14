@@ -1,7 +1,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NetworkMonitorAgent.Views.CustomPopupView"
-             xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
+             xmlns:vm="clr-namespace:NetworkMonitor.Maui.ViewModels"
              IsVisible="{Binding IsPopupVisible}"
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
 

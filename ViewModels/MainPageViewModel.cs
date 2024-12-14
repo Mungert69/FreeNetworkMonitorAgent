@@ -4,12 +4,13 @@ using System.Runtime.CompilerServices;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Connection;
 using System.Windows.Input;
-using NetworkMonitorAgent.Services;
+using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Processor.Services;
 using OpenAI.ObjectModels.ResponseModels;
 
-namespace NetworkMonitorAgent.ViewModels
+namespace NetworkMonitor.Maui.ViewModels
 {
     public class MainPageViewModel : INotifyPropertyChanged
     {
@@ -80,13 +81,15 @@ namespace NetworkMonitorAgent.ViewModels
         private bool _disableAgentOnServiceShutdown;
         private string _serviceMessage = "No Service Message";
         private AgentUserFlow _agentUserFlow;
+        private IRootNamespaceService _rootNamespaceService;
 
-        public MainPageViewModel(NetConnectConfig netConfig, IPlatformService platformService, ILogger logger, IAuthService authService)
+        public MainPageViewModel(NetConnectConfig netConfig, IPlatformService platformService, ILogger logger, IAuthService authService, IRootNamespaceService rootNamespaceService)
         {
             _netConfig = netConfig;
             _platformService = platformService;
             _logger = logger;
             _authService = authService;
+            _rootNamespaceService=rootNamespaceService;
 
             if (_platformService != null)
             {
@@ -249,6 +252,7 @@ namespace NetworkMonitorAgent.ViewModels
         {
             new TaskItem
             {
+                RootNamespaceService=_rootNamespaceService,
                 TaskDescription = "Authorize Agent",
                 IsCompleted = _agentUserFlow.IsAuthorized,
                 TaskAction = new Command(async () =>
@@ -271,12 +275,14 @@ namespace NetworkMonitorAgent.ViewModels
             },
             new TaskItem
             {
+                 RootNamespaceService=_rootNamespaceService,
                 TaskDescription = "Login Free Network Monitor",
                 IsCompleted = _agentUserFlow.IsLoggedInWebsite,
                 TaskAction = new Command(async () => await ExecuteLoginAsync())
             },
             new TaskItem
             {
+                 RootNamespaceService=_rootNamespaceService,
                 TaskDescription = "Scan for Hosts",
                 IsCompleted = _agentUserFlow.IsHostsAdded,
                 TaskAction = new Command(async () => await ExecuteScanHostsAsync())
@@ -437,6 +443,7 @@ namespace NetworkMonitorAgent.ViewModels
     public class TaskItem : INotifyPropertyChanged
     {
         private bool _isCompleted;
+        private IRootNamespaceService _rootNamespaceService;
         public string TaskDescription { get; set; } = "";
         public string ButtonText => IsCompleted ? $"{TaskDescription ?? "Task"} (Completed)" : TaskDescription ?? "Task";
         public Color ButtonBackgroundColor
@@ -449,9 +456,9 @@ namespace NetworkMonitorAgent.ViewModels
 
                     if (_isCompleted)
                     {
-                        if (App.Current?.RequestedTheme == AppTheme.Dark)
+                        if (RootNamespaceService.GetRequestedTheme() == AppTheme.Dark)
                         {
-                            color = ColorResource.GetResourceColor("Grey950");
+                            color = RootNamespaceService.GetResourceColor("Grey950");
                         }
                         else
                         {
@@ -460,7 +467,7 @@ namespace NetworkMonitorAgent.ViewModels
                     }
                     else
                     {
-                        color = ColorResource.GetResourceColor("Warning");
+                        color = RootNamespaceService.GetResourceColor("Warning");
                     }
 
                     return color;
@@ -480,7 +487,7 @@ namespace NetworkMonitorAgent.ViewModels
                 {
                     if (_isCompleted)
                     {
-                        return ColorResource.GetResourceColor("Primary");
+                        return RootNamespaceService.GetResourceColor("Primary");
                     }
                     else { return Colors.White; }
                 }
@@ -512,6 +519,8 @@ namespace NetworkMonitorAgent.ViewModels
         }
 
         public ICommand TaskAction { get; set; }
+        public IRootNamespaceService RootNamespaceService { get => _rootNamespaceService; set => _rootNamespaceService = value; }
+
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

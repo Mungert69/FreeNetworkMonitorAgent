@@ -1,5 +1,5 @@
 using NetworkMonitor.Api.Services;
-using NetworkMonitorAgent.ViewModels;
+using NetworkMonitor.Maui.ViewModels;
 namespace NetworkMonitorAgent;
 public partial class NetworkMonitorPage : ContentPage
 {

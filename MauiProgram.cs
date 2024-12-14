@@ -16,6 +16,8 @@ using Microsoft.Maui.Storage;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Text;
+using NetworkMonitor.MauiLib;
 
 
 namespace NetworkMonitorAgent
@@ -89,9 +91,11 @@ namespace NetworkMonitorAgent
                     config = new ConfigurationBuilder().AddJsonStream(stream).Build();
                 }
                 builder.Configuration.AddConfiguration(config);
-                Task.Run(() => CopyAssetsToLocalStorage($"{config["OpensslVersion"]}-{os}")).Wait();
-
-                ListCopiedFiles();
+                Task.Run(async () =>
+                {
+                    string output = await CopyAssetsHelper.CopyAssetsToLocalStorage($"{config["OpensslVersion"]}-{os}", "cs-assets");
+                    Console.WriteLine(output);
+                }).Wait();
 
 
             }
@@ -235,7 +239,7 @@ namespace NetworkMonitorAgent
 
                 });
 
-           
+
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
 #if ANDROID
@@ -324,7 +328,7 @@ namespace NetworkMonitorAgent
 
                             return new ScanPage(logger, scanProcessorStatesViewModel, platformService);
                         });
-           
+
             builder.Services.AddSingleton(provider =>
            {
                var apiService = provider.GetRequiredService<IApiService>();
@@ -332,266 +336,15 @@ namespace NetworkMonitorAgent
            });
             builder.Services.AddSingleton(provider =>
            {
-              
-                var logger = provider.GetRequiredService<ILogger<MainPage>>();
+
+               var logger = provider.GetRequiredService<ILogger<MainPage>>();
                var processorStatesViewModel = provider.GetRequiredService<ProcessorStatesViewModel>();
                var mainPageViewModel = provider.GetRequiredService<MainPageViewModel>();
-               return new MainPage( logger, mainPageViewModel, processorStatesViewModel);
+               return new MainPage(logger, mainPageViewModel, processorStatesViewModel);
            });
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DateViewPage>();
         }
-        private static async Task CopyAssetsToLocalStorage(string directoryName)
-        {
-            try
-            {
-                  Console.WriteLine($"---BEGIN------");
 
-                Console.WriteLine($"Starting asset copy from : {directoryName}");
-
-                string[] assetFiles = await ListAssetFiles(directoryName);
-
-                string localPath = Path.Combine(FileSystem.AppDataDirectory, "openssl");
-                Directory.CreateDirectory(localPath);
-                string localFilePath = "";
-                foreach (var assetFile in assetFiles)
-                {
-                    string assetFilePath = Path.Combine(directoryName, assetFile);
-                    using (var stream = await FileSystem.OpenAppPackageFileAsync(assetFilePath))
-                    {
-                        if (stream == null)
-                        {
-                            Console.WriteLine($"Failed to open asset file: {assetFilePath}");
-                            continue;
-                        }
-
-                        localFilePath = Path.Combine(localPath, assetFile);
-                        string? localFileDirectory = Path.GetDirectoryName(localFilePath);
-
-                        if (localFileDirectory != null && !Directory.Exists(localFileDirectory))
-                            Directory.CreateDirectory(localFileDirectory);
-
-                        using (var fileStream = new FileStream(localFilePath, FileMode.Create, FileAccess.Write))
-                        {
-                            Console.WriteLine($"Copying file: {localFilePath}");
-                            await stream.CopyToAsync(fileStream);
-                        }
-                    }
-#if WINDOWS
-                    if (IsWindowsBusyboxBinary(assetFile)) SetExecutablePermission(localFilePath);
-                    if (IsWindowsOpenSSLBinary(assetFile)) SetExecutablePermission(localFilePath);
-                    if (IsWindowsNmapBinary(assetFile)) SetExecutablePermission(localFilePath);
-                     if (IsWindowsCurlBinary(assetFile)) SetExecutablePermission(localFilePath);
-#else
-                    if (IsBusyboxBinary(assetFile)) SetExecutablePermission(localFilePath);
-                    if (IsOpenSSLBinary(assetFile)) SetExecutablePermission(localFilePath);
-                    if (IsNmapBinary(assetFile)) SetExecutablePermission(localFilePath);
-                    if (IsCurlBinary(assetFile)) SetExecutablePermission(localFilePath);
-#endif
-
-
-                    Console.WriteLine($"Finshed processing file: {localFilePath}");
-                }
-
-                Console.WriteLine($"Directory copied to: {localPath}");
-                SetLDLibraryPath(Path.Combine(localPath, "lib64"));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error copying assets: {ex.Message}");
-            }
-        }
-        private static bool IsOpenSSLBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/openssl", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsBusyboxBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/busybox", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsNmapBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/nmap", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsCurlBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/curl", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsWindowsOpenSSLBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/openssl.exe", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsWindowsBusyboxBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/busybox.exe", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsWindowsNmapBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/nmap.exe", StringComparison.OrdinalIgnoreCase);
-        }
-        private static bool IsWindowsCurlBinary(string assetFile)
-        {
-            string trimmedPath = assetFile.Trim('/', '\\'); // Trim leading and trailing slashes
-            return trimmedPath.EndsWith("/curl.exe", StringComparison.OrdinalIgnoreCase);
-        }
-        private static void SetExecutablePermission(string filePath)
-        {
-            try
-            {
-                Console.WriteLine($"Attempting to set executable permission for: {filePath}");
-
-#if ANDROID
-        NetworkMonitorAgent.Platforms.Android.PermissionsHelper.MakeFileExecutable(filePath);
-#elif WINDOWS
-
-                ProcessFileForSymbolicLink(filePath);
-#else
-                // Existing implementation for other platforms
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "sh",
-                        Arguments = $"-c \"chmod +x {filePath}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (!string.IsNullOrEmpty(output))
-                {
-                    Console.WriteLine($"chmod output: {output}");
-                }
-                if (!string.IsNullOrEmpty(error))
-                {
-                    Console.WriteLine($"chmod error: {error}");
-                }
-
-                Console.WriteLine($"Set executable permission for: {filePath}");
-#endif
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to set executable permission for {filePath}: {ex.Message}");
-            }
-        }
-
-#if WINDOWS
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern bool CreateSymbolicLink(
-            string lpSymlinkFileName,
-            string lpTargetFileName,
-            int dwFlags);
-
-        const int SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1;
-
-        private static void CreateSymbolicLinkWindows(string symlinkPath, string targetPath, bool isDirectory)
-        {
-            bool result = CreateSymbolicLink(symlinkPath, targetPath, isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
-            if (!result)
-            {
-                throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-            }
-        }
-        private static void ProcessFileForSymbolicLink(string filePath)
-        {
-            // Check if the file path ends with .exe
-            if (filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-            {
-                // Remove the .exe extension
-                string targetPath = Path.ChangeExtension(filePath, null);
-
-                // Create a symbolic link
-                CreateSymbolicLinkWindows(filePath, targetPath, false);
-            }
-            else
-            {
-                // Handle cases where the file does not end with .exe if needed
-                Console.WriteLine($"File does not end with .exe: {filePath}");
-            }
-        }
-#endif
-
-
-        private static void SetLDLibraryPath(string libraryPath)
-        {
-            try
-            {
-                string ldLibraryPath = $"LD_LIBRARY_PATH={libraryPath}";
-                Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", libraryPath);
-                Console.WriteLine($"Set LD_LIBRARY_PATH to: {libraryPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to set LD_LIBRARY_PATH: {ex.Message}");
-            }
-        }
-
-        private static async Task<string[]> ListAssetFiles(string directoryName)
-        {
-            try
-            {
-                string manifestFileName = Path.Combine(directoryName, "assets_manifest.txt");
-                using (var stream = await FileSystem.OpenAppPackageFileAsync(manifestFileName))
-                using (var reader = new StreamReader(stream))
-                {
-                    var fileList = new List<string>();
-
-                    while (!reader.EndOfStream)
-                    {
-                        var line = await reader.ReadLineAsync();
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            // Trim any leading ./ from the assetFilePath
-                            line = line.TrimStart('.', '/');
-                            Console.WriteLine($"Preparing file: {line}");
-                            fileList.Add(line);
-                        }
-                    }
-
-                    return fileList.ToArray();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading asset manifest: {ex.Message}");
-                return Array.Empty<string>();
-            }
-        }
-
-        private static void ListCopiedFiles()
-        {
-            try
-            {
-                string localPath = Path.Combine(FileSystem.AppDataDirectory, "openssl");
-                string[] files = Directory.GetFiles(localPath, "*", SearchOption.AllDirectories);
-
-                foreach (var file in files)
-                {
-                    Console.WriteLine($"File in local storage: {file}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error listing copied files: {ex.Message}");
-            }
-        }
-
-    }
+    } 
 }

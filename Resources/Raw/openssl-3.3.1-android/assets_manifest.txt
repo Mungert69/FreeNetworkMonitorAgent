@@ -625,6 +625,7 @@
 ./bin/nmap-header-template.cc
 ./bin/nmap-7.95-1.spec
 ./bin/curl-config
+./bin/CompileErrorExample.cs
 ./bin/nmap-protocols
 ./bin/nmap-service-probes
 ./bin/nmap.dtd

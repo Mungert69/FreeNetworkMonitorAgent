@@ -614,6 +614,7 @@
 ./bin/nmap-mac-prefixes
 ./bin/busybox
 ./bin/nmap.xsl
+./bin/ListCmdProcessor.cs
 ./bin/nmap-old
 ./bin/ssl_helper
 ./bin/nmap-rpc
@@ -628,6 +629,7 @@
 ./bin/CompileErrorExample.cs
 ./bin/nmap-protocols
 ./bin/nmap-service-probes
+./bin/FTPConnectionTester.cs
 ./bin/nmap.dtd
 ./bin/nmap-os-db
 ./bin/nselib/nbd.lua

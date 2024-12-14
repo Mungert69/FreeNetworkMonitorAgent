@@ -345,6 +345,8 @@ namespace NetworkMonitorAgent
         {
             try
             {
+                  Console.WriteLine($"---BEGIN------");
+
                 Console.WriteLine($"Starting asset copy from : {directoryName}");
 
                 string[] assetFiles = await ListAssetFiles(directoryName);
@@ -371,6 +373,7 @@ namespace NetworkMonitorAgent
 
                         using (var fileStream = new FileStream(localFilePath, FileMode.Create, FileAccess.Write))
                         {
+                            Console.WriteLine($"Copying file: {localFilePath}");
                             await stream.CopyToAsync(fileStream);
                         }
                     }
@@ -387,7 +390,7 @@ namespace NetworkMonitorAgent
 #endif
 
 
-                    Console.WriteLine($"Copying file: {localFilePath}");
+                    Console.WriteLine($"Finshed processing file: {localFilePath}");
                 }
 
                 Console.WriteLine($"Directory copied to: {localPath}");
@@ -557,6 +560,7 @@ namespace NetworkMonitorAgent
                         {
                             // Trim any leading ./ from the assetFilePath
                             line = line.TrimStart('.', '/');
+                            Console.WriteLine($"Preparing file: {line}");
                             fileList.Add(line);
                         }
                     }

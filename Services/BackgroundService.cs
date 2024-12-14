@@ -15,6 +15,7 @@ namespace NetworkMonitorAgent.Services
     {
         Task<ResultObj> Start();
         Task<ResultObj> Stop();
+        bool IsRunning { get;  }
     }
     public class BackgroundService : IBackgroundService
     {
@@ -29,6 +30,7 @@ namespace NetworkMonitorAgent.Services
         private IMonitorPingInfoView _monitorPingInfoView;
         private LocalProcessorStates _processorStates;
         private ICmdProcessorProvider _cmdProcessorProvider;
+        private bool _isRunning=false;
         public BackgroundService(ILogger logger, NetConnectConfig netConfig, ILoggerFactory loggerFactory, IRabbitRepo rabbitRepo, IFileRepo fileRepo, LocalProcessorStates processorStates, IMonitorPingInfoView monitorPingInfoView, ICmdProcessorProvider cmdProcessorProvider)
         {
             _logger = logger;
@@ -41,6 +43,9 @@ namespace NetworkMonitorAgent.Services
             _cmdProcessorProvider = cmdProcessorProvider;
 
         }
+
+        public bool IsRunning { get => _isRunning;  }
+
         public async Task<ResultObj> Start()
         {
             var result = new ResultObj();
@@ -48,7 +53,9 @@ namespace NetworkMonitorAgent.Services
             try
             {
                 result = await _rabbitRepo.ConnectAndSetUp();
-                if (!result.Success) return result;
+                if (!result.Success) {
+                    _isRunning=false;
+                    return result;}
 
                 var _connectFactory = new NetworkMonitor.Connection.ConnectFactory(_loggerFactory.CreateLogger<ConnectFactory>(), netConfig: _netConfig, _cmdProcessorProvider);
                 _ = _connectFactory.SetupChromium(_netConfig);
@@ -58,6 +65,7 @@ namespace NetworkMonitorAgent.Services
                 var resultProcessor = await _monitorPingProcessor.Init(new ProcessorInitObj());
                 result.Message += resultListener.Message + resultProcessor.Message;
                 result.Success = resultProcessor.Success && resultListener.Success;
+
             }
             catch (Exception e)
             {
@@ -65,7 +73,7 @@ namespace NetworkMonitorAgent.Services
                 result.Message += $" Error : failed to start background service . Error was : {e.Message}";
                 _logger.LogError(result.Message);
             }
-
+            _isRunning=result.Success;
             return result;
 
         }
@@ -79,6 +87,7 @@ namespace NetworkMonitorAgent.Services
                 _logger.LogInformation("Shutting down RabbitListener.");
                 await _rabbitListener.Shutdown();
                 result.Message += " Success : Shutdown RabbitListener.";
+
             }
             catch (Exception e)
             {
@@ -110,6 +119,7 @@ namespace NetworkMonitorAgent.Services
                 _logger.LogError("Error during shutting down RabbitRepo: " + e.ToString());
                 result.Success = false;
             }
+            _isRunning=result.Success;
 
             return result;
         }

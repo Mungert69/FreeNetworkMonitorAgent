@@ -42,16 +42,16 @@ namespace NetworkMonitorAgent.Services
                 if (_isServiceStarted != value)
                 {
 
-                    OnServiceStateChanged();
+                    //OnServiceStateChanged();
                     _isServiceStarted = value;
 
                 }
             }
         }
-        protected void OnServiceStateChanged()
+       /* protected void OnServiceStateChanged()
         {
             ServiceStateChanged?.Invoke(this, EventArgs.Empty);
-        }
+        }*/
 
 
         public PlatformService( ILogger logger)
@@ -114,7 +114,7 @@ namespace NetworkMonitorAgent.Services
             try
             {
                 _disableAgentOnServiceShutdown = false;
-                InitializeReceiver();
+                //InitializeReceiver();
             }
             catch (Exception e)
             {
@@ -134,23 +134,7 @@ namespace NetworkMonitorAgent.Services
         public bool RequestPermissionsAsync()
         {
             try
-            {
-                /*var hasPermissions = await Utils.RequestStoragePermissionsAsync();
-
-                if (!hasPermissions)
-                {
-                    await _dialogService.DisplayAlert("Permission Request", "This app requires storage and battery optimization permissions for network monitoring. Please grant the permissions for optimal functionality.", "OK");
-                    bool openSettings = await _dialogService.DisplayAlert("Permission Denied", "Without the necessary permissions, the app might not work. Would you like to open settings and grant the permissions?", "Yes", "No");
-                    if (openSettings)
-                    {
-                        var intentSettings = new Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
-                        intentSettings.AddCategory(Android.Content.Intent.CategoryDefault);
-                        intentSettings.SetData(Android.Net.Uri.Parse("package:" + Platform.CurrentActivity.PackageName));
-                        Platform.CurrentActivity.StartActivity(intentSettings);
-                    }
-                }*/
-                //await _dialogService.DisplayAlert("Permission Request", "This app requires battery optimization permissions for network monitoring. Please grant the permissions for optimal functionality.", "OK");
-                  
+            {         
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
                 {
 #pragma warning disable CA1416
@@ -240,12 +224,12 @@ var powerService=Context.PowerService;
         {
                  try
             {
-                
-                    
-                    // Update PlatformService properties
+                 IsServiceStarted = state;
+                     // Update PlatformService properties
                     if (result.Success)
                     {
-                        IsServiceStarted = state;
+                     
+                     
                         if (IsServiceStarted) ServiceMessage = " Agent enabled. Complete tasks below to start monitoring...";
                         else
                         {
@@ -258,7 +242,7 @@ var powerService=Context.PowerService;
                     else
                     {
                         var stateStr = "start";
-                        if (!IsServiceStarted) stateStr = "stop";
+                        if (IsServiceStarted) stateStr = "stop";
 
                         ServiceMessage = $" Agent service failed to {stateStr}. Service message was : {result.Message}";
                          _logger.LogError(result.Message+ServiceMessage);
@@ -267,7 +251,7 @@ var powerService=Context.PowerService;
 
                     }
 
-                    OnServiceStateChanged();
+                    // OnServiceStateChanged();
 
                     // Optionally, notify the UI or log the status
                 
@@ -298,15 +282,14 @@ var powerService=Context.PowerService;
                     {
                         bool serviceChangeSuccess = intent?.GetBooleanExtra(AndroidBackgroundService.ServiceStatusExtra, false) ?? false;
                         string? message = intent?.GetStringExtra(AndroidBackgroundService.ServiceMessageExtra);
-
+                        _platformService.IsServiceStarted = serviceChangeSuccess;
                         // Update PlatformService properties
                         if (serviceChangeSuccess)
                         {
-                            _platformService.IsServiceStarted = !_platformService.IsServiceStarted;
-                            if (_platformService.IsServiceStarted) _platformService.ServiceMessage = " Agent enabled. Complete tasks below to start monitoring...";
+                            if (_platformService.IsServiceStarted) _platformService.ServiceMessage = "Android Agent enabled. Complete tasks below to start monitoring...";
                             else
                             {
-                                _platformService.ServiceMessage = " Agent disabled. You can now close the App.";
+                                _platformService.ServiceMessage = "Android Agent disabled. You can now close the App.";
                             }
                             _platformService._serviceOperationCompletionSource?.SetResult(true);
 
@@ -314,14 +297,14 @@ var powerService=Context.PowerService;
                         else
                         {
                             var stateStr = "start";
-                            if (!_platformService.IsServiceStarted) stateStr = "stop";
+                            if (_platformService.IsServiceStarted) stateStr = "stop";
 
-                            _platformService.ServiceMessage = $" Agent service failed to {stateStr}. Service message was : {message}";
+                            _platformService.ServiceMessage = $"Android Agent service failed to {stateStr}. Service message was : {message}";
                             _platformService._serviceOperationCompletionSource?.SetResult(false);
 
                         }
 
-                        _platformService.OnServiceStateChanged();
+                        //_platformService.OnServiceStateChanged();
 
                         // Optionally, notify the UI or log the status
                     }
@@ -381,7 +364,7 @@ var powerService=Context.PowerService;
                 if (result.Success) _serviceMessage = " Agent enabled. Complete tasks below to start monitoring...";
                 else _serviceMessage = $" Agent service failed to start. Service message was : {result.Message}";
                 if (result.Success) _isServiceStarted = true;
-                OnServiceStateChanged();
+                //OnServiceStateChanged();
             }
             catch (Exception ex)
             {
@@ -397,7 +380,7 @@ var powerService=Context.PowerService;
                 if (result.Success) _serviceMessage = " Agent disabled. You can now close the App.";
                 else _serviceMessage = $" Agent service failed to stop. Service message was : {result.Message}";
                 if (result.Success) _isServiceStarted = false;
-                OnServiceStateChanged();
+               // OnServiceStateChanged();
             }
             catch (Exception ex)
             {

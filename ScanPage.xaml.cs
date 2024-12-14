@@ -85,8 +85,8 @@ public partial class ScanPage : ContentPage
         catch (Exception ex)
         {
             // Handle any exceptions
-            await DisplayAlert("Error", $"Could not open browser . Errro was : {ex.Message}", "OK");
-            _logger.LogError($"Could not open browser. Errro was : {ex.ToString()}");
+            await DisplayAlert("Error", $"Could not open browser . Error was : {ex.Message}", "OK");
+            _logger.LogError($"Could not open browser. Error was : {ex.ToString()}");
 
         }
 

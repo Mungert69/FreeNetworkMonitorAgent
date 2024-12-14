@@ -69,9 +69,9 @@
                 <ProjectReference Include="..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj" />
                 <ProjectReference Include="..\NetworkMonitor\NetworkMonitor-Maui.csproj" />
         </ItemGroup>
-<ItemGroup>
-  <!-- Exclude all .cs files in Resources/Raw and its subdirectories -->
-  <Compile Remove="Resources/Raw\**\*.cs" />
-</ItemGroup>
+	<ItemGroup>
+  	<!-- Exclude all .cs files in Resources/Raw from compilation -->
+  		<Compile Remove="Resources/Raw\**\*.cs" />
+	</ItemGroup>
 </Project>
 

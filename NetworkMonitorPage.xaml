@@ -1,50 +1,94 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
-    x:Class="NetworkMonitorAgent.NetworkMonitorPage"
-    x:DataType="vm:NetworkMonitorViewModel">
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:NetworkMonitorAgent.ViewModels"
+             x:Class="NetworkMonitorAgent.NetworkMonitorPage"
+             x:DataType="vm:NetworkMonitorViewModel">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="15" Padding="5" VerticalOptions="Center">
+        <VerticalStackLayout Spacing="15"
+                Padding="5"
+                VerticalOptions="Center">
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"  Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand">
+            <Frame  BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="20"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
-                    <Image Source="logo.png" SemanticProperties.Description="Free Network Monitor Agent Logo. " HeightRequest="100" HorizontalOptions="Center" />
-                    <Label Text="Free Network Monitor Agent" FontSize="22" HorizontalOptions="Center" TextColor="{DynamicResource Primary}" />
+                    <Image Source="logo.png"
+                            SemanticProperties.Description="Free Network Monitor Agent Logo. "
+                            HeightRequest="100"
+                            HorizontalOptions="Center"/>
+                    <Label Text="Free Network Monitor Agent"
+                            FontSize="22"
+                            HorizontalOptions="Center"
+                            TextColor="{DynamicResource Primary}"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
-                <Label Text="Check Host" FontSize="16" HorizontalOptions="Center" TextColor="{DynamicResource Primary}"/>
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="20"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand"
+                    Margin="0,0,0,10">
+                <Label Text="Check Host"
+                        FontSize="16"
+                        HorizontalOptions="Center"
+                        TextColor="{DynamicResource Primary}"/>
             </Frame>
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                    Padding="20"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Select Endpoint Type:" FontSize="16" TextColor="{DynamicResource Primary}"/>
-                    <Picker ItemsSource="{Binding EndpointTypes}" SelectedItem="{Binding SelectedEndpointType}" />
-                    
-                    <Label Text="Enter Address:" FontSize="16" TextColor="{DynamicResource Primary}"/>
-                    <Entry Text="{Binding Address}" Placeholder="Enter address or URL" />
-                    
-                    <Label Text="Enter Port (optional):" FontSize="16" TextColor="{DynamicResource Primary}"/>
-                    <Entry Text="{Binding Port}" Placeholder="Enter port number" Keyboard="Numeric" />
-                    
-                    <Button Text="Test Connection" Command="{Binding TestConnectionCommand}" 
-                            BackgroundColor="{DynamicResource Primary}" TextColor="White" />
+                    <Label Text="Select Endpoint Type:"
+                            FontSize="16"
+                            TextColor="{DynamicResource Primary}"/>
+                    <Picker ItemsSource="{Binding EndpointTypes}"
+                            SelectedItem="{Binding SelectedEndpointType}"/>
+
+                    <Label Text="Enter Address:"
+                            FontSize="16"
+                            TextColor="{DynamicResource Primary}"/>
+                    <Entry Text="{Binding Address}"
+                            Placeholder="Enter address or URL"/>
+
+                    <Label Text="Enter Port (optional):"
+                            FontSize="16"
+                            TextColor="{DynamicResource Primary}"/>
+                    <Entry Text="{Binding Port}"
+                            Placeholder="Enter port number"
+                            Keyboard="Numeric"/>
+                    <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                            Padding="20"
+                            CornerRadius="10"
+                            HorizontalOptions="FillAndExpand"
+                            IsVisible="{Binding HasResult}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Test Result:"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    TextColor="{DynamicResource Primary}"/>
+                            <Label Text="{Binding ResultMessage}"
+                                    TextColor="{DynamicResource Primary}"/>
+                            <Label Text="{Binding ResponseTime, StringFormat='Response Time: {0}ms'}"
+                                    TextColor="{DynamicResource Primary}"/>
+                            <Label Text="{Binding ResultStatus}"
+                                    TextColor="{DynamicResource Primary}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Button Text="Test Connection"
+                            Command="{Binding TestConnectionCommand}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="White"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand" IsVisible="{Binding HasResult}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Test Result:" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource Primary}"/>
-                    <Label Text="{Binding ResultMessage}" TextColor="{DynamicResource Primary}"/>
-                    <Label Text="{Binding ResponseTime, StringFormat='Response Time: {0}ms'}" TextColor="{DynamicResource Primary}"/>
-                    <Label Text="{Binding ResultStatus}" TextColor="{DynamicResource Primary}"/>
-                </VerticalStackLayout>
-            </Frame>
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"/>
 
         </VerticalStackLayout>
     </ScrollView>

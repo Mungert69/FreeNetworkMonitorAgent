@@ -56,14 +56,27 @@ namespace NetworkMonitorAgent.ViewModels
             set
             {
                 SetProperty(ref _showToggle, value);
+            }
+        }
+
+          private bool _showTasks = false;
+        public bool ShowTasks
+        {
+            get => _showTasks;
+            set
+            {
                 SetProperty(ref _showTasks, value);
             }
         }
 
-        private bool _showTasks = true;
 
         // Fields that mirror platform service properties
         private bool _isServiceStarted;
+        public bool IsServiceStarted
+        {
+            get => _isServiceStarted;
+            set => SetProperty(ref _isServiceStarted, value);
+        }
         private bool _disableAgentOnServiceShutdown;
         private string _serviceMessage = "No Service Message";
         private AgentUserFlow _agentUserFlow;
@@ -77,7 +90,7 @@ namespace NetworkMonitorAgent.ViewModels
 
             if (_platformService != null)
             {
-                _platformService.ServiceStateChanged += PlatformServiceStateChanged;
+               // _platformService.ServiceStateChanged += PlatformServiceStateChanged;
                 // Initialize local fields based on current platform state
                 _isServiceStarted = _platformService.IsServiceStarted;
                 _disableAgentOnServiceShutdown = _platformService.DisableAgentOnServiceShutdown;
@@ -101,15 +114,7 @@ namespace NetworkMonitorAgent.ViewModels
             ToggleServiceCommand = new Command<bool>(async (value) => await SetServiceStartedAsync(value));
         }
 
-        public bool ShowTasks
-        {
-            get
-            {
-                if (_disableAgentOnServiceShutdown) return _showTasks && _isServiceStarted;
-                return _isServiceStarted;
-            }
-            set => SetProperty(ref _showTasks, value);
-        }
+       
 
         public string ServiceMessage
         {
@@ -146,30 +151,29 @@ namespace NetworkMonitorAgent.ViewModels
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error in ChangeServiceAsync : {e.Message}");
+                _logger.LogError($"Error in ChangeServiceAsync First Try Catch : {e.Message}");
             }
             finally
             {
                 try
                 {
-                    _isServiceStarted = _platformService?.IsServiceStarted ?? false;
+                    IsServiceStarted = _platformService?.IsServiceStarted ?? false;
                     _disableAgentOnServiceShutdown = _platformService?.DisableAgentOnServiceShutdown ?? false;
-                    _serviceMessage = _platformService?.ServiceMessage ?? "No Service Message";
+                    ServiceMessage = _platformService?.ServiceMessage ?? "No Service Message";
 
                     ShowLoadingMessage?.Invoke(this, (false,false));
+                    ShowTasks=_platformService?.IsServiceStarted ?? false;
                     ShowToggle = true;
-                    OnPropertyChanged(nameof(ServiceMessage));
-                    OnPropertyChanged(nameof(ShowTasks));
-                    OnPropertyChanged(nameof(ShowToggle));
+
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Error in ChangeServiceAsync : {ex.Message}");
+                    _logger.LogError($"Error in ChangeServiceAsync Second Try Catch : {ex.Message}");
                 }
             }
         }
 
-        private void PlatformServiceStateChanged(object? sender, EventArgs e)
+     /*   private void PlatformServiceStateChanged(object? sender, EventArgs e)
         {
             try
             {
@@ -188,7 +192,7 @@ namespace NetworkMonitorAgent.ViewModels
             {
                 _logger.LogError($" Error : handling service state change: {ex.Message}");
             }
-        }
+        }*/
 
         private void OnAgentUserFlowPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {

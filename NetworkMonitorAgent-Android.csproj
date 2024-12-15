@@ -76,6 +76,14 @@
     <Private>true</Private>
   </Reference>
 </ItemGroup>
+<ItemGroup>
+  <AndroidAsset Include="$(OutputPath)/*.dll">
+    <Link>assemblies\%(FileName)%(Extension)</Link>
+  </AndroidAsset>
+</ItemGroup>
+<PropertyGroup>
+  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+</PropertyGroup>
 	
 </Project>
 

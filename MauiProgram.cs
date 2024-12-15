@@ -92,7 +92,7 @@ namespace NetworkMonitorAgent
                 builder.Configuration.AddConfiguration(config);
                 Task.Run(async () =>
                 {
-                    string output = await CopyAssetsHelper.CopyAssetsToLocalStorage($"{config["OpensslVersion"]}-{os}", "cs-assets");
+                    string output = await CopyAssetsHelper.CopyAssetsToLocalStorage($"{config["OpensslVersion"]}-{os}", "cs-assets", "dlls");
                     Console.WriteLine(output);
                 }).Wait();
 

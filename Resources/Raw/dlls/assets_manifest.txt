@@ -55,6 +55,7 @@
 ./System.Threading.Tasks.dll
 ./System.IO.Compression.FileSystem.dll
 ./System.Web.HttpUtility.dll
+./Microsoft.CodeAnalysis.CSharp.dll
 ./System.IO.Compression.ZipFile.dll
 ./System.Globalization.dll
 ./System.Diagnostics.FileVersionInfo.dll
@@ -121,6 +122,7 @@
 ./System.Drawing.dll
 ./System.Diagnostics.TraceSource.dll
 ./System.Reflection.Emit.ILGeneration.dll
+./Microsoft.CodeAnalysis.dll
 ./System.Resources.Reader.dll
 ./System.Xml.XmlDocument.dll
 ./System.Collections.Specialized.dll

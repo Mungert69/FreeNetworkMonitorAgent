@@ -5,6 +5,10 @@ using NetworkMonitor.Objects.Repository;
 using NetworkMonitor.Objects.ServiceMessage;
 using NetworkMonitor.Utils.Helpers;
 using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui;
+using NetworkMonitor.Maui.Views;
+using NetworkMonitor.Maui.ViewModels;
+using NetworkMonitor.Maui.Controls;
 using MetroLog.Maui;
 namespace NetworkMonitorAgent;
 public partial class AppShell : Shell

@@ -2,10 +2,16 @@
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
 using Microsoft.Extensions.Logging;
+using NetworkMonitor.Maui;
+using NetworkMonitor.Maui.Views;
+using NetworkMonitor.Maui.ViewModels;
+using NetworkMonitor.Maui.Controls;
 namespace NetworkMonitorAgent;
 
 public partial class App : Application
 {
+
+[assembly: XamlCompilation(XamlCompilationOptions.Skip)]
 
    // public static ProcessorStatesViewModel ProcessorStatesVM { get; private set; }
     private ILogger? _logger;

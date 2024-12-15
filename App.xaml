@@ -9,9 +9,6 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-              <local:BoundsConverter x:Key="BoundsConverter"/>
-              <local:BoolToColorConverter x:Key="BoolToColorConverter"/>
-              <local:ToggledEventArgsConverter x:Key="ToggledEventArgsConverter"/>
      
         </ResourceDictionary>
     </Application.Resources>

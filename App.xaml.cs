@@ -11,7 +11,6 @@ namespace NetworkMonitorAgent;
 public partial class App : Application
 {
 
-[assembly: XamlCompilation(XamlCompilationOptions.Skip)]
 
    // public static ProcessorStatesViewModel ProcessorStatesVM { get; private set; }
     private ILogger? _logger;

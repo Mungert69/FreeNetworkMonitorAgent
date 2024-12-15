@@ -2,7 +2,7 @@ using Microsoft.Maui.Controls;
 using System;
 using System.Globalization;
 
-namespace NetworkMonitorAgent;
+namespace NetworkMonitor.Maui.Utils;
 public class ToggledEventArgsConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

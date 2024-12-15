@@ -2,7 +2,7 @@
 using NetworkMonitor.Processor.Services;
 using NetworkMonitor.DTOs;
 using NetworkMonitor.Objects;
-using NetworkMonitorAgent.Controls;
+using NetworkMonitor.Maui.Controls;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Connection;

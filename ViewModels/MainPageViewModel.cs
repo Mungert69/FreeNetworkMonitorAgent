@@ -81,15 +81,13 @@ namespace NetworkMonitor.Maui.ViewModels
         private bool _disableAgentOnServiceShutdown;
         private string _serviceMessage = "No Service Message";
         private AgentUserFlow _agentUserFlow;
-        private IRootNamespaceService _rootNamespaceService;
 
-        public MainPageViewModel(NetConnectConfig netConfig, IPlatformService platformService, ILogger logger, IAuthService authService, IRootNamespaceService rootNamespaceService)
+        public MainPageViewModel(NetConnectConfig netConfig, IPlatformService platformService, ILogger logger, IAuthService authService)
         {
             _netConfig = netConfig;
             _platformService = platformService;
             _logger = logger;
             _authService = authService;
-            _rootNamespaceService=rootNamespaceService;
 
             if (_platformService != null)
             {
@@ -252,7 +250,6 @@ namespace NetworkMonitor.Maui.ViewModels
         {
             new TaskItem
             {
-                RootNamespaceService=_rootNamespaceService,
                 TaskDescription = "Authorize Agent",
                 IsCompleted = _agentUserFlow.IsAuthorized,
                 TaskAction = new Command(async () =>
@@ -275,14 +272,12 @@ namespace NetworkMonitor.Maui.ViewModels
             },
             new TaskItem
             {
-                 RootNamespaceService=_rootNamespaceService,
                 TaskDescription = "Login Free Network Monitor",
                 IsCompleted = _agentUserFlow.IsLoggedInWebsite,
                 TaskAction = new Command(async () => await ExecuteLoginAsync())
             },
             new TaskItem
             {
-                 RootNamespaceService=_rootNamespaceService,
                 TaskDescription = "Scan for Hosts",
                 IsCompleted = _agentUserFlow.IsHostsAdded,
                 TaskAction = new Command(async () => await ExecuteScanHostsAsync())
@@ -443,7 +438,6 @@ namespace NetworkMonitor.Maui.ViewModels
     public class TaskItem : INotifyPropertyChanged
     {
         private bool _isCompleted;
-        private IRootNamespaceService _rootNamespaceService;
         public string TaskDescription { get; set; } = "";
         public string ButtonText => IsCompleted ? $"{TaskDescription ?? "Task"} (Completed)" : TaskDescription ?? "Task";
         public Color ButtonBackgroundColor
@@ -456,9 +450,9 @@ namespace NetworkMonitor.Maui.ViewModels
 
                     if (_isCompleted)
                     {
-                        if (RootNamespaceService.GetRequestedTheme() == AppTheme.Dark)
+                        if (ColorResource.GetRequestedTheme() == AppTheme.Dark)
                         {
-                            color = RootNamespaceService.GetResourceColor("Grey950");
+                            color = ColorResource.GetResourceColor("Grey950");
                         }
                         else
                         {
@@ -467,7 +461,7 @@ namespace NetworkMonitor.Maui.ViewModels
                     }
                     else
                     {
-                        color = RootNamespaceService.GetResourceColor("Warning");
+                        color = ColorResource.GetResourceColor("Warning");
                     }
 
                     return color;
@@ -487,7 +481,7 @@ namespace NetworkMonitor.Maui.ViewModels
                 {
                     if (_isCompleted)
                     {
-                        return RootNamespaceService.GetResourceColor("Primary");
+                        return ColorResource.GetResourceColor("Primary");
                     }
                     else { return Colors.White; }
                 }
@@ -519,8 +513,6 @@ namespace NetworkMonitor.Maui.ViewModels
         }
 
         public ICommand TaskAction { get; set; }
-        public IRootNamespaceService RootNamespaceService { get => _rootNamespaceService; set => _rootNamespaceService = value; }
-
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

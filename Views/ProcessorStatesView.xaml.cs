@@ -6,7 +6,7 @@ using NetworkMonitor.Connection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls;
 
-namespace NetworkMonitorAgent.Views;
+namespace NetworkMonitor.Maui.Views;
 public partial class ProcessorStatesView: ContentView
 {
     public ProcessorStatesView()

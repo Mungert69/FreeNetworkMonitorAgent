@@ -3,7 +3,7 @@ using Microsoft.Maui.Layouts;
 using System.Threading;
 using System.Timers;
 using Timer = System.Timers.Timer;
-namespace NetworkMonitorAgent.Controls;
+namespace NetworkMonitor.Maui.Controls;
 
 public class StatusIndicator : ContentView
 {

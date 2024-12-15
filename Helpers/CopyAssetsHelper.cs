@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Text;
 
-namespace NetworkMonitor.MauiLib;
+namespace NetworkMonitor.Maui;
 public class CopyAssetsHelper
 {
 

@@ -1,6 +1,7 @@
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Layouts;
-namespace NetworkMonitorAgent.Controls;
+using NetworkMonitor.Maui;
+namespace NetworkMonitor.Maui.Controls;
 public class AgentIndicator : ContentView
 {
 

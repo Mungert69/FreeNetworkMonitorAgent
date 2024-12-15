@@ -1,27 +1,66 @@
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using Microsoft.Maui.Controls;
+
 namespace NetworkMonitor.Maui;
 
-public interface IRootNamespaceService
+public class RootNamespaceService
 {
-    AppTheme GetRequestedTheme();
-    Color GetResourceColor(string key);
-    string GetAppDataDirectory();
-}
-
-public class RootNamespaceService : IRootNamespaceService
-{
-
-    public static IServiceProvider GetServiceProvider()
-{
-    return NetworkMonitorAgent.MauiProgram.ServiceProvider;
-}
-    public AppTheme GetRequestedTheme()
+    // Dynamically resolve MainActivity Type using reflection
+    public static Type MainActivity
     {
-        return NetworkMonitorAgent.App.Current?.RequestedTheme ?? AppTheme.Light;
+        get
+        {
+            try
+            {
+#if ANDROID
+                var appNamespace = Application.Current?.GetType().Namespace;
+                if (!string.IsNullOrEmpty(appNamespace))
+                {
+                    var mainActivityType = Type.GetType($"{appNamespace}.MainActivity");
+                    if (mainActivityType != null)
+                        return mainActivityType;
+                }
+                throw new InvalidOperationException("Unable to resolve MainActivity. Ensure the namespace is correct.");
+#else
+                throw new PlatformNotSupportedException("MainActivity is only available on Android.");
+#endif
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error resolving MainActivity: {ex.Message}");
+                return null;
+            }
+        }
     }
 
-    public Color GetResourceColor(string key)
+    // Dynamically resolve ServiceProvider via MauiProgram
+    public static IServiceProvider ServiceProvider
     {
-        return NetworkMonitorAgent.ColorResource.GetResourceColor(key);
+        get
+        {
+            try
+            {
+                // Locate the MauiProgram type dynamically
+                var appNamespace = Application.Current?.GetType().Namespace;
+                if (!string.IsNullOrEmpty(appNamespace))
+                {
+                    var mauiProgramType = Type.GetType($"{appNamespace}.MauiProgram");
+                    if (mauiProgramType != null)
+                    {
+                        var serviceProviderProperty = mauiProgramType.GetProperty("ServiceProvider", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        if (serviceProviderProperty?.GetValue(null) is IServiceProvider serviceProvider)
+                            return serviceProvider;
+                    }
+                }
+                throw new InvalidOperationException("Unable to resolve ServiceProvider. Ensure MauiProgram contains a public static ServiceProvider property.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error resolving ServiceProvider: {ex.Message}");
+                return null;
+            }
+        }
     }
 
     public string GetAppDataDirectory()
@@ -29,4 +68,3 @@ public class RootNamespaceService : IRootNamespaceService
         return FileSystem.AppDataDirectory;
     }
 }
-

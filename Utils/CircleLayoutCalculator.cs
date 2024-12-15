@@ -1,4 +1,4 @@
-namespace NetworkMonitorAgent
+namespace NetworkMonitor.Maui.Utils
 {
     public class CircleLayoutCalculator
     {

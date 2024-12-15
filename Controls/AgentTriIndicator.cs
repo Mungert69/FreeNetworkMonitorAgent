@@ -1,8 +1,9 @@
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Layouts;
 using NetworkMonitor.Objects; 
+using NetworkMonitor.Maui;
 
-namespace NetworkMonitorAgent.Controls
+namespace NetworkMonitor.Maui.Controls
 {
     public class AgentTriIndicator : ContentView
     {

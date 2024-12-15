@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 
-namespace NetworkMonitorAgent.Controls
+namespace NetworkMonitor.Maui.Controls
 {
     public class AnimatedButton : Button
     {

@@ -53,15 +53,15 @@ public const string ServiceMessageExtra = "ServiceMessage";
             base.OnCreate();
              _cts = new CancellationTokenSource();
 
-            _logger = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<ILogger<AndroidBackgroundService>>();
-            _netConfig = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<NetConnectConfig>();
-            _loggerFactory = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<ILoggerFactory>();
-            _fileRepo = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IFileRepo>();
-            _rabbitRepo = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IRabbitRepo>();
-            _monitorPingInfoView = NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IMonitorPingInfoView>();
-            _processorStates=NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<LocalProcessorStates>();
-            _cmdProcessorProvider=NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<ICmdProcessorProvider>();
-            _platformService= NetworkMonitorAgent.MauiProgram.ServiceProvider.GetRequiredService<IPlatformService>();
+            _logger = RootNamespaceService.ServiceProvider.GetRequiredService<ILogger<AndroidBackgroundService>>();
+            _netConfig = RootNamespaceService.ServiceProvider.GetRequiredService<NetConnectConfig>();
+            _loggerFactory = RootNamespaceService.ServiceProvider.GetRequiredService<ILoggerFactory>();
+            _fileRepo = RootNamespaceService.ServiceProvider.GetRequiredService<IFileRepo>();
+            _rabbitRepo = RootNamespaceService.ServiceProvider.GetRequiredService<IRabbitRepo>();
+            _monitorPingInfoView = RootNamespaceService.ServiceProvider.GetRequiredService<IMonitorPingInfoView>();
+            _processorStates=RootNamespaceService.ServiceProvider.GetRequiredService<LocalProcessorStates>();
+            _cmdProcessorProvider=RootNamespaceService.ServiceProvider.GetRequiredService<ICmdProcessorProvider>();
+            _platformService= RootNamespaceService.ServiceProvider.GetRequiredService<IPlatformService>();
             _backgroundService = new BackgroundService(_logger, _netConfig, _loggerFactory, _rabbitRepo, _fileRepo,_processorStates, _monitorPingInfoView, _cmdProcessorProvider );
 
         }
@@ -108,7 +108,7 @@ public const string ServiceMessageExtra = "ServiceMessage";
 
         private PendingIntent? GetViewAppPendingIntent()
         {
-            var viewAppIntent = new Intent(this, typeof(NetworkMonitorAgent.MainActivity)); // Replace 'MainActivity' with your main activity class
+            var viewAppIntent = new Intent(this,RootNamespaceService.MainActivity); // Replace 'MainActivity' with your main activity class
             viewAppIntent.SetAction(Intent.ActionMain);
             viewAppIntent.AddCategory(Intent.CategoryLauncher);
             return PendingIntent.GetActivity(this, 0, viewAppIntent, 0);

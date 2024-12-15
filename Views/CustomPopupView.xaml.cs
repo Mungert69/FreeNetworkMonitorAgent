@@ -4,7 +4,7 @@ using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
 
 
-namespace NetworkMonitorAgent.Views;
+namespace NetworkMonitor.Maui.Views;
 public partial class CustomPopupView: ContentView
 {
     public CustomPopupView()

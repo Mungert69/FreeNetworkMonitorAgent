@@ -18,8 +18,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Text;
-using NetworkMonitor.MauiLib;
-
 
 namespace NetworkMonitorAgent
 {
@@ -210,9 +208,7 @@ namespace NetworkMonitorAgent
 
         private static void BuildServices(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton<IRootNamespaceService, RootNamespaceService>();
-
-
+          
             builder.Services.AddSingleton<IApiService>(provider =>
     {
         var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
@@ -310,8 +306,7 @@ namespace NetworkMonitorAgent
               var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
               var platformService = provider.GetRequiredService<IPlatformService>();
               var authService = provider.GetRequiredService<IAuthService>();
-               var rootNamespaceService = provider.GetRequiredService<IRootNamespaceService>();
-              return new MainPageViewModel(netConfig, platformService, logger, authService,rootNamespaceService);
+              return new MainPageViewModel(netConfig, platformService, logger, authService);
           });
 
             builder.Services.AddSingleton(provider =>

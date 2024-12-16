@@ -1,4 +1,4 @@
-using NetworkMonitor.Objects;
+using NetworkMonitor.Maui.Services;
 
 namespace NetworkMonitorAgent
 {

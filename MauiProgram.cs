@@ -234,7 +234,7 @@ namespace NetworkMonitorAgent
                     var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
                     var netConfig = provider.GetRequiredService<NetConnectConfig>();
 
-                    return new CmdProcessorFactory(loggerFactory, rabbitRepo, netConfig);
+                    return new CmdProcessorProvider(loggerFactory, rabbitRepo, netConfig);
 
 
                 });

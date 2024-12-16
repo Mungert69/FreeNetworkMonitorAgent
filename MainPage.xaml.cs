@@ -28,19 +28,19 @@ public partial class MainPage : ContentPage
         // Subscribe to VM events
         _mainPageViewModel.ShowAlertRequested += (sender, args) =>
         {
-            Device.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
                 await DisplayAlert(args.Title, args.Message, "OK"));
         };
 
         _mainPageViewModel.OpenBrowserRequested += (sender, url) =>
         {
-            Device.BeginInvokeOnMainThread(async() =>
+            MainThread.BeginInvokeOnMainThread(async() =>
                 await Browser.Default.OpenAsync(url, BrowserLaunchMode.SystemPreferred));
         };
 
         _mainPageViewModel.NavigateRequested += (sender, route) =>
         {
-            Device.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
                 await Shell.Current.GoToAsync(route));
         };
 

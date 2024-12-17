@@ -5,6 +5,7 @@ using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.Controls;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
+using NetworkMonitor.Maui.Views;
 using NetworkMonitor.Connection;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel;

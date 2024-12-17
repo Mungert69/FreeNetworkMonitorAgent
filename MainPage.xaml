@@ -17,7 +17,7 @@
             </Frame>
 
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
-                <Label Text="Welcome to Free Network Monitor Agent Agent" FontSize="16" HorizontalOptions="Center" TextColor="{DynamicResource Primary}"/>
+                <Label Text="Welcome to Free Network Monitor Agent" FontSize="16" HorizontalOptions="Center" TextColor="{DynamicResource Primary}"/>
             </Frame>
             <!-- Processor States View -->
             <view:ProcessorStatesView x:Name="ProcessorStatesView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />

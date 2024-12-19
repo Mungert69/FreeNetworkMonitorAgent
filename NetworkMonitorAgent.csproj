@@ -81,13 +81,14 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.10" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.21" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
         <PackageReference Include="MetroLog.Maui" Version="2.1.0" />
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.*" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui.csproj" />
         <ProjectReference Include="..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj" />
         <ProjectReference Include="..\NetworkMonitor\NetworkMonitor-Maui.csproj" />
     </ItemGroup>
@@ -143,5 +144,19 @@
         </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="NetworkMonitorMaui">
+            <HintPath>..\NetworkMonitorMaui\bin\Debug\net9.0-android\NetworkMonitorMaui.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <AndroidAsset Include="$(OutputPath)/*.dll">
+            <Link>assemblies\%(FileName)%(Extension)</Link>
+        </AndroidAsset>
+    </ItemGroup>
+    <PropertyGroup>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
 
 </Project>

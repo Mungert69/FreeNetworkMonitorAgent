@@ -67,7 +67,7 @@
 
         </ItemGroup>
         <ItemGroup>
-                <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui.csproj" />  
+                <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui-Android.csproj" />  
         </ItemGroup>
 
         <ItemGroup>

@@ -148,8 +148,5 @@
         <ProjectReference Include="..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj" />
         <ProjectReference Include="..\NetworkMonitor\NetworkMonitor-Maui.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui.csproj" />
-    </ItemGroup>
-
+  
 </Project>

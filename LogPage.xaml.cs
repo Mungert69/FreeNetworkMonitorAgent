@@ -9,7 +9,6 @@ using System.Diagnostics;
 using Microsoft.Maui.Graphics;  // For Rectangle
 using Microsoft.Maui.Layouts;  // For AbsoluteLayoutFlags
 using NetworkMonitor.Maui;
-using NetworkMonitor.Maui.Views;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Maui.Controls;
 namespace NetworkMonitorAgent;

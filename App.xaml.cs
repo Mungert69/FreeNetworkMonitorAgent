@@ -3,7 +3,6 @@ using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui;
-using NetworkMonitor.Maui.Views;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Maui.Controls;
 namespace NetworkMonitorAgent;

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{CECFC27F-96EE-48E5-BE44-93ACB265FD89}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorAgent", "NetworkMonitorAgent.csproj", "{F1540838-880A-4528-8AC3-058ED2BD4F0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorMaui", "..\NetworkMonitorMaui\NetworkMonitorMaui.csproj", "{A61BD78D-B82B-471B-8F31-5CDA22E52485}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\NetworkMonitor\NetworkMonitor-Maui.csproj", "{42A6D244-B284-4C3D-9D64-2132D7505833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\NetworkMonitor\NetworkMonitor-Maui.csproj", "{EBBF145D-B405-43C0-8326-57AF8AAD50E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorMaui", "..\NetworkMonitorMaui\NetworkMonitorMaui.csproj", "{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,30 +18,30 @@ Global
 		Release-Dev|Any CPU = Release-Dev|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CECFC27F-96EE-48E5-BE44-93ACB265FD89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CECFC27F-96EE-48E5-BE44-93ACB265FD89}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CECFC27F-96EE-48E5-BE44-93ACB265FD89}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CECFC27F-96EE-48E5-BE44-93ACB265FD89}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CECFC27F-96EE-48E5-BE44-93ACB265FD89}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
-		{CECFC27F-96EE-48E5-BE44-93ACB265FD89}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
-		{A61BD78D-B82B-471B-8F31-5CDA22E52485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A61BD78D-B82B-471B-8F31-5CDA22E52485}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A61BD78D-B82B-471B-8F31-5CDA22E52485}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A61BD78D-B82B-471B-8F31-5CDA22E52485}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A61BD78D-B82B-471B-8F31-5CDA22E52485}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
-		{A61BD78D-B82B-471B-8F31-5CDA22E52485}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
-		{EBBF145D-B405-43C0-8326-57AF8AAD50E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBBF145D-B405-43C0-8326-57AF8AAD50E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBBF145D-B405-43C0-8326-57AF8AAD50E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBBF145D-B405-43C0-8326-57AF8AAD50E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBBF145D-B405-43C0-8326-57AF8AAD50E0}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
-		{EBBF145D-B405-43C0-8326-57AF8AAD50E0}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
+		{42A6D244-B284-4C3D-9D64-2132D7505833}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42A6D244-B284-4C3D-9D64-2132D7505833}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42A6D244-B284-4C3D-9D64-2132D7505833}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42A6D244-B284-4C3D-9D64-2132D7505833}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42A6D244-B284-4C3D-9D64-2132D7505833}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{42A6D244-B284-4C3D-9D64-2132D7505833}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
+		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
+		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

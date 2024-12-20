@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.ViewModels;
-
+using NetworkMonitor.Maui;
+using NetworkMonitorAgent.Views;
+using NetworkMonitor.Maui.ViewModels;
+using NetworkMonitor.Maui.Controls;
 
 namespace NetworkMonitorAgent;
 
@@ -9,20 +12,23 @@ public partial class MainPage : ContentPage
     private CancellationTokenSource _cancellationTokenSource;
     private readonly MainPageViewModel _mainPageViewModel;
     private readonly ILogger _logger; // Reintroduced logger
-
-    public MainPage(ILogger logger,MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
+private bool _isUpdatingSwitch = false;
+    public MainPage(ILogger logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
     {
         InitializeComponent();
 
-        _logger = logger; // Store the logger
+        _logger = logger;
 
         _mainPageViewModel = mainPageViewModel;
+        BindingContext = _mainPageViewModel;
+        CustomPopupView.BindingContext = processorStatesViewModel;
+        ProcessorStatesView.BindingContext = processorStatesViewModel;
+
+
         _cancellationTokenSource = new CancellationTokenSource();
         _mainPageViewModel.PollingCts = _cancellationTokenSource;
         _mainPageViewModel.ShowLoadingMessage += (sender, args) => ShowLoadingNoCancel(args);
-       
-       // _mainPageViewModel.SetupTasks();
-        // Subscribe to VM events
+
         _mainPageViewModel.ShowAlertRequested += (sender, args) =>
         {
             MainThread.BeginInvokeOnMainThread(async () =>
@@ -31,7 +37,7 @@ public partial class MainPage : ContentPage
 
         _mainPageViewModel.OpenBrowserRequested += (sender, url) =>
         {
-            MainThread.BeginInvokeOnMainThread(async() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
                 await Browser.Default.OpenAsync(url, BrowserLaunchMode.SystemPreferred));
         };
 
@@ -44,28 +50,56 @@ public partial class MainPage : ContentPage
 
         TaskListView.ItemsSource = _mainPageViewModel.Tasks;
 
-        BindingContext = _mainPageViewModel;
-        CustomPopupView.BindingContext = processorStatesViewModel;
-        ProcessorStatesView.BindingContext = processorStatesViewModel;
+
     }
 
-    private void OnSwitchToggled(object sender, ToggledEventArgs e)
+    private async void OnSwitchToggled(object sender, ToggledEventArgs e)
     {
+       
+        if (_isUpdatingSwitch)
+        {
+            return; // Ignore programmatic changes
+        }
+       
+            var switchControl = (Switch)sender;
+            bool originalState = switchControl.IsToggled;
+       
         try
         {
-            if (_mainPageViewModel != null)
-            {
-                _ = _mainPageViewModel.SetServiceStartedAsync(e.Value);
-            }
+            _isUpdatingSwitch = true;
+            // Disable the switch temporarily while the service is starting
+
+            switchControl.IsEnabled = false;
+            _mainPageViewModel.ServiceMessage = "Starting service...";
+            ShowLoading(true);
+
+            // Attempt to start/stop the service
+            bool isStarted = await _mainPageViewModel.SetServiceStartedAsync(e.Value);
+
+            // Reflect the actual service state on the toggle
+            switchControl.IsToggled = isStarted;
+
+            // Update UI feedback
+            _mainPageViewModel.ServiceMessage = isStarted ? "Service is running" : "Failed to start service.";
         }
         catch (Exception ex)
         {
-            DisplayAlert("Error", $"Error in OnSwitchToggled: {ex.Message}", "OK");
+            // Log error and notify the user
             _logger.LogError(ex, "Error in OnSwitchToggled");
+            await DisplayAlert("Error", $"Failed to change service state: {ex.Message}", "OK");
+
+            // Revert the toggle to its previous state
+            switchControl.IsToggled = originalState;
+        }
+        finally
+        {
+            _isUpdatingSwitch = false;
+            switchControl.IsEnabled = true;
+            ShowLoading(false);
         }
     }
 
-   
+
     private void OnCancelClicked(object sender, EventArgs e)
     {
         try

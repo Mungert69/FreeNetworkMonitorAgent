@@ -7,17 +7,7 @@ namespace NetworkMonitorAgent
     {
 
         public Type MainActivity { get => typeof(MainActivity); }
-         public int GetDrawable(string drawableName)
-        {
-            return drawableName switch
-            {
-                "logo" => Resource.Drawable.logo,
-                "view" => Resource.Drawable.view,
-                "stop" => Resource.Drawable.stop,
-                _ => Resource.Drawable.logo
-            };
-        }
-
+     
 public IServiceProvider ServiceProvider { get => MauiProgram.ServiceProvider; }
 
         // Removed duplicate 'Resource' property; accessing Drawable via GetDrawable method instead.

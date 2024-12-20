@@ -26,51 +26,20 @@ namespace NetworkMonitorAgent
         public static IServiceProvider ServiceProvider { get; private set; }
         public static MauiApp CreateMauiApp()
         {
-           
-            var os = "linux";
+            string os = "";
+
 #if ANDROID
-			os="android";
-             ServiceInitializer.Initialize(new RootNamespaceProvider());
+			    os="android";
+                ServiceInitializer.Initialize(new RootNamespaceProvider());
 #endif
 
 #if WINDOWS
-            os = "windows";
+                os = "windows";
 #endif
 
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>().UseMauiCommunityToolkit()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
-            // Add Maui Loggers
-            try
-            {
-                builder.Logging.AddTraceLogger(options =>
-                {
-                    options.MinLevel = LogLevel.Information;
-                    options.MaxLevel = LogLevel.Critical;
-                });
-                builder.Logging.AddInMemoryLogger(options =>
-                {
-                    options.MaxLines = 1024;
-                    options.MinLevel = LogLevel.Information;
-                    options.MaxLevel = LogLevel.Critical;
-                });
-                builder.Logging.AddStreamingFileLogger(options =>
-                {
-                    options.RetainDays = 2;
-                    options.FolderPath = Path.Combine(
-                        FileSystem.CacheDirectory,
-                        "MetroLogs");
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($" Error : could not setup logging . Error was : {ex}");
-            }
+            MauiAppBuilder builder = CreateBuilder();
+
+
             // Define the paths for the local and packaged appsettings.json
             try
             {
@@ -93,7 +62,11 @@ namespace NetworkMonitorAgent
                 builder.Configuration.AddConfiguration(config);
                 Task.Run(async () =>
                 {
-                    string output = await CopyAssetsHelper.CopyAssetsToLocalStorage($"{config["OpensslVersion"]}-{os}", "cs-assets", "dlls");
+                    string output = "";
+                    string opensslVersion = config["OpensslVersion"];
+                    string versionStr = opensslVersion;
+                    if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
+                    else output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
                     Console.WriteLine(output);
                 });
 
@@ -160,6 +133,28 @@ namespace NetworkMonitorAgent
             return app;
         }
 
+        private static MauiAppBuilder CreateBuilder()
+        {
+            try
+            {
+                MauiAppBuilder builder = MauiApp.CreateBuilder();
+                builder
+                    .UseMauiApp<App>().UseMauiCommunityToolkit()
+                    .ConfigureFonts(fonts =>
+                    {
+                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    });
+                return builder;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: Could not create builder. Error was: {e.Message}");
+                throw new InvalidOperationException("Failed to initialize MauiAppBuilder.", e);
+            }
+        }
+
+
         private static void BuildRepoAndConfig(MauiAppBuilder builder)
         {
             builder.Services.AddSingleton(provider =>
@@ -209,7 +204,7 @@ namespace NetworkMonitorAgent
 
         private static void BuildServices(MauiAppBuilder builder)
         {
-          
+
             builder.Services.AddSingleton<IApiService>(provider =>
     {
         var loggerFactory = provider.GetRequiredService<ILoggerFactory>();

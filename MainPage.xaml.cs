@@ -109,8 +109,6 @@ private bool _isUpdatingSwitch = false;
     {
         try
         {
-            _mainPageViewModel.IsPolling = false;
-            // Cancel polling and reset CancellationTokenSource
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
             _mainPageViewModel.PollingCts = _cancellationTokenSource;

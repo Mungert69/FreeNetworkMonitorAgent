@@ -25,7 +25,7 @@
             <!-- Add this inside your Grid or another layout -->
             <ActivityIndicator x:Name="ProgressIndicator"  IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Button x:Name="CancelButton" Text="Cancel" IsVisible="False" Clicked="OnCancelClicked" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Frame IsVisible="{Binding ShowToggle}" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="0" CornerRadius="10" HorizontalOptions="FillAndExpand">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="0" CornerRadius="10" HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
                     <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                         <Label Text="Enable Agent" VerticalOptions="Center" TextColor="{DynamicResource Primary}"/>

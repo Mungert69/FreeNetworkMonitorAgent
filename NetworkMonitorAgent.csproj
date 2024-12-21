@@ -64,7 +64,8 @@
         <MauiAsset Include="Resources\Raw\appsettings.json" />
         <MauiAsset Include="Resources\Raw\**"  LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
         <MauiAsset Include="Resources\Raw\openssl-3.3.1-windows\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-
+        
+        <MauiStyles Include="Resources\Styles\*" /> 
     </ItemGroup>
 
 

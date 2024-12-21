@@ -1,14 +1,20 @@
-#if ANDROID
+
 using NetworkMonitor.Maui.Services;
 
 namespace NetworkMonitorAgent
 {
     public class RootNamespaceProvider : IRootNamespaceProvider
     {
+        private static bool _assetsReady = false;
 
+        public static bool AssetsReady { get => _assetsReady; set => _assetsReady = value; }
+        public IServiceProvider ServiceProvider { get => MauiProgram.ServiceProvider; }
+        public string GetAppDataDirectory() => FileSystem.AppDataDirectory;
+
+
+#if ANDROID
         public Type MainActivity { get => typeof(MainActivity); }
      
-public IServiceProvider ServiceProvider { get => MauiProgram.ServiceProvider; }
 
         // Removed duplicate 'Resource' property; accessing Drawable via GetDrawable method instead.
         public string GetAppDataDirectory() => FileSystem.AppDataDirectory;
@@ -24,7 +30,12 @@ public IServiceProvider ServiceProvider { get => MauiProgram.ServiceProvider; }
                 _ => Resource.Drawable.logo
             };
         }
+#else
+        public Type MainActivity { get => typeof(object); }
+
+        public int GetDrawable(string drawableName) => 0;
+        
+#endif
 
     }
 }
-#endif

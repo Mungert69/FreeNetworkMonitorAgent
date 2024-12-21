@@ -627,7 +627,6 @@
 ./bin/nmap.xsl
 ./bin/openssl.exe
 ./bin/libssh2.dll
-./bin/ListCmdProcessor.cs
 ./bin/ssl_helper
 ./bin/libcrypto-1_1.dll
 ./bin/nmap_performance.reg
@@ -641,7 +640,6 @@
 ./bin/NDIFF_README
 ./bin/ca-bundle.crt
 ./bin/ndiff.bat
-./bin/CompileErrorExample.cs
 ./bin/msvcp120.dll
 ./bin/npcap-1.00.exe
 ./bin/libssl-1_1.dll
@@ -651,7 +649,6 @@
 ./bin/3rd-party-licenses.txt
 ./bin/nmap-service-probes
 ./bin/msvcr120.dll
-./bin/FTPConnectionTester.cs
 ./bin/LICENSE
 ./bin/CHANGELOG
 ./bin/nmap-os-db

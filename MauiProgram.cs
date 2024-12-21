@@ -27,14 +27,15 @@ namespace NetworkMonitorAgent
         public static MauiApp CreateMauiApp()
         {
             string os = "";
+            ServiceInitializer.Initialize(new RootNamespaceProvider());
 
 #if ANDROID
 			    os="android";
-                ServiceInitializer.Initialize(new RootNamespaceProvider());
+               
 #endif
 
 #if WINDOWS
-                os = "windows";
+            os = "windows";
 #endif
 
             MauiAppBuilder builder = CreateBuilder();
@@ -66,7 +67,8 @@ namespace NetworkMonitorAgent
                     string opensslVersion = config["OpensslVersion"];
                     string versionStr = opensslVersion;
                     if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
-                    else output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
+                    output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
+                    RootNamespaceProvider.AssetsReady = true;
                     Console.WriteLine(output);
                 });
 

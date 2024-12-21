@@ -72,7 +72,7 @@
 
         <ItemGroup>
   <Reference Include="NetworkMonitorMaui">
-    <HintPath>..\NetworkMonitorMaui\bin\Debug\net9.0-android\NetworkMonitorMaui.dll</HintPath>
+    <HintPath>..\NetworkMonitorMaui\bin\Debug\net9.0-android\NetworkMonitorMaui-Android.dll</HintPath>
     <Private>true</Private>
   </Reference>
 </ItemGroup>

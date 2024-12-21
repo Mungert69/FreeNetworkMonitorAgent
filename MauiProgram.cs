@@ -40,7 +40,21 @@ namespace NetworkMonitorAgent
 
             MauiAppBuilder builder = CreateBuilder();
 
-
+ try
+            {
+                
+                builder.Logging.AddInMemoryLogger(options =>
+                {
+                    options.MaxLines = 1024;
+                    options.MinLevel = LogLevel.Information;
+                    options.MaxLevel = LogLevel.Critical;
+                });
+              
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error : could not setup logging . Error was : {ex}");
+            }
             // Define the paths for the local and packaged appsettings.json
             try
             {

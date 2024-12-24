@@ -11,6 +11,9 @@ fi
 
 # Proceed with the rest of the commands
 dotnet clean NetworkMonitorAgent-Android.csproj
+dotnet publish ~/code/NetworkMonitor/NetworkMonitor-Maui-Android.csproj -c Release -r android --self-contained true
+cp ~/code/NetworkMonitor/bin/Release/net9.0-android/android/NetworkMonitor-Maui-Android.dll ~/code/FreeNetworkMonitorAgent/Resources/Raw/dlls/NetworkMonitor.dll
+
 cp ./Resources/Raw/appsettings-live.json ./Resources/Raw/appsettings.json
 dotnet build -c Release -f net9.0-android NetworkMonitorAgent-Android.csproj
 

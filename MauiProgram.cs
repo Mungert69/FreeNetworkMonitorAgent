@@ -108,11 +108,12 @@ namespace NetworkMonitorAgent
         }
         private static void LoadConfiguration(MauiAppBuilder builder, string os)
         {
+            IConfigurationRoot? config = null;
             try
             {
                 string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, $"appsettings.json");
                 //string packagedAppSettingsPath = "NetworkMonitorAgent.appsettings.json";
-                IConfigurationRoot config;
+               
                 // Check if a local copy of appsettings.json exists
                 if (File.Exists(localAppSettingsPath))
                 {
@@ -134,6 +135,7 @@ namespace NetworkMonitorAgent
             }
             try
             {
+                if (config != null)
                 Task.Run(async () =>
                 {
                     string output = "";
@@ -144,66 +146,16 @@ namespace NetworkMonitorAgent
                     RootNamespaceProvider.AssetsReady = true;
                     
                 });
+                else    ExceptionHelper.HandleGlobalException(new Exception(),"Config is null");
 
 
             }
             catch (Exception ex)
             {
-                 ExceptionHelper.HandleGlobalException(ex," Error could not load appsetting.json");
+                 ExceptionHelper.HandleGlobalException(ex," Error could not load assets");
             }
 
-            try
-            {
-                BuildRepoAndConfig(builder);
-            }
-            catch (Exception ex)
-            {
-                 ExceptionHelper.HandleGlobalException(ex,"Error in BuildRepoAndConfig");
-            }
-
-            try
-            {
-                BuildServices(builder);
-            }
-            catch (Exception ex)
-            {
-                 ExceptionHelper.HandleGlobalException(ex,"Error in BuildServices");
-            }
-
-            try
-            {
-                BuildViewModels(builder);
-            }
-            catch (Exception ex)
-            {
-                 ExceptionHelper.HandleGlobalException(ex,"Error in BuildViewModels");
-            }
-
-            try
-            {
-                BuildPages(builder);
-            }
-            catch (Exception ex)
-            {
-                 ExceptionHelper.HandleGlobalException(ex"Error in BuildPages");
-            }
-            try
-            {
-                builder.Services.AddSingleton(provider =>
-                        {
-                            var logger = provider.GetRequiredService<ILogger<AppShell>>();
-                            var platformService = provider.GetRequiredService<IPlatformService>();
-                            return new AppShell(logger, platformService);
-                        });
-            }
-            catch (Exception ex)
-            {
-                 ExceptionHelper.HandleGlobalException(ex,"Error creating AppShell");
-            }
-
-
-
-
+          
         }
         private static MauiAppBuilder CreateBuilder()
         {

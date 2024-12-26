@@ -11,6 +11,7 @@ using NetworkMonitor.Maui;
 using NetworkMonitor.Objects.ServiceMessage;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
+using NetworkMonitor.Utils.Helpers;
 using CommunityToolkit.Maui;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Storage;
@@ -18,14 +19,29 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Text;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace NetworkMonitorAgent
 {
     public static class MauiProgram
     {
-        public static IServiceProvider ServiceProvider { get; private set; }
+              public static IServiceProvider ServiceProvider { get; private set; }
         public static MauiApp CreateMauiApp()
         {
+            // Add Global Exception Handling
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                ExceptionHelper.HandleGlobalException(e.ExceptionObject as Exception, "Unhandled Domain Exception");
+            };
+
+            TaskScheduler.UnobservedTaskException += (sender, e) =>
+            {
+                ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
+                e.SetObserved();
+            };
+
             string os = "";
             ServiceInitializer.Initialize(new RootNamespaceProvider());
 
@@ -40,22 +56,57 @@ namespace NetworkMonitorAgent
 
             MauiAppBuilder builder = CreateBuilder();
 
- try
+            try
             {
-                
+
                 builder.Logging.AddInMemoryLogger(options =>
                 {
                     options.MaxLines = 1024;
                     options.MinLevel = LogLevel.Information;
                     options.MaxLevel = LogLevel.Critical;
                 });
-              
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error : could not setup logging . Error was : {ex}");
+                ExceptionHelper.HandleGlobalException(ex, " Error : could not setup logging");
             }
-            // Define the paths for the local and packaged appsettings.json
+
+
+            try
+            {
+                LoadConfiguration(builder, os);
+                BuildRepoAndConfig(builder);
+                BuildServices(builder);
+                BuildViewModels(builder);
+                BuildPages(builder);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.HandleGlobalException(ex, "Initialization Error");
+            }
+            try
+            {
+                builder.Services.AddSingleton(provider =>
+                        {
+                            var logger = provider.GetRequiredService<ILogger<AppShell>>();
+                            var platformService = provider.GetRequiredService<IPlatformService>();
+                            return new AppShell(logger, platformService);
+                        });
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.HandleGlobalException(ex, "Error creating AppShell");
+            }
+
+
+
+            var app = builder.Build();
+            ServiceProvider = app.Services;
+            return app;
+        }
+        private static void LoadConfiguration(MauiAppBuilder builder, string os)
+        {
             try
             {
                 string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, $"appsettings.json");
@@ -75,87 +126,42 @@ namespace NetworkMonitorAgent
                     config = new ConfigurationBuilder().AddJsonStream(stream).Build();
                 }
                 builder.Configuration.AddConfiguration(config);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.HandleGlobalException(ex, $" Error could not load appsetting.json");
+            }
+            try
+            {
                 Task.Run(async () =>
-                {
-                    string output = "";
-                    string opensslVersion = config["OpensslVersion"];
-                    string versionStr = opensslVersion;
-                    if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
-                    output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
-                    RootNamespaceProvider.AssetsReady = true;
-                    Console.WriteLine(output);
-                });
-
+          {
+              string output = "";
+              string opensslVersion = config["OpensslVersion"];
+              string versionStr = opensslVersion;
+              if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
+              output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
+              RootNamespaceProvider.AssetsReady = true;
+              Console.WriteLine(output);
+          });
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error could not load appsetting.json . Error was : {ex.Message}");
-            }
-
-            try
-            {
-                BuildRepoAndConfig(builder);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error in BuildRepoAndConfig: {e}");
-            }
-
-            try
-            {
-                BuildServices(builder);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error in BuildServices: {e}");
-            }
-
-            try
-            {
-                BuildViewModels(builder);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error in BuildViewModels: {e}");
-            }
-
-            try
-            {
-                BuildPages(builder);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error in BuildPages: {e}");
-            }
-            try
-            {
-                builder.Services.AddSingleton(provider =>
-                        {
-                            var logger = provider.GetRequiredService<ILogger<AppShell>>();
-                            var platformService = provider.GetRequiredService<IPlatformService>();
-                            return new AppShell(logger, platformService);
-                        });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error creating AppShell: {e}");
+                ExceptionHelper.HandleGlobalException(ex, $" Error could not copy assets");
             }
 
 
 
-            var app = builder.Build();
-            ServiceProvider = app.Services;
-            return app;
+
         }
-
         private static MauiAppBuilder CreateBuilder()
         {
             try
             {
                 MauiAppBuilder builder = MauiApp.CreateBuilder();
                 builder
-                    .UseMauiApp<App>().UseMauiCommunityToolkit()
+                    .UseMauiApp<App>()
+                    .UseMauiCommunityToolkit()
                     .ConfigureFonts(fonts =>
                     {
                         fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -163,14 +169,11 @@ namespace NetworkMonitorAgent
                     });
                 return builder;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error: Could not create builder. Error was: {e.Message}");
-                throw new InvalidOperationException("Failed to initialize MauiAppBuilder.", e);
+                ExceptionHelper.HandleGlobalException(ex, "Builder Creation Error");
             }
         }
-
-
         private static void BuildRepoAndConfig(MauiAppBuilder builder)
         {
             builder.Services.AddSingleton(provider =>
@@ -357,5 +360,6 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<DateViewPage>();
         }
 
+       
     }
 }

@@ -26,6 +26,19 @@ namespace NetworkMonitorAgent
         public static IServiceProvider ServiceProvider { get; private set; }
         public static MauiApp CreateMauiApp()
         {
+
+              // Add Global Exception Handling
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                ExceptionHelper.HandleGlobalException(e.ExceptionObject as Exception, "Unhandled Domain Exception");
+            };
+
+            TaskScheduler.UnobservedTaskException += (sender, e) =>
+            {
+                ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
+                e.SetObserved();
+            };
+
             string os = "";
             ServiceInitializer.Initialize(new RootNamespaceProvider());
 
@@ -53,7 +66,7 @@ namespace NetworkMonitorAgent
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error : could not setup logging . Error was : {ex}");
+                 ExceptionHelper.HandleGlobalException(ex," Error : could not setup logging");
             }
             // Define the paths for the local and packaged appsettings.json
             try
@@ -83,50 +96,50 @@ namespace NetworkMonitorAgent
                     if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
                     output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
                     RootNamespaceProvider.AssetsReady = true;
-                    Console.WriteLine(output);
+                    
                 });
 
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error could not load appsetting.json . Error was : {ex.Message}");
+                 ExceptionHelper.HandleGlobalException(ex," Error could not load appsetting.json");
             }
 
             try
             {
                 BuildRepoAndConfig(builder);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error in BuildRepoAndConfig: {e}");
+                 ExceptionHelper.HandleGlobalException(ex,"Error in BuildRepoAndConfig");
             }
 
             try
             {
                 BuildServices(builder);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error in BuildServices: {e}");
+                 ExceptionHelper.HandleGlobalException(ex,"Error in BuildServices");
             }
 
             try
             {
                 BuildViewModels(builder);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error in BuildViewModels: {e}");
+                 ExceptionHelper.HandleGlobalException(ex,"Error in BuildViewModels");
             }
 
             try
             {
                 BuildPages(builder);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error in BuildPages: {e}");
+                 ExceptionHelper.HandleGlobalException(ex"Error in BuildPages");
             }
             try
             {
@@ -137,9 +150,9 @@ namespace NetworkMonitorAgent
                             return new AppShell(logger, platformService);
                         });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error creating AppShell: {e}");
+                 ExceptionHelper.HandleGlobalException(ex,"Error creating AppShell");
             }
 
 
@@ -163,10 +176,10 @@ namespace NetworkMonitorAgent
                     });
                 return builder;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error: Could not create builder. Error was: {e.Message}");
-                throw new InvalidOperationException("Failed to initialize MauiAppBuilder.", e);
+                 ExceptionHelper.HandleGlobalException(ex,"Error: Could not create builder");
+                throw new InvalidOperationException("Failed to initialize MauiAppBuilder.", ex);
             }
         }
 
@@ -192,7 +205,7 @@ namespace NetworkMonitorAgent
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error : initializing FileRepo . Error was : {ex}");
+                     ExceptionHelper.HandleGlobalException(ex,"Error : initializing FileRepo");
                     return new FileRepo();
 
                 }

@@ -15,8 +15,8 @@
                 <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
                 <ApplicationIdGuid>d4f21b0e-2c97-4c50-b003-dca43bd9a888</ApplicationIdGuid>
                 <!-- Versions -->
-                <ApplicationDisplayVersion>0.3.5</ApplicationDisplayVersion>
-                <ApplicationVersion>305</ApplicationVersion>
+                <ApplicationDisplayVersion>0.3.6</ApplicationDisplayVersion>
+                <ApplicationVersion>306</ApplicationVersion>
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
@@ -49,8 +49,10 @@
                 <!-- Custom Fonts -->
                 <MauiFont Include="Resources\Fonts\*" />
                 <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-                <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-                 
+                 <MauiAsset Include="Resources\Raw\**" 
+           Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" 
+           LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+
                 <MauiStyles Include="Resources\Styles\*" />
         </ItemGroup>
 

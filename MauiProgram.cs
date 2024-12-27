@@ -8,40 +8,50 @@ using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Api.Services;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui;
-using NetworkMonitor.Objects.ServiceMessage;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
 using CommunityToolkit.Maui;
-using Microsoft.Maui.Hosting;
-using Microsoft.Maui.Storage;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.IO;
-using System.Text;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
+using CommunityToolkit.Maui.Alerts;
+
 
 namespace NetworkMonitorAgent
 {
     public static class MauiProgram
     {
-              public static IServiceProvider ServiceProvider { get; private set; }
+        // Centralized exception handler
+        public static void HandleGlobalException(Exception exception, string title)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Application.Current.MainPage?.DisplayAlert(title, exception.Message, "OK");
+                Console.WriteLine($"Global Exception Caught: {exception}");
+            });
+        }
+
+        public static IServiceProvider ServiceProvider { get; private set; }
         public static MauiApp CreateMauiApp()
         {
 
-              // Add Global Exception Handling
+            // Global exception handlers
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
             {
-                ExceptionHelper.HandleGlobalException(e.ExceptionObject as Exception, "Unhandled Domain Exception");
+                var exception = e.ExceptionObject as Exception;
+                if (exception != null)
+                {
+                    HandleGlobalException(exception, "Unhandled Domain Exception");
+                }
             };
 
             TaskScheduler.UnobservedTaskException += (sender, e) =>
             {
-                ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
-                e.SetObserved();
+                e.SetObserved(); // Prevent the process from terminating
+                HandleGlobalException(e.Exception, "Unobserved Task Exception");
             };
+
+          
+
+
 
             string os = "";
             ServiceInitializer.Initialize(new RootNamespaceProvider());
@@ -70,7 +80,7 @@ namespace NetworkMonitorAgent
             }
             catch (Exception ex)
             {
-                 ExceptionHelper.HandleGlobalException(ex," Error : could not setup logging");
+                ExceptionHelper.HandleGlobalException(ex, " Error : could not setup logging");
             }
 
 
@@ -113,7 +123,7 @@ namespace NetworkMonitorAgent
             {
                 string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, $"appsettings.json");
                 //string packagedAppSettingsPath = "NetworkMonitorAgent.appsettings.json";
-               
+
                 // Check if a local copy of appsettings.json exists
                 if (File.Exists(localAppSettingsPath))
                 {
@@ -136,26 +146,26 @@ namespace NetworkMonitorAgent
             try
             {
                 if (config != null)
-                Task.Run(async () =>
-                {
-                    string output = "";
-                    string opensslVersion = config["OpensslVersion"];
-                    string versionStr = opensslVersion;
-                    if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
-                    output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
-                    RootNamespaceProvider.AssetsReady = true;
-                    
-                });
-                else    ExceptionHelper.HandleGlobalException(new Exception(),"Config is null");
+                    Task.Run(async () =>
+                    {
+                        string output = "";
+                        string opensslVersion = config["OpensslVersion"];
+                        string versionStr = opensslVersion;
+                        if (!string.IsNullOrEmpty(os)) versionStr = $"{opensslVersion}-{os}";
+                        output = await CopyAssetsHelper.CopyAssetsToLocalStorage(versionStr, "cs-assets", "dlls");
+                        RootNamespaceProvider.AssetsReady = true;
+
+                    });
+                else ExceptionHelper.HandleGlobalException(new Exception(), "Config is null");
 
 
             }
             catch (Exception ex)
             {
-                 ExceptionHelper.HandleGlobalException(ex," Error could not load assets");
+                ExceptionHelper.HandleGlobalException(ex, " Error could not load assets");
             }
 
-          
+
         }
         private static MauiAppBuilder CreateBuilder()
         {
@@ -174,7 +184,7 @@ namespace NetworkMonitorAgent
             }
             catch (Exception ex)
             {
-                 ExceptionHelper.HandleGlobalException(ex,"Error: Could not create builder");
+                ExceptionHelper.HandleGlobalException(ex, "Error: Could not create builder");
                 throw new InvalidOperationException("Failed to initialize MauiAppBuilder.", ex);
             }
         }
@@ -199,7 +209,7 @@ namespace NetworkMonitorAgent
                 }
                 catch (Exception ex)
                 {
-                     ExceptionHelper.HandleGlobalException(ex,"Error : initializing FileRepo");
+                    ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
                     return new FileRepo();
 
                 }
@@ -285,7 +295,7 @@ namespace NetworkMonitorAgent
                     var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
                     var fileRepo = provider.GetRequiredService<IFileRepo>();
                     var processorStates = provider.GetRequiredService<LocalProcessorStates>();
-                    var cmdProcessorProvider=provider.GetRequiredService<ICmdProcessorProvider>();
+                    var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
                     var monitorPingInfoView = provider.GetRequiredService<IMonitorPingInfoView>();
 
                     return new BackgroundService(logger, netConfig, loggerFactory, rabbitRepo, fileRepo, processorStates, monitorPingInfoView, cmdProcessorProvider);
@@ -363,7 +373,26 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DateViewPage>();
         }
+        private static void ShowAlertBlocking(string title, string? message)
+        {
+            var fullMessage = string.IsNullOrWhiteSpace(message) ? title : $"{title}\n{message}";
 
-       
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                var mainPage = Application.Current?.MainPage;
+                if (mainPage != null)
+                {
+                    mainPage.DisplayAlert("Error", fullMessage, "OK").GetAwaiter().GetResult();
+                }
+                else
+                {
+                    // Fallback if MainPage is not available
+                    Console.WriteLine(fullMessage);
+                }
+            });
+        }
+
+
+
     }
 }

@@ -6,6 +6,7 @@ namespace NetworkMonitorAgent;
 public partial class DetailsPage : ContentPage
 {
 
+
     private ILogger _logger;
     public DetailsPage(ILogger logger,IMonitorPingInfoView monitorPingInfoView)
     {
@@ -14,6 +15,7 @@ public partial class DetailsPage : ContentPage
             InitializeComponent();
             _logger=logger;
             BindingContext = monitorPingInfoView;
+
         }
         catch (Exception ex)
         {

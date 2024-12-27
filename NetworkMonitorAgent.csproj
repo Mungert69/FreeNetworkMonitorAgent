@@ -9,7 +9,6 @@
         <RootNamespace>NetworkMonitorAgent</RootNamespace>
         <UseMaui>true</UseMaui>
         <SingleProject>true</SingleProject>
-        <SelfContained>true</SelfContained>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
@@ -62,34 +61,26 @@
         <MauiFont Include="Resources\Fonts\*" />
 
         <MauiAsset Include="Resources\Raw\appsettings.json" />
-        <MauiAsset Include="Resources\Raw\**"  LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-        <MauiAsset Include="Resources\Raw\openssl-3.3.1-windows\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <MauiAsset Include="Resources\Raw\openssl-3.3.1-windows\**" Exclude="Resources\Raw\openssl-3.3.1-android\**;Resources\Raw\dlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
         
-        <MauiStyles Include="Resources\Styles\*" /> 
     </ItemGroup>
 
 
     <ItemGroup>
-        <!-- Core MAUI Libraries -->
-        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.21" />
-        <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.21" />
-        <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.21" />
-        <PackageReference Include="Microsoft.Maui.Core" Version="9.0.21" />
-
-        <!-- Logging and Extensions -->
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
 
         <!-- Community Toolkit -->
-        <PackageReference Include="CommunityToolkit.Maui" Version="10.0.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="CommunityToolkit.Maui" Version="10.0.0" />
+
+        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 
         <!-- MetroLog for Logging -->
         <PackageReference Include="MetroLog.Maui" Version="2.1.0" />
+        <PackageReference Include="Syncfusion.Maui.Core" Version="28.1.36" />
+        <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.3" />
 
-        <!-- Windows App SDK for Windows-specific functionality -->
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.*" />
     </ItemGroup>
 
     <ItemGroup>

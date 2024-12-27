@@ -21,8 +21,8 @@ private bool _isUpdatingSwitch = false;
 
         _mainPageViewModel = mainPageViewModel;
         BindingContext = _mainPageViewModel;
-        CustomPopupView.BindingContext = processorStatesViewModel;
-        ProcessorStatesView.BindingContext = processorStatesViewModel;
+       // CustomPopupView.BindingContext = processorStatesViewModel;
+       // ProcessorStatesView.BindingContext = processorStatesViewModel;
 
 
         _cancellationTokenSource = new CancellationTokenSource();

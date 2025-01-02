@@ -35,8 +35,7 @@
         <WindowsPackageType>MSIX</WindowsPackageType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        
+        <PlatformTarget>AnyCPU</PlatformTarget>    
         <LinkerBehavior>None</LinkerBehavior>
 
     </PropertyGroup>

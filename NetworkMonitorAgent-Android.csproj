@@ -49,9 +49,7 @@
                 <!-- Custom Fonts -->
                 <MauiFont Include="Resources\Fonts\*" />
                 <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-                 <MauiAsset Include="Resources\Raw\**" 
-           Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" 
-           LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+                 <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
                 <MauiStyles Include="Resources\Styles\*" />
         </ItemGroup>
@@ -66,6 +64,7 @@
                 <PackageReference Include="Microsoft.Maui.Core" Version="9.0.21" />
                 <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.21" />
                 <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.21" />
+                <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.3" />
 
         </ItemGroup>
         <ItemGroup>

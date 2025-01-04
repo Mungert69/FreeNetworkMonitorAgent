@@ -11,6 +11,8 @@
         <SingleProject>true</SingleProject>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+        <SelfContained>true</SelfContained>
 
         <!-- Display name -->
         <ApplicationTitle>Free Network Monitor Agent</ApplicationTitle>
@@ -20,22 +22,10 @@
 
         <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
-        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
-        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-        <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-        <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
-        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
-        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-        <PackageCertificateThumbprint>F13A020884C94F4309A40BD2B922FBB8FACABC45</PackageCertificateThumbprint>
-        <IncludeSymbols>False</IncludeSymbols>
+         <IncludeSymbols>True</IncludeSymbols>
         <!-- https://github.com/CommunityToolkit/Maui/issues/2205 -->
         <NoWarn>XC0103</NoWarn>
-        <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
-        <WindowsPackageType>MSIX</WindowsPackageType>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-        <GenerateTestArtifacts>True</GenerateTestArtifacts>
-        <PlatformTarget>AnyCPU</PlatformTarget>    
+        <WindowsPackageType>MSIX</WindowsPackageType>   
         <LinkerBehavior>None</LinkerBehavior>
 
     </PropertyGroup>
@@ -54,7 +44,6 @@
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotneplaceholder.png" Resize="True" BaseSize="300,185" />
 
         <!-- Custom Fonts -->
         <MauiFont Include="Resources\Fonts\*" />
@@ -65,7 +54,63 @@
         
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Resources\Images\Logos\logosquare.scale-100.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-125.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-150.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-200.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-400.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-100.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-125.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-150.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-200.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-400.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-100.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-125.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-150.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-200.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-400.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-100.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-125.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-150.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-200.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-400.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-100.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-125.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-150.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-200.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-400.png" />
+    </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="Resources\Images\Logos\logosquare.scale-100.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-125.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-150.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-200.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-400.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-100.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-125.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-150.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-200.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-400.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-100.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-125.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-150.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-200.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-400.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-100.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-125.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-150.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-200.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-400.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-100.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-125.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-150.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-200.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-400.png" />
+    </ItemGroup>
+
+    
     <ItemGroup>
 
         <!-- Community Toolkit -->
@@ -77,61 +122,16 @@
 
         <!-- MetroLog for Logging -->
         <PackageReference Include="MetroLog.Maui" Version="2.1.0" />
+        <PackageReference Include="Microsoft.Maui.Controls.Build.Tasks" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Maui.Controls.Core" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Maui.Controls.Xaml" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Maui.Core" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.21" />
+        <PackageReference Include="Microsoft.Maui.Resizetizer" Version="9.0.21" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
         <PackageReference Include="Syncfusion.Maui.Core" Version="28.1.37" />
         <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.3" />
-
-    </ItemGroup>
-
-    <ItemGroup>
-        <MauiXaml Update="MainPage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="ConfigPage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="DataViewPage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="DetailsPage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="LogsPage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="ScanPage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="SetupGuidePage.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="Views\CustomPopupView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="Views\ProcessorStatesView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-        <MauiXaml Update="Views\ShowDetailsPopup.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </MauiXaml>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="Services\AndroidBackgroundService.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Properties\Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Update="Properties\Resources.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

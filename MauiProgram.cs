@@ -12,7 +12,7 @@ using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
 using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Alerts;
+
 
 
 namespace NetworkMonitorAgent
@@ -20,14 +20,14 @@ namespace NetworkMonitorAgent
     public static class MauiProgram
     {
         // Centralized exception handler
-        public static void HandleGlobalException(Exception exception, string title)
+       /* public static void HandleGlobalException(Exception exception, string title)
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 await Application.Current.MainPage?.DisplayAlert(title, exception.Message, "OK");
                 Console.WriteLine($"Global Exception Caught: {exception}");
             });
-        }
+        }*/
 
         public static IServiceProvider ServiceProvider { get; private set; }
         public static MauiApp CreateMauiApp()
@@ -39,14 +39,14 @@ namespace NetworkMonitorAgent
                 var exception = e.ExceptionObject as Exception;
                 if (exception != null)
                 {
-                    HandleGlobalException(exception, "Unhandled Domain Exception");
+                    ExceptionHelper.HandleGlobalException(exception, "Unhandled Domain Exception");
                 }
             };
 
             TaskScheduler.UnobservedTaskException += (sender, e) =>
             {
                 e.SetObserved(); // Prevent the process from terminating
-                HandleGlobalException(e.Exception, "Unobserved Task Exception");
+                ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
             };
 
           

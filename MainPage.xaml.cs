@@ -11,8 +11,9 @@ public partial class MainPage : ContentPage
 {
     private CancellationTokenSource _cancellationTokenSource;
     private readonly MainPageViewModel _mainPageViewModel;
-    private readonly ILogger _logger; // Reintroduced logger
-private bool _isUpdatingSwitch = false;
+    private readonly ILogger _logger;
+    private bool _isUpdatingSwitch = false;
+
     public MainPage(ILogger logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
     {
         InitializeComponent();
@@ -21,13 +22,26 @@ private bool _isUpdatingSwitch = false;
 
         _mainPageViewModel = mainPageViewModel;
         BindingContext = _mainPageViewModel;
-       // CustomPopupView.BindingContext = processorStatesViewModel;
-       // ProcessorStatesView.BindingContext = processorStatesViewModel;
+        TaskListView.ItemsSource = _mainPageViewModel.Tasks;
+        // CustomPopupView.BindingContext = processorStatesViewModel;
+        // ProcessorStatesView.BindingContext = processorStatesViewModel;
 
 
         _cancellationTokenSource = new CancellationTokenSource();
         _mainPageViewModel.PollingCts = _cancellationTokenSource;
-        _mainPageViewModel.ShowLoadingMessage += (sender, args) => ShowLoadingNoCancel(args);
+
+        _mainPageViewModel.ShowLoadingMessage += (sender, args) =>
+        {
+            (bool show, bool showCancel) = args;
+            MainThread.BeginInvokeOnMainThread( () =>
+            {
+                ProgressIndicator.IsVisible = show;
+                ProgressIndicator.IsRunning = show;
+                CancelButton.IsVisible = showCancel;
+            }
+            );
+        };
+
 
         _mainPageViewModel.ShowAlertRequested += (sender, args) =>
         {
@@ -48,68 +62,104 @@ private bool _isUpdatingSwitch = false;
         };
 
 
-        TaskListView.ItemsSource = _mainPageViewModel.Tasks;
+
 
 
     }
 
     private async void OnSwitchToggled(object sender, ToggledEventArgs e)
     {
-       
-        if (_isUpdatingSwitch)
-        {
-            return; // Ignore programmatic changes
-        }
-        var switchControl = (Switch)sender;
-        bool originalState = switchControl.IsToggled;
-        _isUpdatingSwitch = true;
-
-        if (!RootNamespaceProvider.AssetsReady) {
-            switchControl.IsToggled = false ;
-            await DisplayAlert("Warning", $"Resource files still copying please wait. Check out the Setup Guide for information on the apps features. You may find the Network Monitor Assistant interesting.", "OK");
-            _isUpdatingSwitch = false;
-            return;
-        }
-  
         try
         {
-            _isUpdatingSwitch = true;
-            // Disable the switch temporarily while the service is starting
+            // Safely handle casting the sender to Switch
+            var switchControl = sender as Switch ?? throw new InvalidCastException("Sender is not a Switch.");
 
-            switchControl.IsEnabled = false;
-            _mainPageViewModel.ServiceMessage = "Starting service...";
-            ShowLoading(true);
+            bool originalState = switchControl.IsToggled;
 
-            // Attempt to start/stop the service
-            bool isStarted = await _mainPageViewModel.SetServiceStartedAsync(e.Value);
-
-            // Reflect the actual service state on the toggle
-            switchControl.IsToggled = isStarted;
-
+            // Prevent re-entry for programmatic changes
+            if (_isUpdatingSwitch)
+            {
+                return;
             }
+
+            _isUpdatingSwitch = true;
+            // Check if assets are ready
+            if (!RootNamespaceProvider.AssetsReady)
+            {
+                switchControl.IsToggled = false;
+                await DisplayAlert("Warning",
+                    "Resource files still copying please wait. Check out the Setup Guide for information on the app's features. You may find the Network Monitor Assistant interesting.",
+                    "OK");
+                _isUpdatingSwitch = false;
+                return;
+            }
+
+            try
+            {
+                // Disable the switch temporarily while the service is starting
+                switchControl.IsEnabled = false;
+               
+                _mainPageViewModel.ServiceMessage = "Starting service...";
+                ShowLoading(true);
+
+                // Attempt to start/stop the service
+                bool isStarted = await _mainPageViewModel.SetServiceStartedAsync(e.Value);
+
+                // Reflect the actual service state on the toggle
+                switchControl.IsToggled = isStarted;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Service operation was canceled.");
+                await DisplayAlert("Operation Canceled", "The operation was canceled by the user.", "OK");
+                switchControl.IsToggled = originalState;
+            }
+            catch (TimeoutException)
+            {
+                _logger.LogError("Service operation timed out.");
+                await DisplayAlert("Timeout", "The operation timed out. Please try again later.", "OK");
+                switchControl.IsToggled = originalState;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in OnSwitchToggled");
+                await DisplayAlert("Error", $"An unexpected error occurred: {ex.Message}", "OK");
+                switchControl.IsToggled = originalState;
+            }
+            finally
+            {
+                // Ensure cleanup is always performed
+                _isUpdatingSwitch = false;
+                switchControl.IsEnabled = true;
+                ShowLoading(false);
+            }
+        }
+        catch (InvalidCastException ex)
+        {
+            _logger.LogError(ex, "Sender was not a Switch.");
+            await DisplayAlert("Error", "An internal error occurred. Please restart the app.", "OK");
+        }
         catch (Exception ex)
         {
-            // Log error and notify the user
-            _logger.LogError(ex, "Error in OnSwitchToggled");
-            await DisplayAlert("Error", $"Failed to change service state: {ex.Message}", "OK");
-
-            // Revert the toggle to its previous state
-            switchControl.IsToggled = originalState;
-        }
-        finally
-        {
-            _isUpdatingSwitch = false;
-            switchControl.IsEnabled = true;
-            ShowLoading(false);
+            _logger.LogError(ex, "Unexpected error in initial OnSwitchToggled logic");
+            await DisplayAlert("Error", $"An unexpected error occurred: {ex.Message}", "OK");
         }
     }
 
 
-    private void OnCancelClicked(object sender, EventArgs e)
+    private void ShowLoading(bool show) {
+        ProgressIndicator.IsVisible = show;
+        ProgressIndicator.IsRunning = show;
+        CancelButton.IsVisible = show;
+    }
+
+
+    private async void OnCancelClicked(object sender, EventArgs e)
     {
         try
         {
             _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
             _mainPageViewModel.PollingCts = _cancellationTokenSource;
             CancelButton.IsVisible = false;
@@ -117,39 +167,8 @@ private bool _isUpdatingSwitch = false;
         }
         catch (Exception ex)
         {
-            DisplayAlert("Error", $"Could not complete Cancel. Error: {ex.Message}", "OK");
+            await DisplayAlert("Error", $"Could not complete Cancel. Error: {ex.Message}", "OK");
             _logger.LogError(ex, "Could not complete Cancel");
-        }
-    }
-
-    private void ShowLoading(bool show)
-    {
-        try
-        {
-            ProgressIndicator.IsVisible = show;
-            ProgressIndicator.IsRunning = show;
-            CancelButton.IsVisible = show;
-        }
-        catch (Exception ex)
-        {
-            DisplayAlert("Error", $"Could not update loading indicators. Error: {ex.Message}", "OK");
-            _logger.LogError(ex, "Could not update loading indicators in ShowLoading");
-        }
-    }
-
-    private void ShowLoadingNoCancel((bool show, bool showCancel) args)
-    {
-        try
-        {
-            (bool show, bool showCancel) = args;
-            ProgressIndicator.IsVisible = show;
-            ProgressIndicator.IsRunning = show;
-            CancelButton.IsVisible = showCancel;
-        }
-        catch (Exception ex)
-        {
-            DisplayAlert("Error", $"Could not update loading indicators. Error: {ex.Message}", "OK");
-            _logger.LogError(ex, "Could not update loading indicators in ShowLoadingNoCancel");
         }
     }
 

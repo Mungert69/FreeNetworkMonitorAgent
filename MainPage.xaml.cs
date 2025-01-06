@@ -25,7 +25,7 @@ public partial class MainPage : ContentPage
         // CustomPopupView.BindingContext = processorStatesViewModel;
         // ProcessorStatesView.BindingContext = processorStatesViewModel;
 
-
+        TaskListView.ItemsSource = _mainPageViewModel.Tasks;
         _cancellationTokenSource = new CancellationTokenSource();
         _mainPageViewModel.PollingCts = _cancellationTokenSource;
 

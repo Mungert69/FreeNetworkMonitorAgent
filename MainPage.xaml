@@ -39,10 +39,14 @@
 
 
             <Frame   BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="0" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
-                <ListView IsVisible="{Binding ShowTasks}" x:Name="TaskListView" ItemsSource="{Binding Tasks}" HasUnevenRows="true">
+                <ListView  x:Name="TaskListView"  IsVisible="{Binding ShowTasks}" >
                     <ListView.ItemTemplate>
-                        <DataTemplate >
+                        <DataTemplate  x:DataType="vm:TaskItem">
+                            
                             <ViewCell>
+                                <ViewCell.BindingContext>
+                                    <Binding />
+                                </ViewCell.BindingContext>
                                 <StackLayout Orientation="Horizontal" Padding="10">
                                     <CheckBox IsChecked="{Binding IsCompleted}" IsEnabled="False" />
                                     <controls:AnimatedButton Text="{Binding ButtonText}" Command="{Binding TaskAction}" BackgroundColor="{Binding ButtonBackgroundColor}" TextColor="{Binding ButtonTextColor}" CornerRadius="5" Padding="10" FontSize="16"/>
@@ -51,6 +55,7 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+
             </Frame>
             <!-- Task List -->
         </VerticalStackLayout>

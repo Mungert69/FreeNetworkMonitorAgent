@@ -4,7 +4,6 @@
 ./Microsoft.Extensions.Diagnostics.dll
 ./Microsoft.Extensions.FileProviders.Abstractions.dll
 ./System.Text.Encoding.CodePages.dll
-./Microsoft.WindowsAppRuntime.Bootstrap.Net.dll
 ./System.Linq.Parallel.dll
 ./Microsoft.Extensions.Hosting.dll
 ./System.ComponentModel.EventBasedAsync.dll
@@ -157,7 +156,6 @@
 ./System.Diagnostics.Contracts.dll
 ./System.AppContext.dll
 ./System.IdentityModel.Tokens.Jwt.dll
-./Microsoft.Maui.Graphics.dll
 ./System.Collections.NonGeneric.dll
 ./Microsoft.Windows.Storage.Projection.dll
 ./System.Security.Cryptography.dll
@@ -177,7 +175,6 @@
 ./Microsoft.CodeAnalysis.CSharp.dll
 ./Microsoft.WinUI.dll
 ./Microsoft.IdentityModel.Abstractions.dll
-./hostfxr.dll
 ./System.Net.Http.dll
 ./Microsoft.VisualBasic.dll
 ./System.Security.Cryptography.Cng.dll
@@ -210,7 +207,6 @@
 ./System.Drawing.dll
 ./System.Net.Sockets.dll
 ./NetworkMonitorProcessor-Maui.dll
-./hostpolicy.dll
 ./Microsoft.Extensions.Configuration.CommandLine.dll
 ./System.ServiceModel.Web.dll
 ./Microsoft.CodeAnalysis.dll

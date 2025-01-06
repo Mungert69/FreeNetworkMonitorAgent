@@ -22,7 +22,6 @@ public partial class MainPage : ContentPage
 
         _mainPageViewModel = mainPageViewModel;
         BindingContext = _mainPageViewModel;
-        TaskListView.ItemsSource = _mainPageViewModel.Tasks;
         // CustomPopupView.BindingContext = processorStatesViewModel;
         // ProcessorStatesView.BindingContext = processorStatesViewModel;
 

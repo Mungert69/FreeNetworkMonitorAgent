@@ -15,7 +15,7 @@
         <SelfContained>true</SelfContained>
 
         <!-- Display name -->
-        <ApplicationTitle>Network Monitor Agent</ApplicationTitle>
+        <ApplicationTitle>Free Network Monitor Agent</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
@@ -95,6 +95,7 @@
       <None Remove="Resources\Images\SquareLogo\placeholder.scale-150.png" />
       <None Remove="Resources\Images\SquareLogo\placeholder.scale-200.png" />
       <None Remove="Resources\Images\SquareLogo\placeholder.scale-400.png" />
+      <None Remove="temp\Package.appxmanifest.bak" />
     </ItemGroup>
 
     <ItemGroup>
@@ -168,6 +169,10 @@
         <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui.csproj" />
         <ProjectReference Include="..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj" />
         <ProjectReference Include="..\NetworkMonitor\NetworkMonitor-Maui.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="temp\" />
     </ItemGroup>
   
 </Project>

@@ -40,10 +40,6 @@ namespace NetworkMonitorAgent
                 ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
             };
 
-
-
-
-
             string os = "";
             ServiceInitializer.Initialize(new RootNamespaceProvider());
 
@@ -57,7 +53,6 @@ namespace NetworkMonitorAgent
 #endif
 
             MauiAppBuilder builder = CreateBuilder();
-
             try
             {
 
@@ -70,15 +65,11 @@ namespace NetworkMonitorAgent
                         options.MaxLevel = LogLevel.Critical;
                     });
                 });
-
-
             }
             catch (Exception ex)
             {
                 ExceptionHelper.HandleGlobalException(ex, " Error : could not setup logging");
             }
-
-
             try
             {
                 LoadConfiguration(builder, os);
@@ -94,11 +85,11 @@ namespace NetworkMonitorAgent
             try
             {
                 builder.Services.AddSingleton<AppShell>(provider =>
-                        {
+                {
                             var logger = provider.GetRequiredService<ILogger<AppShell>>();
                             var platformService = provider.GetRequiredService<IPlatformService>();
                             return new AppShell(logger, platformService);
-                        });
+                });
             }
             catch (Exception ex)
             {
@@ -194,7 +185,7 @@ namespace NetworkMonitorAgent
                 return new NetConnectConfig(configuration, appDataDirectory);
             });
 
-            builder.Services.AddSingleton<LocalProcessorStates,LocalProcessorStates();
+            builder.Services.AddSingleton<LocalProcessorStates,LocalProcessorStates>();
             builder.Services.AddSingleton<IFileRepo>(provider =>
             {
                 try
@@ -301,8 +292,5 @@ namespace NetworkMonitorAgent
                 }
             });
         }
-
-
-
     }
 }

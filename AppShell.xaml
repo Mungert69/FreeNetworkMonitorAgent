@@ -3,23 +3,23 @@
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:NetworkMonitorAgent"  Title="NetworkMonitorAgent">
-    <FlyoutItem Title="Home" Route="Home">
-        <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+    <FlyoutItem Title="Home" >
+        <ShellContent Route="Home" ContentTemplate="{DataTemplate local:MainPage}" />
     </FlyoutItem>
-     <FlyoutItem Title="Check a Host" Route="Check">
-        <ShellContent ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
+     <FlyoutItem Title="Check a Host" >
+        <ShellContent Route="Check" ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Scan Local Network" Route="Scan">
-        <ShellContent ContentTemplate="{DataTemplate local:ScanPage}" />
+    <FlyoutItem Title="Scan Local Network" >
+        <ShellContent Route="Scan" ContentTemplate="{DataTemplate local:ScanPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Monitored Hosts" Route="Data">
-        <ShellContent ContentTemplate="{DataTemplate local:DataViewPage}" />
+    <FlyoutItem Title="Monitored Hosts" >
+        <ShellContent Route="Data" ContentTemplate="{DataTemplate local:DataViewPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Show Config" Route="Config">
-        <ShellContent ContentTemplate="{DataTemplate local:ConfigPage}" />
+    <FlyoutItem Title="Show Config" >
+        <ShellContent Route="Config" ContentTemplate="{DataTemplate local:ConfigPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Setup Guide" Route="SetupGuide">
-        <ShellContent ContentTemplate="{DataTemplate local:SetupGuidePage}" />
+    <FlyoutItem Title="Setup Guide" >
+        <ShellContent Route="SetupGuide" ContentTemplate="{DataTemplate local:SetupGuidePage}" />
     </FlyoutItem>
 
 <ShellContent Route="DetailsPage" ContentTemplate="{DataTemplate local:DetailsPage}" />

@@ -20,8 +20,8 @@
                 <Label Text="Welcome to Free Network Monitor Agent" FontSize="16" HorizontalOptions="Center" TextColor="{DynamicResource Primary}"/>
             </Frame>
             <!-- Processor States View -->
-            <!--<view:ProcessorStatesView x:Name="ProcessorStatesView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" /> -->
-            <!--<view:CustomPopupView x:Name="CustomPopupView" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" /> -->
+            <view:ProcessorStatesView x:Name="ProcessorStatesView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+            <view:CustomPopupView x:Name="CustomPopupView" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" />
             <!-- Add this inside your Grid or another layout -->
             <ActivityIndicator x:Name="ProgressIndicator"  IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Button x:Name="CancelButton" Text="Cancel" IsVisible="False" Clicked="OnCancelClicked" HorizontalOptions="Center" VerticalOptions="Center"/>

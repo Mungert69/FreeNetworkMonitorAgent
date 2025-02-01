@@ -233,6 +233,8 @@ namespace NetworkMonitorAgent
         private static void BuildServices(MauiAppBuilder builder)
         {
 
+            builder.Services.AddSingleton<IMonitorPingInfoView,MonitorPingInfoView>();
+
             builder.Services.AddSingleton<IApiService>(provider =>
     {
         var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
@@ -304,41 +306,11 @@ namespace NetworkMonitorAgent
 
         private static void BuildViewModels(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton<IMonitorPingInfoView>(provider =>
-           {
-               return new MonitorPingInfoView();
-           });
-            builder.Services.AddSingleton<ProcessorStatesViewModel>(provider =>
-                        {
-                            var logger = provider.GetRequiredService<ILogger<ProcessorStatesViewModel>>();
-                            var processorStates = provider.GetRequiredService<LocalProcessorStates>();
-                            // Choose the appropriate constructor
-                            return new ProcessorStatesViewModel(logger, processorStates);
-                        });
-            builder.Services.AddSingleton<ScanProcessorStatesViewModel>(provider =>
-           {
-               var logger = provider.GetRequiredService<ILogger<ScanProcessorStatesViewModel>>();
-               var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
-               var nmapCmdProcessorStates = cmdProcessorProvider.GetProcessorStates("Nmap");
-               var netConfig = provider.GetRequiredService<NetConnectConfig>();
-               var apiService = provider.GetRequiredService<IApiService>();
-               return new ScanProcessorStatesViewModel(logger, nmapCmdProcessorStates, apiService, netConfig);
-           });
-            builder.Services.AddSingleton<MainPageViewModel>(provider =>
-          {
-              var netConfig = provider.GetRequiredService<NetConnectConfig>();
-              var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
-              var platformService = provider.GetRequiredService<IPlatformService>();
-              var authService = provider.GetRequiredService<IAuthService>();
-              return new MainPageViewModel(netConfig, platformService, logger, authService);
-          });
-
-            builder.Services.AddSingleton<ConfigPageViewModel>(provider =>
-            {
-                var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                var logger = provider.GetRequiredService<ILogger<ConfigPageViewModel>>();
-                return new ConfigPageViewModel(logger, netConfig);
-            });
+         
+         builder.Services.AddSingleton<ProcessorStatesViewModel>();
+            builder.Services.AddSingleton<ScanProcessorStatesViewModel>();
+            builder.Services.AddSingleton<MainPageViewModel>();
+            builder.Services.AddSingleton<ConfigPageViewModel>();
 
         }
         private static void BuildPages(MauiAppBuilder builder)

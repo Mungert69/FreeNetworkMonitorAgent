@@ -35,20 +35,119 @@
                 <PublishTrimmed>false</PublishTrimmed>
                 <RunAOTCompilation>false</RunAOTCompilation>
         </PropertyGroup>
+       
         <ItemGroup>
-                <!-- App Icon -->
-                <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
-                <!-- Splash Screen -->
-                <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
-                <!-- Images -->
-                <MauiImage Include="Resources\Images\*" />
-                <!--<MauiImage Update="Resources\Images\logo.svg" BaseSize="168,208" /> -->
-                <!-- Custom Fonts -->
-                <MauiFont Include="Resources\Fonts\*" />
-                <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-                <MauiStyles Include="Resources\Styles\*" />
-        </ItemGroup>
+        <!-- App Icon -->
+
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
+
+        <MauiIcon Include="Resources\Splash\splash.svg">
+            <Color>#FFFFFF</Color>
+            <ForegroundFile>Resources\AppIcon\appiconfg.svg</ForegroundFile>
+        </MauiIcon>
+
+        <!-- Splash Screen -->
+
+        <!-- Images -->
+        <MauiImage Include="Resources\Images\*" />
+
+        <!-- Custom Fonts -->
+        <MauiFont Include="Resources\Fonts\*" />
+
+        <MauiAsset Include="Resources\Raw\appsettings.json" />
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+                
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Images\Logos\logosquare.scale-100.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-125.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-150.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-200.png" />
+      <None Remove="Resources\Images\Logos\logosquare.scale-400.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-100.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-125.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-150.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-200.png" />
+      <None Remove="Resources\Images\Logos\placeholder.scale-400.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-100.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-125.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-150.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-200.png" />
+      <None Remove="Resources\Images\SquareLogo\logomediumsquare.scale-400.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-100.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-125.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-150.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-200.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.scale-400.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-16.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-16_altform-lightunplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-16_altform-unplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-24.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-24_altform-lightunplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-24_altform-unplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-256.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-256_altform-lightunplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-256_altform-unplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-32.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-32_altform-lightunplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-32_altform-unplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-48.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-48_altform-lightunplated.png" />
+      <None Remove="Resources\Images\SquareLogo\logosquare.targetsize-48_altform-unplated.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-100.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-125.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-150.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-200.png" />
+      <None Remove="Resources\Images\SquareLogo\placeholder.scale-400.png" />
+      <None Remove="temp\Package.appxmanifest.bak" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Resources\Images\Logos\logosquare.scale-100.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-125.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-150.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-200.png" />
+      <Content Include="Resources\Images\Logos\logosquare.scale-400.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-100.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-125.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-150.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-200.png" />
+      <Content Include="Resources\Images\Logos\placeholder.scale-400.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-100.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-125.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-150.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-200.png" />
+      <Content Include="Resources\Images\SquareLogo\logomediumsquare.scale-400.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-100.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-125.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-150.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-200.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.scale-400.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-16.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-16_altform-lightunplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-16_altform-unplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-24.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-24_altform-lightunplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-24_altform-unplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-256.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-256_altform-lightunplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-256_altform-unplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-32.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-32_altform-lightunplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-32_altform-unplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-48.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-48_altform-lightunplated.png" />
+      <Content Include="Resources\Images\SquareLogo\logosquare.targetsize-48_altform-unplated.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-100.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-125.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-150.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-200.png" />
+      <Content Include="Resources\Images\SquareLogo\placeholder.scale-400.png" />
+    </ItemGroup>
+
+    
         <ItemGroup>
                 <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
                 <PackageReference Include="CommunityToolkit.Maui" Version="11.0.0" />

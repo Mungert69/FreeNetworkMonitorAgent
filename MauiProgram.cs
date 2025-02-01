@@ -199,7 +199,14 @@ namespace NetworkMonitorAgent
         var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
         return new ApiService(loggerFactory, configuration, cmdProcessorProvider, FileSystem.AppDataDirectory);
     });
-            builder.Services.AddSingleton<IAuthService,AuthService>();
+            builder.Services.AddSingleton<IAuthService>(provider =>
+         {
+             var logger = provider.GetRequiredService<ILogger<AuthService>>();
+             var netConfig = provider.GetRequiredService<NetConnectConfig>();
+             var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
+             var processorStates = provider.GetRequiredService<LocalProcessorStates>();
+             return new AuthService(logger, netConfig, rabbitRepo, processorStates);
+         });
             builder.Services.AddSingleton<ICmdProcessorProvider>
                 (provider =>
                 {

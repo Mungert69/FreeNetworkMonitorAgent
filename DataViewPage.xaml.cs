@@ -20,17 +20,17 @@ using Microsoft.Maui.Layouts;
 using CommunityToolkit.Maui.Views;
 
 namespace NetworkMonitorAgent;
-public partial class DateViewPage : ContentPage
+public partial class DataViewPage : ContentPage
 {
 
     private ILogger _logger;
     private IMonitorPingInfoView _monitorPingInfoView;
-    public DateViewPage(IMonitorPingInfoView monitorPingInfoView)
+    public DataViewPage(ILogger logger,IMonitorPingInfoView monitorPingInfoView)
     {
         try
         {
             InitializeComponent();
-            _logger = MauiProgram.ServiceProvider.GetRequiredService<ILogger<DateViewPage>>();
+            _logger = logger;
             _monitorPingInfoView = monitorPingInfoView;
             BindingContext = monitorPingInfoView;
         }

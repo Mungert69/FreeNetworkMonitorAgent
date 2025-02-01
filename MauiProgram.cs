@@ -370,8 +370,19 @@ namespace NetworkMonitorAgent
                var mainPageViewModel = provider.GetRequiredService<MainPageViewModel>();
                return new MainPage(logger, mainPageViewModel, processorStatesViewModel);
            });
-            builder.Services.AddSingleton<ConfigPage>();
-            builder.Services.AddSingleton<DateViewPage>();
+            builder.Services.AddSingleton(provider =>
+            {
+
+                var logger = provider.GetRequiredService<ILogger<DataViewPage>>();
+                var monitorPingInfoView = provider.GetRequiredService<IMonitorPingInfoView>();
+
+                return new DataViewPage(logger, monitorPingInfoView);
+            });
+            builder.Services.AddSingleton(provider =>
+            {
+                var configPageViewModel = provider.GetRequiredService<ConfigPageViewModel>();
+                return new ConfigPage(configPageViewModel);
+            });
         }
         private static void ShowAlertBlocking(string title, string? message)
         {

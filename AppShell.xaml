@@ -13,7 +13,7 @@
         <ShellContent ContentTemplate="{DataTemplate local:ScanPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Monitored Hosts" Route="Data">
-        <ShellContent ContentTemplate="{DataTemplate local:DateViewPage}" />
+        <ShellContent ContentTemplate="{DataTemplate local:DataViewPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Show Config" Route="Config">
         <ShellContent ContentTemplate="{DataTemplate local:ConfigPage}" />

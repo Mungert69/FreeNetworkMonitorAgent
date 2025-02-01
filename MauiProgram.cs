@@ -40,16 +40,11 @@ namespace NetworkMonitorAgent
                 ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
             };
 
-
-
-
-
             string os = "";
             ServiceInitializer.Initialize(new RootNamespaceProvider());
 
 #if ANDROID
-			    os="android";
-               
+			    os="android";             
 #endif
 
 #if WINDOWS
@@ -60,7 +55,6 @@ namespace NetworkMonitorAgent
 
             try
             {
-
                 builder.Services.AddLogging(loggingBuilder =>
                 {
                     loggingBuilder.AddInMemoryLogger(options =>
@@ -70,14 +64,11 @@ namespace NetworkMonitorAgent
                         options.MaxLevel = LogLevel.Critical;
                     });
                 });
-
-
             }
             catch (Exception ex)
             {
                 ExceptionHelper.HandleGlobalException(ex, " Error : could not setup logging");
             }
-
 
             try
             {
@@ -99,9 +90,6 @@ namespace NetworkMonitorAgent
             {
                 ExceptionHelper.HandleGlobalException(ex, "Error creating AppShell");
             }
-
-
-
             var app = builder.Build();
             ServiceProvider = app.Services;
             return app;
@@ -184,7 +172,6 @@ namespace NetworkMonitorAgent
 
             builder.Services.AddSingleton<IFileRepo>(provider =>
             {
-
                 try
                 {
 
@@ -192,13 +179,11 @@ namespace NetworkMonitorAgent
                     string prefixPath = FileSystem.AppDataDirectory;
                     var fileRepo = new FileRepo(isRunningOnMauiAndroid, prefixPath);
                     return fileRepo;
-
                 }
                 catch (Exception ex)
                 {
                     ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
                     return new FileRepo();
-
                 }
 
             });
@@ -221,8 +206,6 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<IPlatformService, WindowsPlatformService>();
             builder.Services.AddSingleton<IBackgroundService>();
 #endif
-
-
         }
 
         private static void BuildViewModels(MauiAppBuilder builder)
@@ -240,9 +223,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<NetworkMonitorPage>();
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<ConfigPage>();
-            builder.Services.AddSingleton<DataViewPage>();
-
-            
+            builder.Services.AddSingleton<DataViewPage>();      
         }
         private static void ShowAlertBlocking(string title, string? message)
         {
@@ -262,8 +243,5 @@ namespace NetworkMonitorAgent
                 }
             });
         }
-
-
-
     }
 }

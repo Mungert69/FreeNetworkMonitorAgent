@@ -22,10 +22,6 @@
         <ShellContent ContentTemplate="{DataTemplate local:SetupGuidePage}" />
     </FlyoutItem>
 
-     <FlyoutItem Title="Logs" Route="Logs">
-        <ShellContent ContentTemplate="{DataTemplate local:LogsPage}" />
-    </FlyoutItem>
-
 <ShellContent Route="DetailsPage" ContentTemplate="{DataTemplate local:DetailsPage}" />
 
 

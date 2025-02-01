@@ -17,12 +17,5 @@ public partial class App : Application
             Console.WriteLine($"Error initializing App: {ex.Message}");
         }
     }
-
-    protected override void OnStart()
-    {
-        base.OnStart();
-        LogController.InitializeNavigation(
-            page => MainPage!.Navigation.PushModalAsync(page),
-            () => MainPage!.Navigation.PopModalAsync());
-    }
+   
 }

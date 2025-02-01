@@ -1,4 +1,3 @@
-using MetroLog.Maui;
 using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;

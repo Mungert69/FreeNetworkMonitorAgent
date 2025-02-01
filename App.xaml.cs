@@ -1,5 +1,4 @@
-﻿using MetroLog.Maui;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.Utils;
 namespace NetworkMonitorAgent;
 

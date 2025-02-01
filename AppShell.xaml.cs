@@ -8,7 +8,6 @@ using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Maui.Controls;
-using MetroLog.Maui;
 namespace NetworkMonitorAgent;
 public partial class AppShell : Shell
 {

@@ -185,14 +185,18 @@ namespace NetworkMonitorAgent
         }
         private static void BuildRepoAndConfig(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton<LocalProcessorStates>(provider =>
-         {
-             return new LocalProcessorStates();
-         });
 
+             builder.Services.AddSingleton<NetConnectConfig>(provider =>
+            {
+                // Assuming Configuration is properly set up
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var appDataDirectory = FileSystem.AppDataDirectory;
+                return new NetConnectConfig(configuration, appDataDirectory);
+            });
+
+            builder.Services.AddSingleton<LocalProcessorStates,LocalProcessorStates();
             builder.Services.AddSingleton<IFileRepo>(provider =>
             {
-
                 try
                 {
 
@@ -206,26 +210,15 @@ namespace NetworkMonitorAgent
                 {
                     ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
                     return new FileRepo();
-
                 }
 
             });
             builder.Services.AddSingleton<IRabbitRepo>(provider =>
            {
-               var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
-               var netConfig = provider.GetRequiredService<NetConnectConfig>();
-               // Choose the appropriate constructor
-               return new RabbitRepo(logger, netConfig);
+                var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
+                var netConfig = provider.GetRequiredService<NetConnectConfig>();
+                return new RabbitRepo(logger, netConfig);
            });
-
-
-            builder.Services.AddSingleton<NetConnectConfig>(provider =>
-            {
-                // Assuming Configuration is properly set up
-                var configuration = provider.GetRequiredService<IConfiguration>();
-                var appDataDirectory = FileSystem.AppDataDirectory;
-                return new NetConnectConfig(configuration, appDataDirectory);
-            });
 
 
         }
@@ -234,56 +227,22 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
-
-            builder.Services.AddSingleton<IApiService>(provider =>
-    {
-        var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-        var configuration = provider.GetRequiredService<IConfiguration>();
-        var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
-
-        return new ApiService(loggerFactory, configuration, cmdProcessorProvider, FileSystem.AppDataDirectory);
-    });
-            builder.Services.AddSingleton<IAuthService>(provider =>
-         {
-             var logger = provider.GetRequiredService<ILogger<AuthService>>();
-             var netConfig = provider.GetRequiredService<NetConnectConfig>();
-             var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
-             var processorStates = provider.GetRequiredService<LocalProcessorStates>();
-             return new AuthService(logger, netConfig, rabbitRepo, processorStates);
-         });
-            builder.Services.AddSingleton<ICmdProcessorProvider>
-                (provider =>
-                {
-
-                    var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-                    var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
-                    var netConfig = provider.GetRequiredService<NetConnectConfig>();
-
-                    return new CmdProcessorProvider(loggerFactory, rabbitRepo, netConfig);
-
-
-                });
-
-
+            builder.Services.AddSingleton<IApiService,ApiService();
+            builder.Services.AddSingleton<IAuthService,AuthService();
+            builder.Services.AddSingleton<ICmdProcessorProvider,CmdProcessorProvider();
+          
+#if ANDROID
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
-#if ANDROID
 				  var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
 				   return new AndroidPlatformService(logger);
+            });
 #endif
 
-#if WINDOWS
-                var logger = provider.GetRequiredService<ILogger<WindowsPlatformService>>();
-                 var backgroundService = provider.GetRequiredService<IBackgroundService>();
-                return new WindowsPlatformService(backgroundService, logger);
-#endif
-                // throw new NotImplementedException("Unsupported platform");
-            });
 #if WINDOWS
             builder.Services.AddSingleton<IBackgroundService>
                 (provider =>
                 {
-
                     var logger = provider.GetRequiredService<ILogger<BackgroundService>>();
                     var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                     var netConfig = provider.GetRequiredService<NetConnectConfig>();
@@ -292,14 +251,17 @@ namespace NetworkMonitorAgent
                     var processorStates = provider.GetRequiredService<LocalProcessorStates>();
                     var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
                     var monitorPingInfoView = provider.GetRequiredService<IMonitorPingInfoView>();
-
                     return new BackgroundService(logger, netConfig, loggerFactory, rabbitRepo, fileRepo, processorStates, monitorPingInfoView, cmdProcessorProvider);
-
-
                 });
+
+            builder.Services.AddSingleton<IPlatformService>(provider =>
+            {
+                var logger = provider.GetRequiredService<ILogger<WindowsPlatformService>>();
+                 var backgroundService = provider.GetRequiredService<IBackgroundService>();
+                return new WindowsPlatformService(backgroundService, logger);
+            });
 #endif
-
-
+      
         }
 
         private static void BuildViewModels(MauiAppBuilder builder)

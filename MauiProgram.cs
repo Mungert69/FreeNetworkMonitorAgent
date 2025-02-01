@@ -187,7 +187,7 @@ namespace NetworkMonitorAgent
                 }
 
             });
-            builder.Services.AddSingleton<IRabbitRepo,RabbitRepo();
+            builder.Services.AddSingleton<IRabbitRepo,RabbitRepo>();
             builder.Services.AddSingleton<NetConnectConfig>();
         }
 
@@ -199,7 +199,6 @@ namespace NetworkMonitorAgent
 
 #if ANDROID
             builder.Services.AddSingleton<IPlatformService, AndroidPlatformService>();
-
 #endif
 
 #if WINDOWS

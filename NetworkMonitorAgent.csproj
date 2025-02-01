@@ -15,7 +15,7 @@
         <SelfContained>true</SelfContained>
 
         <!-- Display name -->
-        <ApplicationTitle>Network Monitor Agent</ApplicationTitle>
+        <ApplicationTitle>Free Network Monitor Agent</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>

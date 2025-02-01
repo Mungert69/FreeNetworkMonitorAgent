@@ -57,18 +57,16 @@ namespace NetworkMonitorAgent
             {
                 builder.Services.AddLogging(loggingBuilder =>
                 {
-                    loggingBuilder.AddInMemoryLogger(options =>
-                    {
-                        options.MaxLines = 1024;
-                        options.MinLevel = LogLevel.Information;
-                        options.MaxLevel = LogLevel.Critical;
-                    });
+                    loggingBuilder.ClearProviders(); // Remove default providers if any
+                    loggingBuilder.AddConsole(); // Log to console (for debugging)
+                    loggingBuilder.AddDebug();   // Log to Debug output window
                 });
             }
             catch (Exception ex)
             {
-                ExceptionHelper.HandleGlobalException(ex, " Error : could not setup logging");
+                ExceptionHelper.HandleGlobalException(ex, "Error: Could not setup logging");
             }
+
 
             try
             {
@@ -187,15 +185,15 @@ namespace NetworkMonitorAgent
                 }
 
             });
-            builder.Services.AddSingleton<IRabbitRepo,RabbitRepo>();
+            builder.Services.AddSingleton<IRabbitRepo, RabbitRepo>();
             builder.Services.AddSingleton<NetConnectConfig>();
         }
 
         private static void BuildServices(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton<IApiService,ApiService>();
-            builder.Services.AddSingleton<IAuthService,AuthService>();
-            builder.Services.AddSingleton<ICmdProcessorProvider,CmdProcessorProvider>();
+            builder.Services.AddSingleton<IApiService, ApiService>();
+            builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddSingleton<ICmdProcessorProvider, CmdProcessorProvider>();
 
 #if ANDROID
             builder.Services.AddSingleton<IPlatformService, AndroidPlatformService>();
@@ -222,7 +220,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<NetworkMonitorPage>();
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<ConfigPage>();
-            builder.Services.AddSingleton<DataViewPage>();      
+            builder.Services.AddSingleton<DataViewPage>();
         }
         private static void ShowAlertBlocking(string title, string? message)
         {

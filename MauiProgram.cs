@@ -218,9 +218,9 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
-            builder.Services.AddSingleton<IApiService,ApiService();
-            builder.Services.AddSingleton<IAuthService,AuthService();
-            builder.Services.AddSingleton<ICmdProcessorProvider,CmdProcessorProvider();
+            builder.Services.AddSingleton<IApiService,ApiService>();
+            builder.Services.AddSingleton<IAuthService,AuthService>();
+            builder.Services.AddSingleton<ICmdProcessorProvider,CmdProcessorProvider>();
           
 #if ANDROID
             builder.Services.AddSingleton<IPlatformService>(provider =>

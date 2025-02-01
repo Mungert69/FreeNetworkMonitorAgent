@@ -9,13 +9,13 @@ namespace NetworkMonitorAgent;
 public partial class ScanPage : ContentPage
 {
 
-    private ILogger _logger;
+    private readonly ILogger _logger;
 
-    private ScanProcessorStatesViewModel _scanProcessorStatesViewModel;
+    private readonly ScanProcessorStatesViewModel _scanProcessorStatesViewModel;
 
-    private IPlatformService _platformService;
+    private readonly IPlatformService _platformService;
 
-    public ScanPage(ILogger logger, ScanProcessorStatesViewModel scanProcessorStatesViewModel, IPlatformService platformService)
+    public ScanPage(ILogger<ScanPage> logger, ScanProcessorStatesViewModel scanProcessorStatesViewModel, IPlatformService platformService)
     {
         try
         {

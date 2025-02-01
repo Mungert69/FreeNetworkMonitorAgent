@@ -23,20 +23,19 @@ namespace NetworkMonitorAgent;
 public partial class DataViewPage : ContentPage
 {
 
-    private ILogger _logger;
-    private IMonitorPingInfoView _monitorPingInfoView;
-    public DataViewPage(ILogger logger,IMonitorPingInfoView monitorPingInfoView)
+    private readonly ILogger _logger;
+    private readonly IMonitorPingInfoView _monitorPingInfoView;
+    public DataViewPage(IMonitorPingInfoView monitorPingInfoView)
     {
         try
         {
             InitializeComponent();
-            _logger = logger;
             _monitorPingInfoView = monitorPingInfoView;
-            BindingContext = monitorPingInfoView;
+            BindingContext = _monitorPingInfoView;
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : Unable to load DataViewPage. Error was: {ex.Message}");
+             _logger?.LogError($" Error : Unable to load DataViewPage. Error was: {ex.Message}");
         }
 
     }
@@ -47,10 +46,8 @@ public partial class DataViewPage : ContentPage
         {
             if (sender is View view && view.BindingContext is MPIndicator mpIndicator)
             {
-                var monitorPingInfoView = BindingContext as IMonitorPingInfoView;
-                monitorPingInfoView?.SelectMonitorPingInfo(mpIndicator.MonitorIPID);
-
-                var monitorPingInfo = monitorPingInfoView?.SelectedMonitorPingInfo;
+                _monitorPingInfoView?.SelectMonitorPingInfo(mpIndicator.MonitorIPID);
+                var monitorPingInfo = _monitorPingInfoView?.SelectedMonitorPingInfo;
                 if (monitorPingInfo != null)
                 {
                     await ShowDetailsPopup(monitorPingInfo);
@@ -59,7 +56,7 @@ public partial class DataViewPage : ContentPage
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : in OnStatusIndicatorTapped on DataViewPage. Error was: {ex.Message}");
+             _logger?.LogError($" Error : in OnStatusIndicatorTapped on DataViewPage. Error was: {ex.Message}");
         }
     }
 
@@ -88,7 +85,7 @@ public partial class DataViewPage : ContentPage
         }
         catch (Exception e)
         {
-            _logger.LogError($" Error: Could not navigate to page {nameof(DetailsPage)}. Error was: {e.ToString()}");
+             _logger?.LogError($" Error: Could not navigate to page {nameof(DetailsPage)}. Error was: {e.ToString()}");
         }// Yes was tapped
     }
 }

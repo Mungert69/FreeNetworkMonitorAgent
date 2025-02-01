@@ -14,7 +14,7 @@ public partial class MainPage : ContentPage
     private readonly ILogger _logger;
     private bool _isUpdatingSwitch = false;
 
-    public MainPage(ILogger logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
+    public MainPage(ILogger<MainPage> logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
     {
         InitializeComponent();
 

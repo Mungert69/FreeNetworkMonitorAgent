@@ -12,21 +12,22 @@ using MetroLog.Maui;
 namespace NetworkMonitorAgent;
 public partial class AppShell : Shell
 {
-    IPlatformService? _platformService;
-    private ILogger? _logger;
-    public AppShell(ILogger? logger, IPlatformService? platformService)
+  private readonly IPlatformService _platformService;
+private readonly ILogger _logger;
+
+    public AppShell(ILogger<AppShell> logger, IPlatformService platformService)
     {
         try
         {
-          
+
             InitializeComponent();
             _logger = logger;
             _platformService = platformService;
 
-             }
+        }
         catch (Exception ex)
         {
-           _logger?.LogError($" Error initializing AppShell {ex.Message} ");
+            _logger?.LogError($" Error initializing AppShell {ex.Message} ");
         }
     }
     protected override void OnAppearing()
@@ -40,7 +41,6 @@ public partial class AppShell : Shell
         {
             _logger?.LogError($" Error requesting permissions {ex.Message} ");
         }
-
-
     }
+
 }

@@ -19,15 +19,6 @@ namespace NetworkMonitorAgent
 {
     public static class MauiProgram
     {
-        // Centralized exception handler
-       /* public static void HandleGlobalException(Exception exception, string title)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await Application.Current.MainPage?.DisplayAlert(title, exception.Message, "OK");
-                Console.WriteLine($"Global Exception Caught: {exception}");
-            });
-        }*/
 
         public static IServiceProvider ServiceProvider { get; private set; }
         public static MauiApp CreateMauiApp()
@@ -49,7 +40,7 @@ namespace NetworkMonitorAgent
                 ExceptionHelper.HandleGlobalException(e.Exception, "Unobserved Task Exception");
             };
 
-          
+
 
 
 
@@ -70,12 +61,16 @@ namespace NetworkMonitorAgent
             try
             {
 
-                builder.Logging.AddInMemoryLogger(options =>
+                builder.Services.AddLogging(loggingBuilder =>
                 {
-                    options.MaxLines = 1024;
-                    options.MinLevel = LogLevel.Information;
-                    options.MaxLevel = LogLevel.Critical;
+                    loggingBuilder.AddInMemoryLogger(options =>
+                    {
+                        options.MaxLines = 1024;
+                        options.MinLevel = LogLevel.Information;
+                        options.MaxLevel = LogLevel.Critical;
+                    });
                 });
+
 
             }
             catch (Exception ex)
@@ -98,7 +93,7 @@ namespace NetworkMonitorAgent
             }
             try
             {
-                builder.Services.AddSingleton(provider =>
+                builder.Services.AddSingleton<AppShell>(provider =>
                         {
                             var logger = provider.GetRequiredService<ILogger<AppShell>>();
                             var platformService = provider.GetRequiredService<IPlatformService>();
@@ -190,7 +185,7 @@ namespace NetworkMonitorAgent
         }
         private static void BuildRepoAndConfig(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton(provider =>
+            builder.Services.AddSingleton<LocalProcessorStates>(provider =>
          {
              return new LocalProcessorStates();
          });
@@ -313,14 +308,14 @@ namespace NetworkMonitorAgent
            {
                return new MonitorPingInfoView();
            });
-            builder.Services.AddSingleton(provider =>
+            builder.Services.AddSingleton<ProcessorStatesViewModel>(provider =>
                         {
                             var logger = provider.GetRequiredService<ILogger<ProcessorStatesViewModel>>();
                             var processorStates = provider.GetRequiredService<LocalProcessorStates>();
                             // Choose the appropriate constructor
                             return new ProcessorStatesViewModel(logger, processorStates);
                         });
-            builder.Services.AddSingleton(provider =>
+            builder.Services.AddSingleton<ScanProcessorStatesViewModel>(provider =>
            {
                var logger = provider.GetRequiredService<ILogger<ScanProcessorStatesViewModel>>();
                var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
@@ -329,7 +324,7 @@ namespace NetworkMonitorAgent
                var apiService = provider.GetRequiredService<IApiService>();
                return new ScanProcessorStatesViewModel(logger, nmapCmdProcessorStates, apiService, netConfig);
            });
-            builder.Services.AddSingleton(provider =>
+            builder.Services.AddSingleton<MainPageViewModel>(provider =>
           {
               var netConfig = provider.GetRequiredService<NetConnectConfig>();
               var logger = provider.GetRequiredService<ILogger<MainPageViewModel>>();
@@ -338,7 +333,7 @@ namespace NetworkMonitorAgent
               return new MainPageViewModel(netConfig, platformService, logger, authService);
           });
 
-            builder.Services.AddSingleton(provider =>
+            builder.Services.AddSingleton<ConfigPageViewModel>(provider =>
             {
                 var netConfig = provider.GetRequiredService<NetConnectConfig>();
                 var logger = provider.GetRequiredService<ILogger<ConfigPageViewModel>>();
@@ -348,41 +343,13 @@ namespace NetworkMonitorAgent
         }
         private static void BuildPages(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton(provider =>
-                        {
-                            var scanProcessorStatesViewModel = provider.GetRequiredService<ScanProcessorStatesViewModel>();
-                            var logger = provider.GetRequiredService<ILogger<ScanPage>>();
-                            var platformService = provider.GetRequiredService<IPlatformService>();
+            builder.Services.AddSingleton<ScanPage>();
+            builder.Services.AddSingleton<NetworkMonitorPage>();
+            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddSingleton<ConfigPage>();
+            builder.Services.AddSingleton<DataViewPage>();
 
-                            return new ScanPage(logger, scanProcessorStatesViewModel, platformService);
-                        });
-
-            builder.Services.AddSingleton(provider =>
-           {
-               var apiService = provider.GetRequiredService<IApiService>();
-               return new NetworkMonitorPage(apiService);
-           });
-            builder.Services.AddSingleton(provider =>
-           {
-
-               var logger = provider.GetRequiredService<ILogger<MainPage>>();
-               var processorStatesViewModel = provider.GetRequiredService<ProcessorStatesViewModel>();
-               var mainPageViewModel = provider.GetRequiredService<MainPageViewModel>();
-               return new MainPage(logger, mainPageViewModel, processorStatesViewModel);
-           });
-            builder.Services.AddSingleton(provider =>
-            {
-
-                var logger = provider.GetRequiredService<ILogger<DataViewPage>>();
-                var monitorPingInfoView = provider.GetRequiredService<IMonitorPingInfoView>();
-
-                return new DataViewPage(logger, monitorPingInfoView);
-            });
-            builder.Services.AddSingleton(provider =>
-            {
-                var configPageViewModel = provider.GetRequiredService<ConfigPageViewModel>();
-                return new ConfigPage(configPageViewModel);
-            });
+            
         }
         private static void ShowAlertBlocking(string title, string? message)
         {

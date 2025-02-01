@@ -19,12 +19,11 @@
                 <ApplicationVersion>407</ApplicationVersion>
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
-<RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
-
+                <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
         </PropertyGroup>
-         <PropertyGroup Condition="'$(Configuration)'=='Release-Dev'">
-    <DefineConstants>DEV</DefineConstants>
-</PropertyGroup>
+        <PropertyGroup Condition="'$(Configuration)'=='Release-Dev'">
+                <DefineConstants>DEV</DefineConstants>
+        </PropertyGroup>
         <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU' or '$(Configuration)'=='Release-Dev'">
                 <AndroidPackageFormat>aab</AndroidPackageFormat>
                 <AndroidSigningKeyAlias>networkmonitormaui</AndroidSigningKeyAlias>
@@ -36,8 +35,6 @@
                 <PublishTrimmed>false</PublishTrimmed>
                 <RunAOTCompilation>false</RunAOTCompilation>
         </PropertyGroup>
-
-
         <ItemGroup>
                 <!-- App Icon -->
                 <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
@@ -49,41 +46,36 @@
                 <!-- Custom Fonts -->
                 <MauiFont Include="Resources\Fonts\*" />
                 <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-                 <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-
+                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
                 <MauiStyles Include="Resources\Styles\*" />
         </ItemGroup>
-
         <ItemGroup>
- <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
+                <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
                 <PackageReference Include="CommunityToolkit.Maui" Version="11.0.0" />
                 <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
                 <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.30" />
                 <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.30" />
-               <PackageReference Include="Microsoft.Maui.Core" Version="9.0.30" />
+                <PackageReference Include="Microsoft.Maui.Core" Version="9.0.30" />
                 <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.30" />
                 <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.30" />
+                <PackageReference Include="Syncfusion.Maui.Core" Version="28.2.3" />
                 <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.3" />
-
         </ItemGroup>
         <ItemGroup>
-                <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui-Android.csproj" />  
+                <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui-Android.csproj" />
         </ItemGroup>
-
         <ItemGroup>
-  <Reference Include="NetworkMonitorMaui">
-    <HintPath>..\NetworkMonitorMaui\bin\Debug\net9.0-android\NetworkMonitorMaui-Android.dll</HintPath>
-    <Private>true</Private>
-  </Reference>
-</ItemGroup>
-<ItemGroup>
-  <AndroidAsset Include="$(OutputPath)/*.dll">
-    <Link>assemblies\%(FileName)%(Extension)</Link>
-  </AndroidAsset>
-</ItemGroup>
-<PropertyGroup>
-  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-</PropertyGroup>
-	
+                <Reference Include="NetworkMonitorMaui">
+                        <HintPath>..\NetworkMonitorMaui\bin\Debug\net9.0-android\NetworkMonitorMaui-Android.dll</HintPath>
+                        <Private>true</Private>
+                </Reference>
+        </ItemGroup>
+        <ItemGroup>
+                <AndroidAsset Include="$(OutputPath)/*.dll">
+                        <Link>assemblies\%(FileName)%(Extension)</Link>
+                </AndroidAsset>
+        </ItemGroup>
+        <PropertyGroup>
+                <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        </PropertyGroup>
 </Project>
-

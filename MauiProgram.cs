@@ -269,14 +269,12 @@ namespace NetworkMonitorAgent
             {
 #if ANDROID
 				  var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
-				   //var dialogService = provider.GetRequiredService<IDialogService>();
 				   return new AndroidPlatformService(logger);
 #endif
 
 #if WINDOWS
                 var logger = provider.GetRequiredService<ILogger<WindowsPlatformService>>();
-                //var dialogService = provider.GetRequiredService<IDialogService>();
-                var backgroundService = provider.GetRequiredService<IBackgroundService>();
+                 var backgroundService = provider.GetRequiredService<IBackgroundService>();
                 return new WindowsPlatformService(backgroundService, logger);
 #endif
                 // throw new NotImplementedException("Unsupported platform");

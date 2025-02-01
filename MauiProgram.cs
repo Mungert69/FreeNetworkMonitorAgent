@@ -233,7 +233,7 @@ namespace NetworkMonitorAgent
         private static void BuildServices(MauiAppBuilder builder)
         {
 
-            builder.Services.AddSingleton<IMonitorPingInfoView,MonitorPingInfoView>();
+            builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
 
             builder.Services.AddSingleton<IApiService>(provider =>
     {
@@ -306,8 +306,8 @@ namespace NetworkMonitorAgent
 
         private static void BuildViewModels(MauiAppBuilder builder)
         {
-         
-         builder.Services.AddSingleton<ProcessorStatesViewModel>();
+
+            builder.Services.AddSingleton<ProcessorStatesViewModel>();
             builder.Services.AddSingleton<ScanProcessorStatesViewModel>();
             builder.Services.AddSingleton<MainPageViewModel>();
             builder.Services.AddSingleton<ConfigPageViewModel>();
@@ -321,7 +321,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DataViewPage>();
 
-            
+
         }
         private static void ShowAlertBlocking(string title, string? message)
         {

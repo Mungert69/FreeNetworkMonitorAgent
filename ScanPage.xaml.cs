@@ -69,7 +69,7 @@ public partial class ScanPage : ContentPage
                 _scanProcessorStatesViewModel.DefaultEndpointType = selectedEndpointType;
             }
         }
-          catch (Exception ex)
+        catch (Exception ex)
         {
             if (_logger != null) _logger.LogError($" Error : in OnEndpointTypePickerSelectedIndexChanged on ScanPage. Error was: {ex.Message}");
         }
@@ -190,25 +190,27 @@ public partial class ScanPage : ContentPage
     }
     private void OnHostsSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        try {
-        var selectedHosts = e.CurrentSelection.Cast<MonitorIP>().ToList();
-        if (selectedHosts != null && selectedHosts.Count > 0)
+        try
         {
-            _scanProcessorStatesViewModel.AddSelectedHosts(selectedHosts);
-        }
+            var selectedHosts = e.CurrentSelection.Cast<MonitorIP>().ToList();
+            if (selectedHosts != null && selectedHosts.Count > 0)
+            {
+                _scanProcessorStatesViewModel.AddSelectedHosts(selectedHosts);
+            }
         }
         catch (Exception ex)
         {
             if (_logger != null) _logger.LogError($" Error : in OnHostsSelectionChanged on ScanPage. Error was: {ex.Message}");
         }
 
-        
+
     }
     private async void OnGoHomeClicked(object sender, EventArgs e)
     {
-        try {
-        await Shell.Current.GoToAsync("//Home");
-    }
+        try
+        {
+            await Shell.Current.GoToAsync("//Home");
+        }
         catch (Exception ex)
         {
             if (_logger != null) _logger.LogError($" Error : in OnGoHomeClicked on LogsPage. Error was: {ex.Message}");

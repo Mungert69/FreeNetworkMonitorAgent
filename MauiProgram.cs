@@ -1,5 +1,4 @@
-﻿using MetroLog.MicrosoftExtensions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Connection;
 using NetworkMonitor.DTOs;
@@ -46,18 +45,23 @@ namespace NetworkMonitorAgent
             {
                 builder.Services.AddLogging(loggingBuilder =>
                 {
-                    loggingBuilder.AddInMemoryLogger(options =>
-                    {
-                        options.MaxLines = 1024;
-                        options.MinLevel = LogLevel.Information;
-                        options.MaxLevel = LogLevel.Critical;
-                    });
+                    loggingBuilder.ClearProviders(); // Optional: Clears default providers if necessary
+                    loggingBuilder.SetMinimumLevel(LogLevel.Information); // Set the minimum log level
+
+                    // Add standard logging providers
+                    loggingBuilder.AddConsole(); // Console logger (useful for debugging)
+                    loggingBuilder.AddDebug();   // Debug output window (useful in Visual Studio)
+
+                    // You can add other logging providers here, such as:
+                    // loggingBuilder.AddEventLog(); // Windows Event Log
+                    // loggingBuilder.AddFile("app.log"); // File-based logging (requires additional package)
                 });
             }
             catch (Exception ex)
             {
-                ExceptionHelper.HandleGlobalException(ex, " Error : could not setup logging");
+                ExceptionHelper.HandleGlobalException(ex, "Error: could not setup logging");
             }
+
             try
             {
                 LoadConfiguration(builder, os);

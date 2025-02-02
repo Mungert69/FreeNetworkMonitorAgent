@@ -55,8 +55,7 @@
         <MauiFont Include="Resources\Fonts\*" />
 
         <MauiAsset Include="Resources\Raw\appsettings.json" />
-        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-        <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+         <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.3.1-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
                 
     </ItemGroup>
 
@@ -101,7 +100,6 @@
       <None Remove="Resources\Images\SquareLogo\placeholder.scale-150.png" />
       <None Remove="Resources\Images\SquareLogo\placeholder.scale-200.png" />
       <None Remove="Resources\Images\SquareLogo\placeholder.scale-400.png" />
-      <None Remove="temp\Package.appxmanifest.bak" />
     </ItemGroup>
 
     <ItemGroup>
@@ -157,7 +155,6 @@
                 <PackageReference Include="Microsoft.Maui.Core" Version="9.0.30" />
                 <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.30" />
                 <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.30" />
-                <PackageReference Include="Syncfusion.Maui.Core" Version="28.2.3" />
                 <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.3" />
         </ItemGroup>
         <ItemGroup>

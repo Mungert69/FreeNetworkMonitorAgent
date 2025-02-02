@@ -1,5 +1,6 @@
 
 using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Objects;
 
 namespace NetworkMonitorAgent
 {
@@ -10,6 +11,7 @@ namespace NetworkMonitorAgent
         public static bool AssetsReady { get => _assetsReady; set => _assetsReady = value; }
         public IServiceProvider ServiceProvider { get => MauiProgram.ServiceProvider; }
         public string GetAppDataDirectory() => FileSystem.AppDataDirectory;
+        public ColorResource ColorResource => ColorResource;
 
 
 #if ANDROID

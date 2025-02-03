@@ -33,11 +33,13 @@
                                    <Picker x:Name="EndpointTypePicker"
                                            Title="Select Default Endpoint Type"
                                            ItemsSource="{Binding EndpointTypes}"
-                                           SelectedItem="{Binding DefaultEndpointType}"/>
+                                           SelectedItem="{Binding DefaultEndpointType}"
+                                            FontSize="18"/>
                                    <Picker x:Name="NetworkInterfacePicker"
                                            Title="Select Network Interface"
                                            ItemsSource="{Binding NetworkInterfaces}"
-                                           SelectedItem="{Binding SelectedNetworkInterface}"
+                                           SelectedItem="{Binding SelectedNetworkInterface}"                                 
+                                            FontSize="18"
                                            ItemDisplayBinding="{Binding .}"/>
                                    <StackLayout Orientation="Horizontal"
                                                 HorizontalOptions="Center">

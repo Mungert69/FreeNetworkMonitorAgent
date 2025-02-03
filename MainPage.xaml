@@ -62,7 +62,7 @@
                 <VerticalStackLayout Spacing="10">
                     <StackLayout Orientation="Horizontal"
                                  HorizontalOptions="CenterAndExpand">
-                        <Label Text="Enable Agent"
+                        <Label Text="Enable Agent "
                                VerticalOptions="Center"
                                TextColor="{DynamicResource Primary}"/>
                         <Switch  Toggled="OnSwitchToggled"/>

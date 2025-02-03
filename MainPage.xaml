@@ -1,68 +1,116 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-     xmlns:controls="clr-namespace:NetworkMonitor.Maui.Controls;assembly=NetworkMonitorMaui"
-    xmlns:view="clr-namespace:NetworkMonitorAgent.Views"
-    xmlns:vm="clr-namespace:NetworkMonitor.Maui.ViewModels;assembly=NetworkMonitorMaui"
-    x:Class="NetworkMonitorAgent.MainPage"
-    >
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NetworkMonitor.Maui.Controls;assembly=NetworkMonitorMaui"
+             xmlns:view="clr-namespace:NetworkMonitorAgent.Views"
+             xmlns:vm="clr-namespace:NetworkMonitor.Maui.ViewModels;assembly=NetworkMonitorMaui"
+             x:Class="NetworkMonitorAgent.MainPage">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="15" Padding="5" VerticalOptions="Center">
+        <VerticalStackLayout Spacing="15"
+                             Padding="5"
+                             VerticalOptions="Center">
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"  Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="20"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
-                    <Image Source="logo.png" SemanticProperties.Description="Free Network Monitor Agent Logo. " HeightRequest="100" HorizontalOptions="Center" />
-                    <Label Text="Free Network Monitor Agent" FontSize="22" HorizontalOptions="Center" TextColor="{DynamicResource Primary}" />
+                    <Image Source="logo.png"
+                           SemanticProperties.Description="Free Network Monitor Agent Logo. "
+                           HeightRequest="100"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Free Network Monitor Agent"
+                           FontSize="22"
+                           HorizontalOptions="Center"
+                           TextColor="{DynamicResource Primary}"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
-                <Label Text="Welcome to Free Network Monitor Agent" FontSize="16" HorizontalOptions="Center" TextColor="{DynamicResource Primary}"/>
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="20"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand"
+                   Margin="0,0,0,10">
+                <Label Text="Welcome to Free Network Monitor Agent"
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       TextColor="{DynamicResource Primary}"/>
             </Frame>
             <!-- Processor States View -->
-            <view:ProcessorStatesView x:Name="ProcessorStatesView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
-            <view:CustomPopupView x:Name="CustomPopupView" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" />
+            <view:ProcessorStatesView x:Name="ProcessorStatesView"
+                                      HorizontalOptions="FillAndExpand"
+                                      VerticalOptions="FillAndExpand"/>
+            <view:CustomPopupView x:Name="CustomPopupView"
+                                  AbsoluteLayout.LayoutBounds="0,0,1,1"
+                                  AbsoluteLayout.LayoutFlags="All"/>
             <!-- Add this inside your Grid or another layout -->
-            <ActivityIndicator x:Name="ProgressIndicator"  IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Button x:Name="CancelButton" Text="Cancel" IsVisible="False" Clicked="OnCancelClicked" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="0" CornerRadius="10" HorizontalOptions="FillAndExpand">
+            <ActivityIndicator x:Name="ProgressIndicator"
+                               IsVisible="False"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+            <Button x:Name="CancelButton"
+                    Text="Cancel"
+                    IsVisible="False"
+                    Clicked="OnCancelClicked"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="0"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
-                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                        <Label Text="Enable Agent" VerticalOptions="Center" TextColor="{DynamicResource Primary}"/>
+                    <StackLayout Orientation="Horizontal"
+                                 HorizontalOptions="CenterAndExpand">
+                        <Label Text="Enable Agent"
+                               VerticalOptions="Center"
+                               TextColor="{DynamicResource Primary}"/>
                         <Switch  Toggled="OnSwitchToggled"/>
-                       
+                        <Label Text="{Binding ServiceMessage}"
+                               VerticalOptions="Center"
+                               TextColor="{DynamicResource Secondary}"/>
                     </StackLayout>
-                    <Label Text="{Binding ServiceMessage}" VerticalOptions="Center" HorizontalOptions="StartAndExpand" TextColor="{DynamicResource Primary}"/>
+
                 </VerticalStackLayout>
             </Frame>
 
 
 
-            <Frame   BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="0" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
-                <ListView  x:Name="TaskListView"  IsVisible="{Binding ShowTasks}" >
-                    <ListView.ItemTemplate>
-                        <DataTemplate  x:DataType="vm:TaskItem">
-                            
-                            <ViewCell>
-                                <ViewCell.BindingContext>
-                                    <Binding />
-                                </ViewCell.BindingContext>
-                                <StackLayout Orientation="Horizontal" Padding="10">
-                                      
-                                    <CheckBox IsChecked="{Binding IsCompleted}" IsEnabled="False" />
-                                    <Label Text="{Binding ButtonText}" FontSize="18" HorizontalOptions="Center" TextColor="{Binding ButtonTextColor}" BackgroundColor="{Binding ButtonBackgroundColor}"/>
-            <Button Text="Test"  BackgroundColor="White" TextColor="Black" CornerRadius="5" Padding="10" FontSize="16"/>
-       
-                                    <controls:AnimatedButton Text="{Binding ButtonText}" Command="{Binding TaskAction}" BackgroundColor="{Binding ButtonBackgroundColor}" TextColor="{Binding ButtonTextColor}" CornerRadius="5" Padding="10" FontSize="16"/>
-                                </StackLayout>
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="0"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand"
+                   Margin="0,0,0,10">
+                <CollectionView x:Name="TaskCollectionView"
+                                IsVisible="{Binding ShowTasks}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TaskItem">
+                            <Grid Padding="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
+                                <!-- Example: A checkbox for completion -->
+                                <CheckBox Grid.Column="0"
+                                          IsChecked="{Binding IsCompleted}"
+                                          IsEnabled="False"
+                                          VerticalOptions="Center"/>
+
+                                <controls:AnimatedButton Grid.Column="1"
+                                                         Text="{Binding ButtonText}"
+                                                         Command="{Binding TaskAction}"
+                                                         BackgroundColor="{Binding ButtonBackgroundColor}"
+                                                         TextColor="{Binding ButtonTextColor}"
+                                                         CornerRadius="5"
+                                                         Padding="10"
+                                                         FontSize="16"
+                                                         VerticalOptions="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Frame>
-            <!-- Task List -->
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

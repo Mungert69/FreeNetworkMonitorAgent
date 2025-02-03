@@ -82,7 +82,7 @@ namespace NetworkMonitorAgent
                 // Add some logging or handling here if needed
             }
 
-            return Microsoft.Maui.Graphics.Color.Transparent;
+            return new Microsoft.Maui.Graphics.Color(0, 0, 0, 0);
         }
 
 #endif

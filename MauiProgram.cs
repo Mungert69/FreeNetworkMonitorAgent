@@ -11,6 +11,7 @@ using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
 using CommunityToolkit.Maui;
+
 namespace NetworkMonitorAgent
 {
     public static class MauiProgram

@@ -63,8 +63,10 @@
                     <StackLayout Orientation="Horizontal"
                                  HorizontalOptions="CenterAndExpand">
                         <Label Text="Enable Agent "
-                               VerticalOptions="Center"
-                               TextColor="{DynamicResource Primary}"/>
+                            VerticalOptions="Center"
+                            TextColor="{DynamicResource Primary}"
+                            Padding="0,0,5,0"/>
+
                         <Switch  Toggled="OnSwitchToggled"/>
                         <Label Text="{Binding ServiceMessage}"
                                VerticalOptions="Center"

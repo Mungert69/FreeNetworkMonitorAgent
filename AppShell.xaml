@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell x:Class="NetworkMonitorAgent.AppShell"
-  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-  xmlns:local="clr-namespace:NetworkMonitorAgent"  Title="NetworkMonitorAgent">
-    <FlyoutItem Title="Home" >
-        <ShellContent Route="Home" ContentTemplate="{DataTemplate local:MainPage}" />
-    </FlyoutItem>
-     <FlyoutItem Title="Check a Host" >
-        <ShellContent Route="Check" ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Scan Local Network" >
-        <ShellContent Route="Scan" ContentTemplate="{DataTemplate local:ScanPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Monitored Hosts" >
-        <ShellContent Route="Data" ContentTemplate="{DataTemplate local:DataViewPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Show Config" >
-        <ShellContent Route="Config" ContentTemplate="{DataTemplate local:ConfigPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Setup Guide" >
-        <ShellContent Route="SetupGuide" ContentTemplate="{DataTemplate local:SetupGuidePage}" />
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:NetworkMonitorAgent"
+       Title="NetworkMonitorAgent">
+
+    <FlyoutItem>
+        <ShellContent Route="Home" 
+                     Title="Home"
+                     ContentTemplate="{DataTemplate local:MainPage}" />
+        <ShellContent Route="Check" 
+                     Title="Check a Host"
+                     ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
+        <ShellContent Route="Scan" 
+                     Title="Scan Local Network"
+                     ContentTemplate="{DataTemplate local:ScanPage}" />
+        <ShellContent Route="Data" 
+                     Title="Monitored Hosts"
+                     ContentTemplate="{DataTemplate local:DataViewPage}" />
+        <ShellContent Route="Config" 
+                     Title="Show Config"
+                     ContentTemplate="{DataTemplate local:ConfigPage}" />
+        <ShellContent Route="SetupGuide" 
+                     Title="Setup Guide"
+                     ContentTemplate="{DataTemplate local:SetupGuidePage}" />
     </FlyoutItem>
 
-<ShellContent Route="DetailsPage" ContentTemplate="{DataTemplate local:DetailsPage}" />
-
+    <!-- Optional: Additional routes that aren't in the main flyout menu -->
+    <ShellContent Route="DetailsPage" 
+                  ContentTemplate="{DataTemplate local:DetailsPage}" />
 
 </Shell>

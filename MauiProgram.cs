@@ -263,7 +263,6 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DataViewPage>();
-            Routing.RegisterRoute("//Scan", typeof(ScanPage));
         }
         private static void ShowAlertBlocking(string title, string? message)
         {

@@ -18,16 +18,53 @@ namespace NetworkMonitorAgent
 #if ANDROID
         public Type MainActivity { get => typeof(MainActivity); }
            // Method to retrieve a Drawable field dynamically (Optional based on use case)
-        public int GetDrawable(string drawableName)
+       public int GetDrawable(string drawableName)
+{
+    try
+    {
+        int resourceId;
+        switch (drawableName?.ToLowerInvariant()) // Case-insensitive match
         {
-            return drawableName switch
-            {
-                "logo" => Resource.Drawable.logo,
-                "view" => Resource.Drawable.view,
-                "stop" => Resource.Drawable.stop,
-                _ => Resource.Drawable.logo
-            };
+            case "logo":
+                resourceId = Resource.Drawable.logo;
+                break;
+            case "view":
+                resourceId = Resource.Drawable.view;
+                break;
+            case "stop":
+                resourceId = Resource.Drawable.stop;
+                break;
+            default:
+                // Fallback to a system icon
+                resourceId = Android.Resource.Drawable.IcDialogAlert;
+                Console.WriteLine($"Drawable '{drawableName}' not found; using system fallback icon.");
+                break;
         }
+
+        // Validate the resource ID
+        if (IsValidResourceId(resourceId))
+        {
+            return resourceId;
+        }
+        else
+        {
+            Console.WriteLine($"Invalid resource ID for drawable '{drawableName}'; using system fallback icon.");
+            return Android.Resource.Drawable.IcDialogAlert;
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log the exception and return the default system icon
+        Console.WriteLine($"Error retrieving drawable '{drawableName}': {ex.Message}");
+        return Android.Resource.Drawable.IcDialogAlert;
+    }
+}
+
+private bool IsValidResourceId(int resourceId)
+{
+    // Resource IDs in Android are positive integers
+    return resourceId > 0;
+}
 #else
         public Type MainActivity { get => typeof(object); }
 

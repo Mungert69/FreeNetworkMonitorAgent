@@ -76,7 +76,7 @@ public partial class DataViewPage : ContentPage
                 if (boolResult)
                 {
 
-                    var detailsPage = new DetailsPage(_logger,_monitorPingInfoView);
+                    var detailsPage = new DetailsPage(_monitorPingInfoView);
                     await Shell.Current.Navigation.PushAsync(detailsPage);
 
                 }

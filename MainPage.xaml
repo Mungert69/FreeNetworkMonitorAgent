@@ -70,16 +70,14 @@
                         <Switch  Toggled="OnSwitchToggled"/>
 
                     </StackLayout>
-                    <FlexLayout Direction="Row"
-                                JustifyContent="Center"
-                                AlignItems="Center"
-                                Wrap="Wrap">
-                        <Label Text="{Binding ServiceMessage}"
-                               TextColor="{DynamicResource Secondary}"
-                               LineBreakMode="WordWrap"
-                               FlexLayout.Grow="1"
-                               HorizontalTextAlignment="Start"/>
-                    </FlexLayout>
+                       <Grid HorizontalOptions="CenterAndExpand">
+        <Label Text="{Binding ServiceMessage}"
+               TextColor="{DynamicResource Secondary}"
+               LineBreakMode="WordWrap"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
+               WidthRequest="300" />
+    </Grid>
                 </VerticalStackLayout>
             </Frame>
 

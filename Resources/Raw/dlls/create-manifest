@@ -1,2 +1,12 @@
+#!/bin/bash
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the script's directory
+cd "$SCRIPT_DIR"
+
+# Create the assets_manifest.txt file in the script's directory
 find . -type f > assets_manifest.txt
 
+# Optional: Print confirmation
+echo "Created assets_manifest.txt in: $SCRIPT_DIR"

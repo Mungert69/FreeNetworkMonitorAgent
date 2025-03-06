@@ -839,7 +839,6 @@
 ./bin/nselib/rpcap.lua
 ./bin/README-WIN32
 ./assets_manifest.txt
-./create-manifest
 ./lib64/libssl.a
 ./lib64/curves
 ./lib64/oqsprovider.dll

@@ -586,5 +586,34 @@ OPENSSL_3.3.0 {
         SSL_poll;
         SSL_set_value_uint;
         SSL_write_ex2;
-    local: *;
 } OPENSSL_3.2.0;
+OPENSSL_3.4.0 {
+    global:
+        SSL_CTX_flush_sessions_ex;
+        SSL_CTX_set_block_padding_ex;
+        SSL_get1_builtin_sigalgs;
+        SSL_set_block_padding_ex;
+} OPENSSL_3.3.0;
+OPENSSL_3.5.0 {
+    global:
+        OSSL_QUIC_server_method;
+        SSL_CTX_get_domain_flags;
+        SSL_CTX_set_domain_flags;
+        SSL_CTX_set_new_pending_conn_cb;
+        SSL_accept_connection;
+        SSL_get0_domain;
+        SSL_get0_listener;
+        SSL_get_accept_connection_queue_len;
+        SSL_get_domain_flags;
+        SSL_is_domain;
+        SSL_is_listener;
+        SSL_listen;
+        SSL_new_domain;
+        SSL_new_from_listener;
+        SSL_new_listener;
+        SSL_new_listener_from;
+        SSL_set_quic_tls_cbs;
+        SSL_set_quic_tls_early_data_enabled;
+        SSL_set_quic_tls_transport_params;
+    local: *;
+} OPENSSL_3.4.0;

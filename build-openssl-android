@@ -1,0 +1,4 @@
+export ANDROID_NDK_ROOT=/usr/lib/android-sdk/ndk/27.2.12479018
+PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$ANDROID_NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin:$PATH
+./Configure android-arm -D__ANDROID_API__=21
+make

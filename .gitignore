@@ -357,3 +357,4 @@ appsettings*
 bin/
 obj/
 
+.env

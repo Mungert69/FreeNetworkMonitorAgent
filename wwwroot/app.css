@@ -1,0 +1,22 @@
+/* Add to your app.css */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents double scrollbars */
+  }
+  
+  /* Ensure the chat container can break out of content padding */
+  .content {
+    position: relative;
+    height: 100%;
+  }
+  
+  /* Fix for Blazor's error boundary positioning */
+  .blazor-error-boundary {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20000; /* Above chat */
+  }

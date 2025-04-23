@@ -196,6 +196,17 @@ namespace NetworkMonitorAgent
         }
         private static void BuildServices(MauiAppBuilder builder)
         {
+           builder.Services.AddMauiBlazorWebView();
+
+#if DEBUG
+    builder.Services.AddBlazorWebViewDeveloperTools();
+#endif
+            // Register your chat services
+            builder.Services.AddSingleton<ChatStateService>();
+            builder.Services.AddSingleton<AudioService>();
+            builder.Services.AddSingleton<WebSocketService>();
+            builder.Services.AddSingleton<LLMService>();
+
             builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
             builder.Services.AddSingleton<IApiService>(provider =>
     {
@@ -263,6 +274,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<ConfigPage>();
             builder.Services.AddSingleton<DataViewPage>();
+            builder.Services.AddSingleton<ChatPage>();
         }
         private static void ShowAlertBlocking(string title, string? message)
         {

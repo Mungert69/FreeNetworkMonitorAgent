@@ -197,6 +197,7 @@ namespace NetworkMonitorAgent
         private static void BuildServices(MauiAppBuilder builder)
         {
            builder.Services.AddMauiBlazorWebView();
+           
 
 #if DEBUG
     builder.Services.AddBlazorWebViewDeveloperTools();

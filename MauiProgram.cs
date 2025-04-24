@@ -11,6 +11,7 @@ using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
 using CommunityToolkit.Maui;
+using Microsoft.JSInterop;
 
 namespace NetworkMonitorAgent
 {
@@ -150,6 +151,13 @@ namespace NetworkMonitorAgent
                         fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                         fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     });
+
+                builder.Services.AddMauiBlazorWebView();
+
+
+#if DEBUG
+                builder.Services.AddBlazorWebViewDeveloperTools();
+#endif
                 return builder;
             }
             catch (Exception ex)
@@ -196,17 +204,22 @@ namespace NetworkMonitorAgent
         }
         private static void BuildServices(MauiAppBuilder builder)
         {
-           builder.Services.AddMauiBlazorWebView();
-           
+         
+            
+            builder.Services.AddScoped<ILLMService,LLMService>();
+            builder.Services.AddScoped<AudioService>(provider =>
+              new AudioService(provider.GetService<IJSRuntime>()));
+            builder.Services.AddScoped<ChatStateService>(provider =>
+                new ChatStateService(provider.GetService<IJSRuntime>()));
 
-#if DEBUG
-    builder.Services.AddBlazorWebViewDeveloperTools();
-#endif
-            // Register your chat services
-            builder.Services.AddSingleton<ChatStateService>();
-            builder.Services.AddSingleton<AudioService>();
-            builder.Services.AddSingleton<WebSocketService>();
-            builder.Services.AddSingleton<LLMService>();
+            builder.Services.AddScoped<WebSocketService>(provider =>
+                new WebSocketService(
+                    provider.GetRequiredService<ChatStateService>(),
+                    provider.GetService<IJSRuntime>(),
+                    provider.GetRequiredService<AudioService>(),
+                    provider.GetRequiredService<ILLMService>()));
+
+          
 
             builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
             builder.Services.AddSingleton<IApiService>(provider =>

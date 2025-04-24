@@ -1451,3 +1451,4 @@
 ./share/scripts/ajp-methods.nse
 ./share/scripts/http-robtex-shared-ns.nse
 ./share/ncat/ca-bundle.crt
+./lib64/algo_info.json

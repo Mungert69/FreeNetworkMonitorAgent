@@ -858,3 +858,4 @@
 ./lib64/libcrypto.dll.a
 ./lib64/libssl.def
 ./lib64/libssl.pc
+./lib64/algo_info.json

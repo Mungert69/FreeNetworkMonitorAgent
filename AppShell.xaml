@@ -11,6 +11,12 @@
                      ContentTemplate="{DataTemplate local:MainPage}" />
     </FlyoutItem>
 
+    <FlyoutItem Title="AI Assistant">
+        <ShellContent Route="Chat" 
+                 Title="AI Assistant"
+                 ContentTemplate="{DataTemplate local:ChatPage}" />
+    </FlyoutItem>
+
     <FlyoutItem Title="Check a Host">
         <ShellContent Route="Check" 
                      Title="Check a Host"

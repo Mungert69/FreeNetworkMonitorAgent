@@ -3,7 +3,7 @@
 @inject IJSRuntime JSRuntime
 @inject WebSocketService WebSocketService
 @inject AudioService AudioService
-@inject LLMService LLMService
+@inject ILLMService LLMService
 
 <div class="chat-container @(ChatState.IsExpanded ? "expanded" : "")" style="@GetChatContainerStyle()">
     <div class="chat-card">

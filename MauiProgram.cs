@@ -212,12 +212,15 @@ namespace NetworkMonitorAgent
             builder.Services.AddScoped<ChatStateService>(provider =>
                 new ChatStateService(provider.GetService<IJSRuntime>()));
 
-            builder.Services.AddScoped<WebSocketService>(provider =>
-                new WebSocketService(
+            builder.Services.AddScoped<WebSocketService>(provider => {
+
+                return new WebSocketService(
                     provider.GetRequiredService<ChatStateService>(),
                     provider.GetService<IJSRuntime>(),
                     provider.GetRequiredService<AudioService>(),
-                    provider.GetRequiredService<ILLMService>()));
+                    provider.GetRequiredService<ILLMService>(),
+                    provider.GetRequiredService<NetConnectConfig>());
+            });
 
           
 

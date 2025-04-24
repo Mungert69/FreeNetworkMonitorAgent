@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using NetworkMonitor.Connection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,8 @@ namespace NetworkMonitorAgent
         private readonly object _reconnectLock = new object();
         private string _queuedReplayMessage;
         private bool _isConnectionReady;
-        public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
+        private NetConnectConfig _netConfig;
+        public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService, NetConnectConfig netConfig)
         {
             _chatState = chatState;
             _jsRuntime = jsRuntime;
@@ -36,6 +38,7 @@ namespace NetworkMonitorAgent
             _cancellationTokenSource = new CancellationTokenSource();
             _llmService = llmService;
             _siteId = string.Empty;
+            _netConfig=netConfig;
         }
 
         public async Task Initialize(string siteId)
@@ -79,6 +82,11 @@ namespace NetworkMonitorAgent
 
 
                 _webSocket = new ClientWebSocket();
+                // Add the auth token to the request headers if provided
+                if (!string.IsNullOrEmpty(_netConfig.LocalSystemUrl.RabbitPassword))
+                {
+                    _webSocket.Options.SetRequestHeader("Authorization", $"Bearer {_netConfig.LocalSystemUrl.RabbitPassword}");
+                }
                 var serverUrl = _llmService.GetLLMServerUrl(_siteId);
                 await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
 

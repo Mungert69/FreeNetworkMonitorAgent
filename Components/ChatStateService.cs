@@ -11,7 +11,7 @@ namespace NetworkMonitorAgent
     {
         // Audio and UI state
         public bool IsMuted { get; set; } = true;
-        public bool IsExpanded { get; set; } = false;
+        public bool IsExpanded { get; set; } = true;
         public bool IsDrawerOpen { get; set; } = false;
         public bool AutoScrollEnabled { get; set; } = true;
 

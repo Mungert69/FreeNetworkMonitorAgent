@@ -90,12 +90,11 @@ namespace NetworkMonitorAgent
                 {
                     _webSocket.Options.SetRequestHeader(
     "Authorization", 
-    $"Bearer {WebUtility.UrlEncode(_netConfig.LocalSystemUrl.RabbitPassword)}"
+    $"Bearer {_netConfig.LocalSystemUrl.RabbitPassword}"
 );
                     serverUrl = _llmService.GetLLMServerAuthUrl(_siteId);
                     Console.WriteLine($"Using Auth Url {serverUrl}");
-               Console.WriteLine($"Token being sent: {_netConfig.LocalSystemUrl.RabbitPassword}");
-
+              
                 }
                 await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
 

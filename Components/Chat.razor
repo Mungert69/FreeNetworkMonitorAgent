@@ -34,7 +34,7 @@
                         <span class="tooltip">Toggle LLM Type</span>
                     </button>
                     
-                   <button @onclick="() => ToggleDrawer(!ChatState.IsDrawerOpen)" 
+                   @*<button @onclick="() => ToggleDrawer(!ChatState.IsDrawerOpen)" 
             class="drawer-toggle"
             aria-label="@(ChatState.IsDrawerOpen ? "Close links drawer" : "Open links drawer")">
         <i class="material-icons">
@@ -43,10 +43,10 @@
         <span class="tooltip">
             @(ChatState.IsDrawerOpen ? "Close Links" : "Open Links")
         </span>
-    </button>
+    </button>*@
     
                     
-                    <button @onclick="ToggleExpand" aria-label="@(ChatState.IsExpanded ? "Contract" : "Expand")">
+                   @* <button @onclick="ToggleExpand" aria-label="@(ChatState.IsExpanded ? "Contract" : "Expand")">
                         @if (ChatState.IsExpanded)
                         {
                             <i class="material-icons">fullscreen_exit</i>
@@ -57,7 +57,7 @@
                            	<i class="material-icons">fullscreen</i>
                             <span class="tooltip">Expand</span>
                         }
-                    </button>
+                    </button>*@
                     
                     <button @onclick="ResetChat" class="warning-button" aria-label="Start new chat">
                         <i class="material-icons">refresh</i>
@@ -85,10 +85,10 @@
                         <span class="tooltip">History</span>
                     </button>
                     
-                    <button @onclick="CloseChat" aria-label="Hide assistant">
+                   @* <button @onclick="CloseChat" aria-label="Hide assistant">
                        <i class="material-icons">close</i>
                         <span class="tooltip">Hide Assistant</span>
-                    </button>
+                    </button>*@
                 </div>
             </div>
         </div>
@@ -130,14 +130,14 @@
         </div>
 
         @* Links Drawer - simplified since toggle is in header *@
-<div class="drawer @(ChatState.IsDrawerOpen ? "open" : "")">
+@*<div class="drawer @(ChatState.IsDrawerOpen ? "open" : "")">
     <div class="drawer-header">
         <h3>Available Links</h3>
     </div>
     <div class="drawer-content">
         @RenderLinks()
     </div>
-</div>
+</div>*@
 
        @* History Popper - Already implemented as a popup *@
 @if (IsHistoryOpen)

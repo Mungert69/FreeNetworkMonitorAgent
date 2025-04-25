@@ -31,7 +31,7 @@ window.chatInterop = {
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 const arrayBuffer = await audioBlob.arrayBuffer();
-                DotNet.invokeMethodAsync('NetworkMonitorMaui', 'ReceiveAudioBlob', arrayBuffer);
+                DotNet.invokeMethodAsync('NetworkMonitorAgent', 'ReceiveAudioBlob', arrayBuffer);
             };
             
             mediaRecorder.start();

@@ -82,12 +82,16 @@ namespace NetworkMonitorAgent
 
 
                 _webSocket = new ClientWebSocket();
+                 var serverUrl = _llmService.GetLLMServerUrl(_siteId);
+               
                 // Add the auth token to the request headers if provided
                 if (!string.IsNullOrEmpty(_netConfig.LocalSystemUrl.RabbitPassword))
                 {
                     _webSocket.Options.SetRequestHeader("Authorization", $"Bearer {_netConfig.LocalSystemUrl.RabbitPassword}");
+                    serverUrl = _llmService.GetLLMServerAuthUrl(_siteId);
+                    Console.WriteLine($"Using Auth Url {serverUrl}");
+               
                 }
-                var serverUrl = _llmService.GetLLMServerUrl(_siteId);
                 await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
 
                 // Start listening and ping - but DON'T send init message here

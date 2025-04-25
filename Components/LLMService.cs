@@ -14,6 +14,12 @@ namespace NetworkMonitorAgent
             return $"wss://devoauth.freenetworkmonitor.click/LLM/llm-stream";
         }
 
+         public string GetLLMServerAuthUrl(string siteId)
+        {
+            // Implement your logic to get the LLM server URL
+            return $"wss://devoauth.freenetworkmonitor.click/LLM/llm-stream-auth";
+        }
+
         public  List<string> GetLLMTypes()
         {
             return new List<string> { "TurboLLM", "HugLLM", "TestLLM" };

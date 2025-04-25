@@ -5,6 +5,7 @@ namespace NetworkMonitorAgent
 {
     List<string> GetLLMTypes();
     string GetLLMServerUrl(string siteId);
+    string GetLLMServerAuthUrl(string siteId);
 }
     public  class LLMService : ILLMService
     {

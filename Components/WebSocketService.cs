@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace NetworkMonitorAgent
 {
@@ -87,10 +88,14 @@ namespace NetworkMonitorAgent
                 // Add the auth token to the request headers if provided
                 if (!string.IsNullOrEmpty(_netConfig.LocalSystemUrl.RabbitPassword))
                 {
-                    _webSocket.Options.SetRequestHeader("Authorization", $"Bearer {_netConfig.LocalSystemUrl.RabbitPassword}");
+                    _webSocket.Options.SetRequestHeader(
+    "Authorization", 
+    $"Bearer {WebUtility.UrlEncode(_netConfig.LocalSystemUrl.RabbitPassword)}"
+);
                     serverUrl = _llmService.GetLLMServerAuthUrl(_siteId);
                     Console.WriteLine($"Using Auth Url {serverUrl}");
-               
+               Console.WriteLine($"Token being sent: {_netConfig.LocalSystemUrl.RabbitPassword}");
+
                 }
                 await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
 

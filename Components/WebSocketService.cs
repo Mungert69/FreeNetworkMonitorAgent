@@ -39,7 +39,7 @@ namespace NetworkMonitorAgent
             _cancellationTokenSource = new CancellationTokenSource();
             _llmService = llmService;
             _siteId = string.Empty;
-            _netConfig=netConfig;
+            _netConfig = netConfig;
         }
 
         public async Task Initialize(string siteId)
@@ -51,30 +51,12 @@ namespace NetworkMonitorAgent
             try
             {
                 await ConnectWebSocket(); // This now JUST connects without sending init message
-                await SendInitialization(); // Send init message separately
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
             }
         }
-        private async Task SendInitialization()
-        {
-            try
-            {
-                var timeZone = TimeZoneInfo.Local.Id;
-                var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
-                await Send(sendStr);
-                Console.WriteLine($"Sent initialization: {sendStr}");
-              
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error sending initialization: {ex}");
-                throw;
-            }
-        }
-
 
         private async Task ConnectWebSocket()
         {
@@ -83,21 +65,32 @@ namespace NetworkMonitorAgent
                 await CleanupWebSocket();
 
                 _webSocket = new ClientWebSocket();
-                 var serverUrl = _llmService.GetLLMServerUrl(_siteId);
-               
+                var serverUrl = _llmService.GetLLMServerUrl(_siteId);
+
                 // Add the auth token to the request headers if provided
                 if (!string.IsNullOrEmpty(_netConfig.LocalSystemUrl.RabbitPassword))
                 {
                     _webSocket.Options.SetRequestHeader(
-    "Authorization", 
+    "Authorization",
     $"Bearer {_netConfig.LocalSystemUrl.RabbitPassword}"
 );
                     serverUrl = _llmService.GetLLMServerAuthUrl(_siteId);
                     Console.WriteLine($"Using Auth Url {serverUrl}");
-              
+
                 }
                 await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
+                Console.WriteLine($"WebSocket connection established to {serverUrl}");
 
+                // Send initialization IMMEDIATELY after connection
+                var timeZone = TimeZoneInfo.Local.Id;
+                var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
+                await _webSocket.SendAsync(
+                    new ArraySegment<byte>(Encoding.UTF8.GetBytes(sendStr)),
+                    WebSocketMessageType.Text,
+                    true,
+                    _cancellationTokenSource.Token);
+
+                Console.WriteLine($"Sent opening message to websocket: {sendStr}");
                 // Start listening and ping - but DON'T send init message here
                 _ = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
                 _ = Task.Run(PingInterval, _cancellationTokenSource.Token);
@@ -180,6 +173,22 @@ namespace NetworkMonitorAgent
                     _chatState.IsReady = true;
                     await TrySendQueuedMessage();
                 }
+                // Handle audio tags first
+                if (message.Contains("</audio>"))
+                {
+                    var parts = message.Split(new[] { "</audio>" }, StringSplitOptions.None);
+                    var textPart = parts.Length > 0 ? parts[0].Trim() : string.Empty;
+                    var audioFile = parts.Length > 1 ? parts[1].Trim() : string.Empty;
+
+
+
+                    if (!string.IsNullOrEmpty(audioFile) && !_chatState.IsMuted)
+                    {
+                        await _audioService.PlayAudioSequentially(audioFile);
+                    }
+                    return;
+                }
+
                 Console.WriteLine($"Received message: {message}");
                 if (message.StartsWith("<function-data>") && message.EndsWith("</function-data>"))
                 {
@@ -434,7 +443,7 @@ namespace NetworkMonitorAgent
 
                 // Reset chat state
                 _chatState.IsReady = false;
-               _chatState.LLMFeedback = "";
+                _chatState.LLMFeedback = "";
                 _chatState.IsProcessing = false;
                 _chatState.IsLLMBusy = false;
                 _chatState.IsCallingFunction = false;
@@ -451,8 +460,7 @@ namespace NetworkMonitorAgent
                 }
 
                 await ConnectWebSocket();
-                await SendInitialization();
-                //await _chatState.NotifyStateChanged();
+                await _chatState.NotifyStateChanged();
             }
             catch (Exception ex)
             {
@@ -599,10 +607,9 @@ namespace NetworkMonitorAgent
 
                 Console.WriteLine($"Attempting to reconnect (attempt {_reconnectAttempts})");
 
-              
+
                 // Establish new connection
                 await ConnectWebSocket();
-                await SendInitialization();
 
                 _reconnectAttempts = 0;
             }

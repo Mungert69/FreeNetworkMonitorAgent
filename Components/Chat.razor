@@ -296,6 +296,7 @@
 
  private async Task ResetChat()
     {
+         await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
         await WebSocketService.ResetLLM(true); // This will generate a new session ID
          }
 
@@ -405,6 +406,7 @@
         
        await ChatState.StoreNewSessionID(selectedSessionId);
         await WebSocketService.ResetLLM(false); 
+         await WebSocketService.SendMessage("<|REPLAY_HISTORY|>");
    
         }
 

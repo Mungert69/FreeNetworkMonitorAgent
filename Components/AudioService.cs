@@ -1,5 +1,8 @@
 using Microsoft.JSInterop;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
+using System;
 
 namespace NetworkMonitorAgent
 {
@@ -8,6 +11,11 @@ namespace NetworkMonitorAgent
         private readonly IJSRuntime _jsRuntime;
         private IJSObjectReference? _jsModule;
         private bool _isInitialized = false;
+        private readonly Queue<string> _audioQueue = new Queue<string>();
+        private bool _isPlaying = false;
+        private CancellationTokenSource? _playbackCts;
+        private readonly object _lock = new object();
+        private IJSObjectReference? _currentRecorder;
 
         public AudioService(IJSRuntime jsRuntime)
         {
@@ -27,53 +35,153 @@ namespace NetworkMonitorAgent
         public async Task PlayAudioSequentially(string audioFile)
         {
             await EnsureInitialized();
-            await _jsRuntime.InvokeVoidAsync("chatInterop.playAudio", audioFile);
+            
+            lock (_lock)
+            {
+                _audioQueue.Enqueue(audioFile);
+                if (!_isPlaying)
+                {
+                    _ = ProcessQueueAsync(); // Fire and forget
+                }
+            }
+        }
+
+        private async Task ProcessQueueAsync()
+        {
+            lock (_lock)
+            {
+                if (_isPlaying) return;
+                _isPlaying = true;
+                _playbackCts = new CancellationTokenSource();
+            }
+
+            try
+            {
+                while (true)
+                {
+                    string nextAudio;
+                    lock (_lock)
+                    {
+                        if (_audioQueue.Count == 0 || _playbackCts?.IsCancellationRequested == true)
+                        {
+                            break;
+                        }
+                        nextAudio = _audioQueue.Dequeue();
+                    }
+
+                    try
+                    {
+                        // Create a promise that completes when audio finishes
+                        var tcs = new TaskCompletionSource<bool>();
+                        var dotnetRef = DotNetObjectReference.Create(new AudioCallbackHelper(tcs));
+                        
+                        await _jsRuntime.InvokeVoidAsync(
+                            "chatInterop.playAudioWithCallback",
+                            nextAudio,
+                            dotnetRef);
+                            
+                        await tcs.Task.WaitAsync(_playbackCts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        // Playback was cancelled
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Error playing audio: {ex}");
+                    }
+                }
+            }
+            finally
+            {
+                lock (_lock)
+                {
+                    _isPlaying = false;
+                    _playbackCts?.Dispose();
+                    _playbackCts = null;
+                }
+            }
         }
 
         public async Task PauseAudio()
         {
             await EnsureInitialized();
+            lock (_lock)
+            {
+                _playbackCts?.Cancel();
+            }
             await _jsRuntime.InvokeVoidAsync("chatInterop.pauseAudio");
         }
 
         public async Task ClearQueue()
         {
             await EnsureInitialized();
-            await _jsRuntime.InvokeVoidAsync("chatInterop.clearAudioQueue");
+            lock (_lock)
+            {
+                _audioQueue.Clear();
+                _playbackCts?.Cancel();
+            }
+            await _jsRuntime.InvokeVoidAsync("chatInterop.pauseAudio");
         }
 
         public async Task StartRecording()
         {
             await EnsureInitialized();
-            await _jsRuntime.InvokeVoidAsync("chatInterop.startRecording");
+            _currentRecorder = await _jsRuntime.InvokeAsync<IJSObjectReference>(
+                "chatInterop.startRecording");
         }
 
-        public async Task StopRecording()
+        public async Task<byte[]> StopRecording()
         {
             await EnsureInitialized();
-            await _jsRuntime.InvokeVoidAsync("chatInterop.stopRecording");
+            if (_currentRecorder != null)
+            {
+                return await _jsRuntime.InvokeAsync<byte[]>(
+                    "chatInterop.stopRecording",
+                    _currentRecorder);
+            }
+            return Array.Empty<byte>();
         }
 
         public async ValueTask DisposeAsync()
         {
             try
             {
+                await ClearQueue();
                 if (_jsModule is not null)
                 {
                     await _jsModule.DisposeAsync();
                 }
+                _playbackCts?.Dispose();
             }
-            catch { }
-
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error disposing AudioService: {ex}");
+            }
         }
 
-        // Note: Your current chatInterop.js doesn't have transcribeAudio implemented
-        // You'll need to either add it to chatInterop.js or remove this method
         public async Task<string> TranscribeAudio(byte[] audioBlob)
         {
             await EnsureInitialized();
             return await _jsRuntime.InvokeAsync<string>(
                 "chatInterop.transcribeAudio", audioBlob);
+        }
+
+        private class AudioCallbackHelper
+        {
+            private readonly TaskCompletionSource<bool> _tcs;
+
+            public AudioCallbackHelper(TaskCompletionSource<bool> tcs)
+            {
+                _tcs = tcs;
+            }
+
+            [JSInvokable]
+            public void OnAudioEnded()
+            {
+                _tcs.TrySetResult(true);
+            }
         }
     }
 }

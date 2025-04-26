@@ -52,8 +52,8 @@ else
                     <div class="group-date">@group.Key</div>
                     @foreach (var history in group.Value)
                     {
-                        <div class="history-item" @onclick="() => HandleSelectSession(history.SessionId)">
-                            <div class="history-content">
+                        <div class="history-item">
+                            <div class="history-content"  @onclick="() => HandleSelectSession(history.SessionId)">
                                 <div class="history-name">@history.Name.Trim()</div>
                                 <div class="history-details">
                                     <span class="history-type">@history.LLMType</span>

@@ -301,10 +301,6 @@
          }
 
    
-
-
-
-
     private async Task ProcessAudioBlob(byte[] audioBlob)
     {
         try
@@ -412,7 +408,15 @@
 
     private async Task HandleDeleteSession(string fullSessionId)
     {
-        await WebSocketService.SendMessage($"<|REMOVE_SAVED_SESSION|>{fullSessionId}");
+         bool isCurrentSession = fullSessionId.StartsWith(ChatState.SessionId);
+
+    await WebSocketService.SendMessage($"<|REMOVE_SAVED_SESSION|>{fullSessionId}");
+
+    if (isCurrentSession)
+    {
+        // Only reset if deleting current session
+        await WebSocketService.ResetLLM(true);
+    }
     }
 
 

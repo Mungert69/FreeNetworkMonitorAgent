@@ -23,7 +23,8 @@ namespace NetworkMonitorAgent
         private CancellationTokenSource _cancellationTokenSource;
         private string _siteId; // Remove readonly since we need to assign it later
         private readonly ILLMService _llmService;
-
+        private Task _receiveTask;
+        private Task _pingTask;
         private int _reconnectAttempts = 0;
         private const int MaxReconnectAttempts = 5;
         private bool _isReconnecting = false;
@@ -91,40 +92,50 @@ namespace NetworkMonitorAgent
                     _cancellationTokenSource.Token);
 
                 Console.WriteLine($"Sent opening message to websocket: {sendStr}");
-                // Start listening and ping - but DON'T send init message here
-                _ = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
-                _ = Task.Run(PingInterval, _cancellationTokenSource.Token);
+
+                _receiveTask = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
+                _pingTask = Task.Run(PingInterval, _cancellationTokenSource.Token);
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"WebSocket connection error: {ex}");
             }
         }
-        private async Task PingInterval()
+      private async Task PingInterval()
+{
+    while (!_cancellationTokenSource.Token.IsCancellationRequested)
+    {
+        try
         {
-            while (!_cancellationTokenSource.Token.IsCancellationRequested)
+            if (_webSocket?.State == WebSocketState.Open)
             {
-                try
-                {
-                    if (_webSocket?.State == WebSocketState.Open)
-                    {
-                        await Send("");
-                        Console.WriteLine("Sent web socket Ping");
-                    }
-                    else
-                    {
-                        await Reconnect();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Ping error: {ex}");
-                    await HandleSendFailure(ex);
-                }
-                await Task.Delay(20000);
+                await Send("");
+                Console.WriteLine("Sent web socket Ping");
+            }
+            else
+            {
+                await Reconnect();
             }
         }
-
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Ping error: {ex}");
+            await HandleSendFailure(ex);
+        }
+        
+        // Pass the cancellation token to Task.Delay
+        // This will throw OperationCanceledException when cancellation is requested
+        try
+        {
+            await Task.Delay(20000, _cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Exit the loop immediately when cancellation is requested
+            break;
+        }
+    }
+}
         // Add these helper methods
         private async Task HandleSendFailure(Exception ex)
         {
@@ -146,7 +157,7 @@ namespace NetworkMonitorAgent
         private async Task ReceiveMessages()
         {
             var buffer = new byte[65535];
-            while (!_cancellationTokenSource.Token.IsCancellationRequested && _webSocket?.State == WebSocketState.Open)
+            while (!_cancellationTokenSource.Token.IsCancellationRequested )
             {
                 try
                 {
@@ -554,37 +565,50 @@ namespace NetworkMonitorAgent
                 throw; // Re-throw to let caller know send failed
             }
         }
-        private async Task CleanupWebSocket()
+     private async Task CleanupWebSocket()
+{
+    try
+    {
+        // Cancel any ongoing operations first
+        if (!_cancellationTokenSource.IsCancellationRequested)
+            _cancellationTokenSource.Cancel();
+            
+        // Wait for background tasks to complete
+        if (_receiveTask != null)
         {
-            try
-            {
-                if (_webSocket != null)
-                {
-                    // Cancel any ongoing operations first
-                    _cancellationTokenSource.Cancel();
-
-                    if (_webSocket.State == WebSocketState.Open)
-                    {
-                        await _webSocket.CloseAsync(
-                            WebSocketCloseStatus.NormalClosure,
-                            "Cleaning up",
-                            CancellationToken.None);
-                    }
-
-                    _webSocket.Dispose();
-                    _webSocket = null;
-                }
-
-                // Reset cancellation token source
-                _cancellationTokenSource?.Dispose();
-                _cancellationTokenSource = new CancellationTokenSource();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"WebSocket cleanup error: {ex}");
-            }
+            try { await Task.WhenAny(_receiveTask, Task.Delay(1000)); } catch { }
+            _receiveTask = null;
+        }
+        
+        if (_pingTask != null)
+        {
+            try { await Task.WhenAny(_pingTask, Task.Delay(1000)); } catch { }
+            _pingTask = null;
         }
 
+        if (_webSocket != null)
+        {
+            if (_webSocket.State == WebSocketState.Open)
+            {
+                await _webSocket.CloseAsync(
+                    WebSocketCloseStatus.NormalClosure,
+                    "Cleaning up",
+                    CancellationToken.None);
+            }
+            
+            _webSocket.Dispose();
+            _webSocket = null;
+        }
+
+        // Reset cancellation token source
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = new CancellationTokenSource();
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"WebSocket cleanup error: {ex}");
+    }
+}
         private async Task Reconnect()
         {
             lock (_reconnectLock)

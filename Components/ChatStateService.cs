@@ -119,17 +119,8 @@ namespace NetworkMonitorAgent
 
             if (!string.IsNullOrEmpty(storedSessionId) && !string.IsNullOrEmpty(storedTimestamp))
             {
-                var currentTime = DateTime.Now.Ticks;
-                var storedTime = long.Parse(storedTimestamp);
-                var oneDayInTicks = TimeSpan.TicksPerDay;
-
-                if (currentTime - storedTime <= oneDayInTicks)
-                {
-                    return storedSessionId;
-                }
-
-                await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
-                await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
+               
+                    return storedSessionId;           
             }
 
             // Create new session

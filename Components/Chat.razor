@@ -234,7 +234,7 @@
 {
     await Task.Delay(5000);
     ChatState.IsToggleDisabled = false;
-    StateHasChanged();
+        await InvokeAsync(StateHasChanged);
 }
     protected override async Task OnInitializedAsync()
     {
@@ -246,8 +246,7 @@
     {
          if (ChatState.IsReady && ChatState.IsToggleDisabled)
     {
-        // Only start the delay if we're in a toggle-disabled state
-        _ = HandleLLMReady(); // Fire and forget
+        _ = HandleLLMReady(); 
     }
         await InvokeAsync(StateHasChanged);
     }
@@ -310,7 +309,7 @@
         try
         {
             ChatState.IsProcessing = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
 
             var transcription = await AudioService.TranscribeAudio(audioBlob);
 
@@ -331,7 +330,7 @@
         finally
         {
             ChatState.IsProcessing = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -344,9 +343,10 @@
     {
         await AudioService.ClearQueue();
         ChatState.IsProcessing = true;
+        await InvokeAsync(StateHasChanged);
         await WebSocketService.SendMessage(transcription);
         ChatState.CurrentMessage = "";
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleStartRecording()

@@ -80,7 +80,7 @@ namespace NetworkMonitorAgent
         {
             try
             {
-
+                await CleanupWebSocket();
 
                 _webSocket = new ClientWebSocket();
                  var serverUrl = _llmService.GetLLMServerUrl(_siteId);
@@ -142,14 +142,7 @@ namespace NetworkMonitorAgent
             }
         }
 
-        private async Task HandleReceiveFailure(Exception ex)
-        {
-            Console.Error.WriteLine($"Receive failure: {ex.Message}");
-            if (IsConnectionLost(ex))
-            {
-                await Reconnect();
-            }
-        }
+
 
         private bool IsConnectionLost(Exception ex)
         {
@@ -441,8 +434,7 @@ namespace NetworkMonitorAgent
 
                 // Reset chat state
                 _chatState.IsReady = false;
-                _chatState.IsMuted = true;
-                _chatState.LLMFeedback = "";
+               _chatState.LLMFeedback = "";
                 _chatState.IsProcessing = false;
                 _chatState.IsLLMBusy = false;
                 _chatState.IsCallingFunction = false;
@@ -460,7 +452,7 @@ namespace NetworkMonitorAgent
 
                 await ConnectWebSocket();
                 await SendInitialization();
-                await _chatState.NotifyStateChanged();
+                //await _chatState.NotifyStateChanged();
             }
             catch (Exception ex)
             {
@@ -554,11 +546,39 @@ namespace NetworkMonitorAgent
                 throw; // Re-throw to let caller know send failed
             }
         }
+        private async Task CleanupWebSocket()
+        {
+            try
+            {
+                if (_webSocket != null)
+                {
+                    // Cancel any ongoing operations first
+                    _cancellationTokenSource.Cancel();
 
-        // Enhanced Reconnect method
+                    if (_webSocket.State == WebSocketState.Open)
+                    {
+                        await _webSocket.CloseAsync(
+                            WebSocketCloseStatus.NormalClosure,
+                            "Cleaning up",
+                            CancellationToken.None);
+                    }
+
+                    _webSocket.Dispose();
+                    _webSocket = null;
+                }
+
+                // Reset cancellation token source
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = new CancellationTokenSource();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"WebSocket cleanup error: {ex}");
+            }
+        }
+
         private async Task Reconnect()
         {
-            // Prevent multiple simultaneous reconnection attempts
             lock (_reconnectLock)
             {
                 if (_isReconnecting) return;
@@ -574,32 +594,16 @@ namespace NetworkMonitorAgent
                     return;
                 }
 
-                // Calculate delay with exponential backoff (max 30 seconds)
                 var delay = Math.Min(30000, (int)Math.Pow(2, _reconnectAttempts) * 1000);
                 await Task.Delay(delay);
 
                 Console.WriteLine($"Attempting to reconnect (attempt {_reconnectAttempts})");
 
-                // Clean up old connection if it exists
-                if (_webSocket != null)
-                {
-                    try
-                    {
-                        await _webSocket.CloseAsync(
-                            WebSocketCloseStatus.NormalClosure,
-                            "Reconnecting",
-                            CancellationToken.None);
-                    }
-                    catch { /* Ignore close errors during reconnect */ }
-                    _webSocket.Dispose();
-                    _webSocket = null;
-                }
-
+              
                 // Establish new connection
                 await ConnectWebSocket();
                 await SendInitialization();
 
-                Console.WriteLine("Reconnected successfully");
                 _reconnectAttempts = 0;
             }
             catch (Exception ex)
@@ -607,7 +611,7 @@ namespace NetworkMonitorAgent
                 Console.Error.WriteLine($"Reconnect attempt failed: {ex}");
                 if (_reconnectAttempts < MaxReconnectAttempts)
                 {
-                    await Reconnect(); // Try again
+                    await Reconnect();
                 }
             }
             finally
@@ -618,7 +622,6 @@ namespace NetworkMonitorAgent
                 }
             }
         }
-
 
         private class FunctionData
         {

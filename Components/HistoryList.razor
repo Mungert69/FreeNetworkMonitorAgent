@@ -167,11 +167,11 @@ else
     {
         // Construct the full session ID like in React: sessionId_userId_llmType
         var fullSessionId = $"{history.SessionId}_{history.UserId}_{history.LLMType}";
+
+        // Only notify parent - don't modify local state here
         await OnDeleteSession.InvokeAsync(fullSessionId);
-        
-        // Update the local list immediately for better UX
-        Histories.RemoveAll(h => h.SessionId == history.SessionId);
-        UpdateFilteredHistories();
+
+        // Let the parent handle the state update through normal data flow
     }
 
     private string GetFormattedDateTime(long unixTime)

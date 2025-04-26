@@ -445,25 +445,6 @@
   font-size: 0.9rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .history-item {
-      flex-direction: column;
-      align-items: flex-start;
-  }
-  
-  .history-actions {
-      margin-left: 0;
-      margin-top: 0.5rem;
-      width: 100%;
-      justify-content: flex-end;
-  }
-  
-  .action-button {
-      padding: 0.5rem 1rem;
-  }
-}
-
 
 
 .history-item .material-icons {
@@ -581,45 +562,7 @@
     background-color: #f1f5f9;
     border-color: #cbd5e1;
   }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .chat-container {
-      width: calc(100% - 20px);
-      right: 10px;
-      bottom: 10px;
-      max-height: 85vh;
-    }
-    
-    .chat-container.expanded {
-      width: calc(100% - 20px);
-      left: 10px;
-      right: 10px;
-      top: 60px;
-      bottom: 10px;
-    }
-    
-    .message-line {
-      max-width: 90%;
-    }
-    
-    .history-popper {
-      width: 280px;
-    }
-  }
-  
-  /* Accessibility enhancements */
-  @media (prefers-reduced-motion) {
-    .chat-container,
-    .drawer,
-    button,
-    .tooltip,
-    .message-line,
-    .history-popper.visible {
-      transition: none;
-      animation: none;
-    }
-  }
+
 
   .message-bubble {
     margin-bottom: 0.5rem;
@@ -667,4 +610,99 @@
 
 .message-content p {
     margin: 0.25rem 0;
+}
+
+/* Consolidated Responsive Adjustments */
+@media (max-width: 768px) {
+    /* Chat Container */
+    .chat-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    /* Messages Area */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 120px; /* Extra space for input + keyboard */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    /* Input Area */
+    .chat-input {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px;
+        background: var(--background);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-container {
+        padding-bottom: env(safe-area-inset-bottom); /* For iPhone home indicator */
+    }
+
+    textarea {
+        min-height: 48px;
+        max-height: 120px;
+    }
+
+    /* Message bubbles */
+    .message-line {
+        max-width: 90%;
+    }
+
+    /* History Items */
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .history-actions {
+        margin-left: 0;
+        margin-top: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .history-popper {
+        width: 90%;
+        right: 5%;
+        max-height: 60vh;
+    }
+
+    .action-button {
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Special case for when keyboard is open */
+@media (max-height: 500px) {
+    .chat-messages {
+        padding-bottom: 80px;
+    }
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion) {
+    .chat-container,
+    .drawer,
+    button,
+    .tooltip,
+    .message-line,
+    .history-popper.visible {
+        transition: none;
+        animation: none;
+    }
 }

@@ -31,11 +31,36 @@ namespace NetworkMonitorAgent
                 _isInitialized = true;
             }
         }
+        public async Task<bool> CheckAndRequestRecordingPermission()
+        {
+            try
+            {
+                await EnsureInitialized();
+                return await _jsRuntime.InvokeAsync<bool>("chatInterop.requestRecordingPermission");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Permission check failed: {ex.Message}");
+                return false;
+            }
+        }
 
+        public async Task<bool> IsRecordingSupported()
+        {
+            try
+            {
+                await EnsureInitialized();
+                return await _jsRuntime.InvokeAsync<bool>("chatInterop.checkRecordingSupport");
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task PlayAudioSequentially(string audioFile)
         {
             await EnsureInitialized();
-            
+
             lock (_lock)
             {
                 _audioQueue.Enqueue(audioFile);
@@ -74,12 +99,12 @@ namespace NetworkMonitorAgent
                         // Create a promise that completes when audio finishes
                         var tcs = new TaskCompletionSource<bool>();
                         var dotnetRef = DotNetObjectReference.Create(new AudioCallbackHelper(tcs));
-                        
+
                         await _jsRuntime.InvokeVoidAsync(
                             "chatInterop.playAudioWithCallback",
                             nextAudio,
                             dotnetRef);
-                            
+
                         await tcs.Task.WaitAsync(_playbackCts.Token);
                     }
                     catch (TaskCanceledException)

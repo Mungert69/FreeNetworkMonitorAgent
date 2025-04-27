@@ -12,32 +12,21 @@ namespace NetworkMonitorAgent
             _logger = logger;
             InitializeComponent();
 
-            // Enhanced debugging
-            this.NavigatedTo += (sender, e) => {
-                _logger.LogInformation("ChatPage NavigatedTo event fired");
-
-                if (this.Content is BlazorWebView bw)
+            if (this.Content is BlazorWebView bw)
+            {
+                bw.BlazorWebViewInitialized += (sender, args) =>
                 {
-                    _logger.LogInformation("BlazorWebView instance found");
-
-                    bw.BlazorWebViewInitializing += (s, args) =>
-                        _logger.LogInformation("BlazorWebView initializing");
-
-                    bw.BlazorWebViewInitialized += (s, args) =>
-                    {
-                        _logger.LogInformation("BlazorWebView initialized");
-                        bw.Dispatcher.DispatchAsync(() =>
-                            _logger.LogInformation("BlazorWebView dispatcher ready"));
-                    };
-
-                    bw.Loaded += (s, args) =>
-                        _logger.LogInformation("BlazorWebView Loaded event fired");
-                }
-                else
-                {
-                    _logger.LogError("Content is not a BlazorWebView");
-                }
-            };
+#if ANDROID
+            // Enable WebView2 features for Android
+            var webView = args.WebView;
+            var settings = webView.Settings;
+            settings.JavaScriptEnabled = true;
+            settings.MediaPlaybackRequiresUserGesture = false;
+            settings.AllowFileAccess = true;
+            settings.AllowContentAccess = true;
+#endif
+                };
+            }
         }
     }
 }

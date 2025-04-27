@@ -394,18 +394,32 @@ private async Task HandleStopRecording()
         await JSRuntime.InvokeVoidAsync("console.error", "Stop recording error:", ex.Message);
     }
 }
-    private void ToggleRecording()
+  private async Task ToggleRecording()
+{
+    if (IsRecording)
     {
-        if (IsRecording)
-        {
-            _ = HandleStopRecording();
-        }
-        else
-        {
-            _ = HandleStartRecording();
-        }
+        await HandleStopRecording();
     }
+    else
+    {
+        // Check support and permissions first
+        var isSupported = await AudioService.IsRecordingSupported();
+        if (!isSupported)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Audio recording not supported on this device");
+            return;
+        }
 
+        var hasPermission = await AudioService.CheckAndRequestRecordingPermission();
+        if (!hasPermission)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Microphone permission required");
+            return;
+        }
+
+        await HandleStartRecording();
+    }
+}
     private void ToggleExpand()
     {
         ChatState.IsExpanded = !ChatState.IsExpanded;

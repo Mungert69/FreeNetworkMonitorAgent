@@ -25,31 +25,51 @@ window.chatInterop = {
         };
     },
 
+    checkRecordingSupport: async function() {
+        return navigator.mediaDevices && 
+               navigator.mediaDevices.getUserMedia && 
+               window.MediaRecorder;
+    },
 
-    startRecording: async function(sessionId) {  // Note: no arrow function
+    requestRecordingPermission: async function() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-            const audioChunks = [];
+            stream.getTracks().forEach(track => track.stop());
+            return true;
+        } catch (error) {
+            console.error('Permission denied:', error);
+            return false;
+        }
+    },
+
+    startRecording: async function(sessionId) {
+        try {
+            if (!await this.checkRecordingSupport()) {
+                throw new Error('Recording not supported');
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const options = { mimeType: 'audio/webm' };
+            const mediaRecorder = new MediaRecorder(stream, options);
             
+            const audioChunks = [];
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     audioChunks.push(event.data);
                 }
             };
             
-            mediaRecorder.start(100);
+            mediaRecorder.start(250); // Collect data every 250ms
             
-            // Now 'this' refers to chatInterop object
-            self.recordingHandles[sessionId] = {
-                mediaRecorder: mediaRecorder,
-                audioChunks: audioChunks,
-                stream: stream
+            this.recordingHandles[sessionId] = {
+                mediaRecorder,
+                audioChunks,
+                stream
             };
             
             return true;
         } catch (error) {
-            console.error('Error starting recording:', error);
+            console.error('Recording error:', error);
             throw error;
         }
     },

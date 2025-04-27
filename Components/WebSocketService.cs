@@ -84,7 +84,7 @@ namespace NetworkMonitorAgent
 
                 // Send initialization IMMEDIATELY after connection
                 var timeZone = TimeZoneInfo.Local.Id;
-                var sendStr = $"{timeZone},{_chatState.LLMRunnerType},{_chatState.SessionId}";
+                var sendStr = $"{timeZone},{_chatState.LLMRunnerType},{_chatState.SessionId},{_netConfig.MonitorLocation}";
                 await _webSocket.SendAsync(
                     new ArraySegment<byte>(Encoding.UTF8.GetBytes(sendStr)),
                     WebSocketMessageType.Text,

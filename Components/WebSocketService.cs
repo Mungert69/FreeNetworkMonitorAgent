@@ -48,7 +48,7 @@ namespace NetworkMonitorAgent
             _siteId = siteId;
             _queuedReplayMessage = "<|REPLAY_HISTORY|>";
             _isConnectionReady = false;
-
+           
             try
             {
                 await ConnectWebSocket(); // This now JUST connects without sending init message
@@ -57,6 +57,8 @@ namespace NetworkMonitorAgent
             {
                 Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
             }
+             _netConfig.AgentUserFlow.IsChatOpened=true;
+
         }
 
         private async Task ConnectWebSocket()

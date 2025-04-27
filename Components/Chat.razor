@@ -183,6 +183,7 @@
                         {
                           <i class="material-icons">mic_off</i>
                             <span class="tooltip">Stop Recording</span>
+                            <div class="recording-indicator" title="Recording..."></div>
                         }
                         else
                         {
@@ -209,7 +210,8 @@
 
 
 @code {
-    //<MessageDisplay Message="ChatState.Message" />
+    private DotNetObjectReference<Chat>? dotNetRef;
+private string recordingSessionId = Guid.NewGuid().ToString();
     private ElementReference outputContainerRef;
     private ElementReference historyButtonRef;
     private bool IsHistoryOpen = false;
@@ -238,6 +240,7 @@
 }
     protected override async Task OnInitializedAsync()
     {
+        dotNetRef = DotNetObjectReference.Create(this);
         ChatState.OnChange += HandleStateChange;
         await base.OnInitializedAsync();
     }
@@ -253,6 +256,7 @@
 
     public void Dispose()
     {
+         dotNetRef?.Dispose();
         ChatState.OnChange -= HandleStateChange;
     }
 
@@ -346,20 +350,50 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task HandleStartRecording()
+   private async Task HandleStartRecording()
+{
+    try
     {
         await AudioService.PauseAudio();
         IsRecording = true;
-        await JSRuntime.InvokeVoidAsync("startRecording");
+        await JSRuntime.InvokeVoidAsync("chatInterop.startRecording", recordingSessionId);
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error starting recording: {ex.Message}");
+        IsRecording = false;
+        await JSRuntime.InvokeVoidAsync("console.error", "Recording error:", ex.Message);
+    }
+}
 
-    private async Task HandleStopRecording()
+private async Task HandleStopRecording()
+{
+    try
     {
         IsRecording = false;
-        var audioBlob = await JSRuntime.InvokeAsync<byte[]>("stopRecording");
-        await ProcessAudioBlob(audioBlob);
-    }
+        // Get base64 string from JS
+        var audioBase64 = await JSRuntime.InvokeAsync<string>("chatInterop.stopRecording", recordingSessionId);
+        
+        if (string.IsNullOrEmpty(audioBase64))
+        {
+            Console.WriteLine("Received empty audio data");
+            return;
+        }
 
+        // Convert base64 to byte array
+        var audioBlob = Convert.FromBase64String(audioBase64);
+        
+        await ProcessAudioBlob(audioBlob);
+        
+        // Generate a new session ID for next recording
+        recordingSessionId = Guid.NewGuid().ToString();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error stopping recording: {ex.Message}");
+        await JSRuntime.InvokeVoidAsync("console.error", "Stop recording error:", ex.Message);
+    }
+}
     private void ToggleRecording()
     {
         if (IsRecording)

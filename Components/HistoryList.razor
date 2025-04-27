@@ -21,7 +21,7 @@ else
         {
             <div class="current-session-section">
                 <h4 class="section-title">Current Session</h4>
-                <div class="history-item current" @onclick="() => HandleSelectSession(CurrentSession.SessionId)">
+                <div class="history-item current">
                     <div class="history-content">
                         <div class="history-name">@CurrentSession.Name.Trim()</div>
                         <div class="history-details">
@@ -31,14 +31,7 @@ else
                             </span>
                         </div>
                     </div>
-                    <div class="history-actions">
-                        <button class="action-button select-button" 
-                                @onclick="() => HandleSelectSession(CurrentSession.SessionId)"
-                                @onclick:preventDefault
-                                title="Continue this session">
-                            <span class="button-text">Open</span>
-                        </button>
-                    </div>
+                   
                 </div>
             </div>
         }
@@ -53,7 +46,7 @@ else
                     @foreach (var history in group.Value)
                     {
                         <div class="history-item">
-                            <div class="history-content"  @onclick="() => HandleSelectSession(history.SessionId)">
+                            <div class="history-content"  @onclick="() => HandleSelectSession(history)">
                                 <div class="history-name">@history.Name.Trim()</div>
                                 <div class="history-details">
                                     <span class="history-type">@history.LLMType</span>
@@ -64,7 +57,7 @@ else
                             </div>
                             <div class="history-actions">
                                 <button class="action-button select-button" 
-                                        @onclick="() => HandleSelectSession(history.SessionId)"
+                                        @onclick="() => HandleSelectSession(history)"
                                         @onclick:preventDefault
                                         title="Load this session">
                                     <span class="button-text">Open</span>
@@ -95,16 +88,16 @@ else
     public List<ChatHistory> Histories { get; set; } = new();
 
     [Parameter]
-    public EventCallback<string> OnSelectSession { get; set; }
+    public EventCallback<ChatHistory> OnSelectSession { get; set; }
 
     [Parameter]
     public EventCallback<string> OnDeleteSession { get; set; }
 
     [Parameter]
-    public string CurrentSessionId { get; set; } = string.Empty;
+    public String CurrentSessionId { get; set; } = string.Empty;
 
     [Parameter]
-    public string LLMType { get; set; } = string.Empty;
+    public String LLMType { get; set; } = string.Empty;
 
     public string? SelectedFilter
     {
@@ -158,9 +151,9 @@ else
             .ToDictionary(g => g.Key, g => g.ToList());
     }
 
-    private async Task HandleSelectSession(string sessionId)
+    private async Task HandleSelectSession(ChatHistory history)
     {
-        await OnSelectSession.InvokeAsync(sessionId);
+        await OnSelectSession.InvokeAsync( history);
     }
 
     private async Task HandleDeleteSession(ChatHistory history)

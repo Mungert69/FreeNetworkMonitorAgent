@@ -31,7 +31,7 @@ namespace NetworkMonitorAgent
         public string HelpMessage { get; set; } = "";
         public string CurrentMessage { get; set; } = "";
         public bool IsDashboard { get; set; }
-
+        private string _lLMRunnerType = "TurboLLM";
         private string _sessionId;
 
         public string SessionId
@@ -40,6 +40,7 @@ namespace NetworkMonitorAgent
             set
             {
                 _sessionId = value;
+                _ = NotifyStateChanged();
             }
         }
         public SystemMessage Message { get; set; } = new SystemMessage
@@ -70,14 +71,23 @@ namespace NetworkMonitorAgent
                 _ = NotifyStateChanged();
             }
         }
+        public string LLMRunnerType
+        {
+            get => _lLMRunnerType;
+            set
+            {
+                _lLMRunnerType = value;
+                _ = NotifyStateChanged();
+            }
+        }
+
         private List<ChatHistory> _histories = new();
         public List<HostLink> LinkData { get; set; } = new List<HostLink>();
-        public string LLMRunnerType { get; set; } = "TurboLLM";
+
         public bool IsHoveringMessages { get; set; } = false;
         public bool IsInputFocused { get; set; } = false;
 
         // Session management
-        public string LLMRunnerTypeRef { get; set; }
         public string OpenMessage { get; set; }
         public bool AutoClickedRef { get; set; } = false;
 
@@ -92,7 +102,6 @@ namespace NetworkMonitorAgent
         public async Task Initialize(string initRunnerType)
         {
             LLMRunnerType = initRunnerType;
-            LLMRunnerTypeRef = initRunnerType;
             SessionId = await GetSessionId();
         }
         public async Task ClearSession()
@@ -119,8 +128,8 @@ namespace NetworkMonitorAgent
 
             if (!string.IsNullOrEmpty(storedSessionId) && !string.IsNullOrEmpty(storedTimestamp))
             {
-               
-                    return storedSessionId;           
+
+                return storedSessionId;
             }
 
             // Create new session

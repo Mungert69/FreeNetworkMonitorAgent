@@ -147,8 +147,8 @@
             Histories="ChatState.Histories" 
             OnSelectSession="HandleSelectSession" 
             OnDeleteSession="HandleDeleteSession" 
-            LLMType="ChatState.LLMRunnerType" 
-            CurrentSessionId="ChatState.SessionId" />
+            LLMType="@ChatState.LLMRunnerType" 
+            CurrentSessionId="@ChatState.SessionId" />
     </div>
 }
 
@@ -397,10 +397,11 @@
         }
     }
 
-    private async Task HandleSelectSession(string selectedSessionId)
+    private async Task HandleSelectSession(ChatHistory history)
     {
         
-       await ChatState.StoreNewSessionID(selectedSessionId);
+       await ChatState.StoreNewSessionID(history.SessionId);
+       ChatState.LLMRunnerType=history.LLMType;
         await WebSocketService.ResetLLM(false); 
          await WebSocketService.SendMessage("<|REPLAY_HISTORY|>");
    
@@ -429,10 +430,9 @@
     
     // 2. Update the LLM type first
     var types = LLMService.GetLLMTypes();
-    var currentIndex = types.IndexOf(ChatState.LLMRunnerTypeRef);
+    var currentIndex = types.IndexOf(ChatState.LLMRunnerType);
     var nextIndex = (currentIndex + 1) % types.Count;
-    
-    ChatState.LLMRunnerTypeRef = types[nextIndex];
+
     ChatState.LLMRunnerType = types[nextIndex];
     
     await WebSocketService.ResetLLM(false); 

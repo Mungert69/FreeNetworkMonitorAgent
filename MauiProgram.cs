@@ -208,7 +208,7 @@ namespace NetworkMonitorAgent
             
             builder.Services.AddScoped<ILLMService,LLMService>();
             builder.Services.AddScoped<AudioService>(provider =>
-              new AudioService(provider.GetService<IJSRuntime>()));
+              new AudioService(provider.GetService<IJSRuntime>(),provider.GetRequiredService<NetConnectConfig>()));
             builder.Services.AddScoped<ChatStateService>(provider =>
                 new ChatStateService(provider.GetService<IJSRuntime>()));
 

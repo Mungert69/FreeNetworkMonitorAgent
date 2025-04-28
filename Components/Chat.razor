@@ -376,15 +376,15 @@ private async Task HandleStopRecording()
             ChatState.IsProcessing = true;
             //await InvokeAsync(StateHasChanged);
 
-            var transcription = await AudioService.TranscribeAudio(audioBlob);
+            var result = await AudioService.TranscribeAudio(audioBlob);
 
-            if (!string.IsNullOrEmpty(transcription))
+            if (result.Success)
             {
-                await SendTranscription(transcription);
+                await SendTranscription(result.Data);
             }
             else
             {
-                await ShowAlert("Failed to transcribe audio.");
+                await ShowAlert(result.Message);
             }
         }
         catch (Exception ex)

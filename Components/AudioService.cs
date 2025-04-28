@@ -3,7 +3,9 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers; 
 using NetworkMonitor.Connection;
+using NetworkMonitor.Objects;
 using System.IO;
+using System.Text.Json;
 
 namespace NetworkMonitorAgent
 {
@@ -185,20 +187,57 @@ namespace NetworkMonitorAgent
 }
 
 
-
-
-   public async Task<string> TranscribeAudio(byte[] webmAudio)
+public async Task<TResultObj<string>> TranscribeAudio(byte[] webmAudio)
 {
+    var result = new TResultObj<string>();
     using var content = new MultipartFormDataContent();
     using var audioContent = new ByteArrayContent(webmAudio);
-    
-    // Explicit WebM type
-    audioContent.Headers.ContentType = MediaTypeHeaderValue.Parse("audio/webm"); 
+
+    audioContent.Headers.ContentType = MediaTypeHeaderValue.Parse("audio/webm");
     content.Add(audioContent, "file", "recording.webm");
 
-    var response = await _httpClient.PostAsync(_apiUrl, content);
-    response.EnsureSuccessStatusCode();
-    return await response.Content.ReadAsStringAsync();
+    try
+    {
+        var response = await _httpClient.PostAsync(_apiUrl, content);
+
+        var responseString = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Transcribe API Response: {responseString}");
+
+        using var doc = JsonDocument.Parse(responseString);
+        var root = doc.RootElement;
+
+        var status = root.GetProperty("status").GetString();
+
+        if (status?.Equals("success", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            var transcription = root.GetProperty("transcription").GetString();
+            result.Success = true;
+            result.Message = "Transcription successful.";
+            result.Data = transcription;
+        }
+        else if (status?.Equals("error", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            var errorMessage = root.GetProperty("message").GetString();
+            result.Success = false;
+            result.Message = $"Transcription failed: {errorMessage}";
+            result.Data = null;
+        }
+        else
+        {
+            result.Success = false;
+            result.Message = "Unexpected response format.";
+            result.Data = null;
+        }
+    }
+    catch (Exception ex)
+    {
+        result.Success = false;
+        result.Message = $"Exception during transcription: {ex.Message}";
+        result.Data = null;
+        Console.Error.WriteLine($"TranscribeAudio error: {ex}");
+    }
+
+    return result;
 }
         public async ValueTask DisposeAsync()
         {

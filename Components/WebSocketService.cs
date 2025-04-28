@@ -21,15 +21,15 @@ namespace NetworkMonitorAgent
         private readonly IJSRuntime _jsRuntime;
         private readonly AudioService _audioService;
         private CancellationTokenSource _cancellationTokenSource;
-        private string _siteId; // Remove readonly since we need to assign it later
+        private string _siteId=""; // Remove readonly since we need to assign it later
         private readonly ILLMService _llmService;
-        private Task _receiveTask;
-        private Task _pingTask;
+        private Task? _receiveTask;
+        private Task? _pingTask;
         private int _reconnectAttempts = 0;
         private const int MaxReconnectAttempts = 5;
         private bool _isReconnecting = false;
         private readonly object _reconnectLock = new object();
-        private string _queuedReplayMessage;
+        private string _queuedReplayMessage="";
         private bool _isConnectionReady;
         private NetConnectConfig _netConfig;
         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService, NetConnectConfig netConfig)
@@ -349,7 +349,7 @@ namespace NetworkMonitorAgent
             return filteredText;
         }
 
-        private List<HostLink> ProcessFunctionData(string functionData)
+        private List<HostLink>? ProcessFunctionData(string functionData)
         {
             if (!_chatState.IsDashboard) return null;
 
@@ -551,7 +551,7 @@ namespace NetworkMonitorAgent
                 }
 
                 var buffer = Encoding.UTF8.GetBytes(message);
-                await _webSocket.SendAsync(
+                await _webSocket?.SendAsync(
                     new ArraySegment<byte>(buffer),
                     WebSocketMessageType.Text,
                     true,
@@ -658,8 +658,8 @@ namespace NetworkMonitorAgent
 
         private class FunctionData
         {
-            public string Name { get; set; }
-            public List<HostLink> DataJson { get; set; }
+            public string Name { get; set; }="";
+            public List<HostLink> DataJson { get; set; }= new ();
         }
     }
 }

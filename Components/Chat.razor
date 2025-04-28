@@ -343,6 +343,9 @@ private async Task HandleStopRecording()
     {
         IsRecording = false;
         byte[] audioBlob=await AudioService.StopRecording(recordingSessionId);
+        if (audioBlob.Length==0 ){
+              Console.WriteLine("Recording has no bytes");
+        }
         await ProcessAudioBlob(audioBlob);
         
     }

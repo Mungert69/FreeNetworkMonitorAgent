@@ -2,7 +2,6 @@ using Microsoft.JSInterop;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers; 
-using NAudio.Wave;
 using NetworkMonitor.Connection;
 using System.IO;
 
@@ -25,6 +24,7 @@ namespace NetworkMonitorAgent
         {
             _jsRuntime = jsRuntime;
             _apiUrl= netConfig.TranscribeAudioUrl;
+            Console.WriteLine($"Using transcribe url: {_apiUrl}");
              _httpClient = new HttpClient()
         {
             Timeout = TimeSpan.FromSeconds(30) // Set appropriate timeout
@@ -138,108 +138,67 @@ namespace NetworkMonitorAgent
         {
             await EnsureInitialized();
             return await _jsRuntime.InvokeAsync<bool>(
-                "chatInterop.startRecording", recordingSessionId);
+                "chatInterop.startRecording", new object[] { recordingSessionId });
         }
 
-        public async Task<byte[]> StopRecording(string recordingSessionId)
+   public async Task<byte[]> StopRecording(string recordingSessionId)
 {
     try
     {
-        await EnsureInitialized();
-        
-        string audioBase64 = await _jsRuntime.InvokeAsync<string>(
-            "chatInterop.stopRecording", 
-            recordingSessionId);
+        // Invoke the JS function and get a stream reference instead of a large string
+        var jsStreamRef = await _jsRuntime.InvokeAsync<IJSStreamReference>(
+            "chatInterop.stopRecording", recordingSessionId);
 
-        if (string.IsNullOrEmpty(audioBase64))
+        if (jsStreamRef == null)
         {
-            Console.WriteLine("Received empty audio data");
+            // No stream returned (maybe recording never started or was already stopped)
             return Array.Empty<byte>();
         }
 
-        // Convert base64 to byte array (still in webm format)
-        byte[] webmBytes = Convert.FromBase64String(audioBase64);
-        
-        // Convert to WAV
-        byte[] wavBytes = await ConvertWebmToWav(webmBytes);
-        
-        return wavBytes;
+        // Read the stream into a MemoryStream (set maxAllowedSize as needed, e.g. 50MB)
+        await using var dataStream = await jsStreamRef.OpenReadStreamAsync(maxAllowedSize: 50_000_000);
+        using var ms = new MemoryStream();
+        await dataStream.CopyToAsync(ms);
+       var result=ms.ToArray();
+        Console.Error.WriteLine($"Got array of data length {result.Length}");
+       
+        return result;
+    }
+    catch (JSException jsEx)
+    {
+        // Handle JavaScript errors (e.g. function not found or JS execution error)
+        Console.Error.WriteLine($"JSInterop error in StopRecording: {jsEx.Message}");
+        return Array.Empty<byte>();
+    }
+    catch (OperationCanceledException cancelEx)
+    {
+        // Handle timeout or cancellation if any token was used
+        Console.Error.WriteLine($"StopRecording was canceled: {cancelEx.Message}");
+        return Array.Empty<byte>();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error stopping recording: {ex.Message}");
+        // Catch all other errors
+        Console.Error.WriteLine($"Unexpected error stopping recording: {ex}");
         return Array.Empty<byte>();
     }
 }
 
-public async Task<byte[]> ConvertWebmToWav(byte[] webmAudio)
+
+
+
+   public async Task<string> TranscribeAudio(byte[] webmAudio)
 {
-    // 1. Write WebM bytes to a temporary file
-    string tempWebmPath = Path.GetTempFileName();
-    await File.WriteAllBytesAsync(tempWebmPath, webmAudio);
+    using var content = new MultipartFormDataContent();
+    using var audioContent = new ByteArrayContent(webmAudio);
+    
+    // Explicit WebM type
+    audioContent.Headers.ContentType = MediaTypeHeaderValue.Parse("audio/webm"); 
+    content.Add(audioContent, "file", "recording.webm");
 
-    try
-    {
-        using (var wavStream = new MemoryStream())
-        {
-            // 2. Read from temp file using MediaFoundationReader
-            using (var reader = new MediaFoundationReader(tempWebmPath))
-            {
-                // 3. Set target format (16kHz, 16-bit, mono)
-                WaveFormat targetFormat = new WaveFormat(16000, 16, 1);
-                
-                // 4. Resample if needed
-                using (var resampler = new MediaFoundationResampler(reader, targetFormat))
-                {
-                    resampler.ResamplerQuality = 60;
-                    
-                    // 5. Write to WAV format
-                    WaveFileWriter.WriteWavFileToStream(wavStream, resampler);
-                }
-            }
-            return wavStream.ToArray();
-        }
-    }
-    finally
-    {
-        // 6. Clean up temp file
-        File.Delete(tempWebmPath);
-    }
-}
-     public async Task<string> TranscribeAudio(byte[] audioBlob)
-{
-    try
-    {
-        // Convert to WAV if not already
-        if (!IsWavFormat(audioBlob))
-        {
-            audioBlob = await ConvertWebmToWav(audioBlob);
-        }
-
-        using var content = new MultipartFormDataContent();
-        using var audioContent = new ByteArrayContent(audioBlob);
-        
-        audioContent.Headers.ContentType = MediaTypeHeaderValue.Parse("audio/wav");
-        content.Add(audioContent, "file", "recording.wav");
-
-        var response = await _httpClient.PostAsync(_apiUrl, content);
-        response.EnsureSuccessStatusCode();
-        
-        return await response.Content.ReadAsStringAsync();
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"Transcription failed: {ex.Message}");
-        return string.Empty;
-    }
-}
-
-private bool IsWavFormat(byte[] audioData)
-{
-    // Check for WAV header "RIFF" signature
-    return audioData.Length > 12 && 
-           System.Text.Encoding.ASCII.GetString(audioData, 0, 4) == "RIFF" &&
-           System.Text.Encoding.ASCII.GetString(audioData, 8, 4) == "WAVE";
+    var response = await _httpClient.PostAsync(_apiUrl, content);
+    response.EnsureSuccessStatusCode();
+    return await response.Content.ReadAsStringAsync();
 }
         public async ValueTask DisposeAsync()
         {
@@ -257,8 +216,6 @@ private bool IsWavFormat(byte[] audioData)
                 Console.Error.WriteLine($"Error disposing AudioService: {ex}");
             }
         }
-
-
 
         private class AudioCallbackHelper
         {

@@ -344,7 +344,9 @@ private async Task HandleStopRecording()
         IsRecording = false;
         byte[] audioBlob=await AudioService.StopRecording(recordingSessionId);
         if (audioBlob.Length==0 ){
-              Console.WriteLine("Recording has no bytes");
+              Console.Error.WriteLine("Recording has no bytes");
+               await ShowAlert("Recording has no bytes");
+               return;
         }
         await ProcessAudioBlob(audioBlob);
         
@@ -373,6 +375,7 @@ private async Task HandleStopRecording()
     {
         try
         {
+            
             ChatState.IsProcessing = true;
             //await InvokeAsync(StateHasChanged);
 

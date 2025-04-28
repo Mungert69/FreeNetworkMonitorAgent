@@ -211,11 +211,11 @@
 
 @code {
     private DotNetObjectReference<Chat>? dotNetRef;
-private string recordingSessionId = Guid.NewGuid().ToString();
     private ElementReference outputContainerRef;
     private ElementReference historyButtonRef;
     private bool IsHistoryOpen = false;
     private bool IsRecording = false;
+    private string recordingSessionId = Guid.NewGuid().ToString();
 
     [Parameter]
     public EventCallback<HostLink> OnHostLinkClick { get; set; }
@@ -305,12 +305,73 @@ private string recordingSessionId = Guid.NewGuid().ToString();
          }
 
    
-    private async Task ProcessAudioBlob(byte[] audioBlob)
+   
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    private async Task SendTranscription(string transcription)
+    {
+        await AudioService.ClearQueue();
+        ChatState.IsProcessing = true;
+        await InvokeAsync(StateHasChanged);
+        await WebSocketService.SendMessage(transcription);
+        ChatState.CurrentMessage = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+   private async Task HandleStartRecording()
+{
+    try
+    {
+        await AudioService.PauseAudio();
+        await AudioService.StartRecording(recordingSessionId);
+        IsRecording = true;
+       }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error starting recording: {ex.Message}");
+        IsRecording = false;
+        await JSRuntime.InvokeVoidAsync("console.error", "Recording error:", ex.Message);
+    }
+}
+
+private async Task HandleStopRecording()
+{
+    try
+    {
+        IsRecording = false;
+        byte[] audioBlob=await AudioService.StopRecording(recordingSessionId);
+        await ProcessAudioBlob(audioBlob);
+        
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error stopping recording: {ex.Message}");
+        await JSRuntime.InvokeVoidAsync("console.error", "Stop recording error:", ex.Message);
+    }
+    recordingSessionId = Guid.NewGuid().ToString();
+}
+  private async Task ToggleRecording()
+{
+    if (IsRecording)
+    {
+        await HandleStopRecording();
+    }
+    else
+    {
+    
+        await HandleStartRecording();
+    }
+}
+
+ private async Task ProcessAudioBlob(byte[] audioBlob)
     {
         try
         {
             ChatState.IsProcessing = true;
-            await InvokeAsync(StateHasChanged);
+            //await InvokeAsync(StateHasChanged);
 
             var transcription = await AudioService.TranscribeAudio(audioBlob);
 
@@ -335,91 +396,6 @@ private string recordingSessionId = Guid.NewGuid().ToString();
         }
     }
 
-    private async Task ShowAlert(string message)
-    {
-        await JSRuntime.InvokeVoidAsync("alert", message);
-    }
-
-    private async Task SendTranscription(string transcription)
-    {
-        await AudioService.ClearQueue();
-        ChatState.IsProcessing = true;
-        await InvokeAsync(StateHasChanged);
-        await WebSocketService.SendMessage(transcription);
-        ChatState.CurrentMessage = "";
-        await InvokeAsync(StateHasChanged);
-    }
-
-   private async Task HandleStartRecording()
-{
-    try
-    {
-        await AudioService.PauseAudio();
-        IsRecording = true;
-        await JSRuntime.InvokeVoidAsync("chatInterop.startRecording", recordingSessionId);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error starting recording: {ex.Message}");
-        IsRecording = false;
-        await JSRuntime.InvokeVoidAsync("console.error", "Recording error:", ex.Message);
-    }
-}
-
-private async Task HandleStopRecording()
-{
-    try
-    {
-        IsRecording = false;
-        // Get base64 string from JS
-        var audioBase64 = await JSRuntime.InvokeAsync<string>("chatInterop.stopRecording", recordingSessionId);
-        
-        if (string.IsNullOrEmpty(audioBase64))
-        {
-            Console.WriteLine("Received empty audio data");
-            return;
-        }
-
-        // Convert base64 to byte array
-        var audioBlob = Convert.FromBase64String(audioBase64);
-        
-        await ProcessAudioBlob(audioBlob);
-        
-        // Generate a new session ID for next recording
-        recordingSessionId = Guid.NewGuid().ToString();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error stopping recording: {ex.Message}");
-        await JSRuntime.InvokeVoidAsync("console.error", "Stop recording error:", ex.Message);
-    }
-}
-  private async Task ToggleRecording()
-{
-    if (IsRecording)
-    {
-        await HandleStopRecording();
-    }
-    else
-    {
-        // Check support and permissions first
-        var isSupported = await AudioService.IsRecordingSupported();
-        if (!isSupported)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Audio recording not supported on this device");
-            return;
-        }
-
-        var hasPermission = await AudioService.CheckAndRequestRecordingPermission();
-        if (!hasPermission)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Microphone permission required");
-            return;
-        }
-
-        await HandleStartRecording();
-    }
-}
     private void ToggleExpand()
     {
         ChatState.IsExpanded = !ChatState.IsExpanded;

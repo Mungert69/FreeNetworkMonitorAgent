@@ -1,8 +1,10 @@
 using Microsoft.JSInterop;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
 using System;
+using System.Net.Http;
+using System.Net.Http.Headers; 
+using NAudio.Wave;
+using NetworkMonitor.Connection;
+using System.IO;
 
 namespace NetworkMonitorAgent
 {
@@ -15,11 +17,18 @@ namespace NetworkMonitorAgent
         private bool _isPlaying = false;
         private CancellationTokenSource? _playbackCts;
         private readonly object _lock = new object();
-        private IJSObjectReference? _currentRecorder;
+        private string _apiUrl;
+          private readonly HttpClient _httpClient;
 
-        public AudioService(IJSRuntime jsRuntime)
+
+        public AudioService(IJSRuntime jsRuntime, NetConnectConfig netConfig)
         {
             _jsRuntime = jsRuntime;
+            _apiUrl= netConfig.TranscribeAudioUrl;
+             _httpClient = new HttpClient()
+        {
+            Timeout = TimeSpan.FromSeconds(30) // Set appropriate timeout
+        };
         }
 
         private async Task EnsureInitialized()
@@ -31,32 +40,7 @@ namespace NetworkMonitorAgent
                 _isInitialized = true;
             }
         }
-        public async Task<bool> CheckAndRequestRecordingPermission()
-        {
-            try
-            {
-                await EnsureInitialized();
-                return await _jsRuntime.InvokeAsync<bool>("chatInterop.requestRecordingPermission");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Permission check failed: {ex.Message}");
-                return false;
-            }
-        }
 
-        public async Task<bool> IsRecordingSupported()
-        {
-            try
-            {
-                await EnsureInitialized();
-                return await _jsRuntime.InvokeAsync<bool>("chatInterop.checkRecordingSupport");
-            }
-            catch
-            {
-                return false;
-            }
-        }
         public async Task PlayAudioSequentially(string audioFile)
         {
             await EnsureInitialized();
@@ -150,25 +134,113 @@ namespace NetworkMonitorAgent
             await _jsRuntime.InvokeVoidAsync("chatInterop.pauseAudio");
         }
 
-        public async Task StartRecording()
+        public async Task<bool> StartRecording(string recordingSessionId)
         {
             await EnsureInitialized();
-            _currentRecorder = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-                "chatInterop.startRecording");
+            return await _jsRuntime.InvokeAsync<bool>(
+                "chatInterop.startRecording", recordingSessionId);
         }
 
-        public async Task<byte[]> StopRecording()
+        public async Task<byte[]> StopRecording(string recordingSessionId)
+{
+    try
+    {
+        await EnsureInitialized();
+        
+        string audioBase64 = await _jsRuntime.InvokeAsync<string>(
+            "chatInterop.stopRecording", 
+            recordingSessionId);
+
+        if (string.IsNullOrEmpty(audioBase64))
         {
-            await EnsureInitialized();
-            if (_currentRecorder != null)
-            {
-                return await _jsRuntime.InvokeAsync<byte[]>(
-                    "chatInterop.stopRecording",
-                    _currentRecorder);
-            }
+            Console.WriteLine("Received empty audio data");
             return Array.Empty<byte>();
         }
 
+        // Convert base64 to byte array (still in webm format)
+        byte[] webmBytes = Convert.FromBase64String(audioBase64);
+        
+        // Convert to WAV
+        byte[] wavBytes = await ConvertWebmToWav(webmBytes);
+        
+        return wavBytes;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error stopping recording: {ex.Message}");
+        return Array.Empty<byte>();
+    }
+}
+
+public async Task<byte[]> ConvertWebmToWav(byte[] webmAudio)
+{
+    // 1. Write WebM bytes to a temporary file
+    string tempWebmPath = Path.GetTempFileName();
+    await File.WriteAllBytesAsync(tempWebmPath, webmAudio);
+
+    try
+    {
+        using (var wavStream = new MemoryStream())
+        {
+            // 2. Read from temp file using MediaFoundationReader
+            using (var reader = new MediaFoundationReader(tempWebmPath))
+            {
+                // 3. Set target format (16kHz, 16-bit, mono)
+                WaveFormat targetFormat = new WaveFormat(16000, 16, 1);
+                
+                // 4. Resample if needed
+                using (var resampler = new MediaFoundationResampler(reader, targetFormat))
+                {
+                    resampler.ResamplerQuality = 60;
+                    
+                    // 5. Write to WAV format
+                    WaveFileWriter.WriteWavFileToStream(wavStream, resampler);
+                }
+            }
+            return wavStream.ToArray();
+        }
+    }
+    finally
+    {
+        // 6. Clean up temp file
+        File.Delete(tempWebmPath);
+    }
+}
+     public async Task<string> TranscribeAudio(byte[] audioBlob)
+{
+    try
+    {
+        // Convert to WAV if not already
+        if (!IsWavFormat(audioBlob))
+        {
+            audioBlob = await ConvertWebmToWav(audioBlob);
+        }
+
+        using var content = new MultipartFormDataContent();
+        using var audioContent = new ByteArrayContent(audioBlob);
+        
+        audioContent.Headers.ContentType = MediaTypeHeaderValue.Parse("audio/wav");
+        content.Add(audioContent, "file", "recording.wav");
+
+        var response = await _httpClient.PostAsync(_apiUrl, content);
+        response.EnsureSuccessStatusCode();
+        
+        return await response.Content.ReadAsStringAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Transcription failed: {ex.Message}");
+        return string.Empty;
+    }
+}
+
+private bool IsWavFormat(byte[] audioData)
+{
+    // Check for WAV header "RIFF" signature
+    return audioData.Length > 12 && 
+           System.Text.Encoding.ASCII.GetString(audioData, 0, 4) == "RIFF" &&
+           System.Text.Encoding.ASCII.GetString(audioData, 8, 4) == "WAVE";
+}
         public async ValueTask DisposeAsync()
         {
             try
@@ -186,12 +258,7 @@ namespace NetworkMonitorAgent
             }
         }
 
-        public async Task<string> TranscribeAudio(byte[] audioBlob)
-        {
-            await EnsureInitialized();
-            return await _jsRuntime.InvokeAsync<string>(
-                "chatInterop.transcribeAudio", audioBlob);
-        }
+
 
         private class AudioCallbackHelper
         {

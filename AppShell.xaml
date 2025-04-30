@@ -7,43 +7,36 @@
 
     <FlyoutItem Title="Home">
         <ShellContent Route="Home" 
-                     Title="Home"
                      ContentTemplate="{DataTemplate local:MainPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="AI Assistant">
+    <FlyoutItem Title="Free Network Monitor Assistant">
         <ShellContent Route="Chat" 
-                 Title="AI Assistant"
                  ContentTemplate="{DataTemplate local:ChatPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Check a Host">
         <ShellContent Route="Check" 
-                     Title="Check a Host"
                      ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Scan Local Network">
         <ShellContent Route="Scan" 
-                     Title="Scan Local Network"
                      ContentTemplate="{DataTemplate local:ScanPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Monitored Hosts">
         <ShellContent Route="Data" 
-                     Title="Monitored Hosts"
                      ContentTemplate="{DataTemplate local:DataViewPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Show Config">
         <ShellContent Route="Config" 
-                     Title="Show Config"
                      ContentTemplate="{DataTemplate local:ConfigPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Setup Guide">
         <ShellContent Route="SetupGuide" 
-                     Title="Setup Guide"
                      ContentTemplate="{DataTemplate local:SetupGuidePage}" />
     </FlyoutItem>
 

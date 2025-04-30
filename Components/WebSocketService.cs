@@ -32,6 +32,9 @@ namespace NetworkMonitorAgent
         private string _queuedReplayMessage="";
         private bool _isConnectionReady;
         private NetConnectConfig _netConfig;
+
+        public string QueuedReplayMessage { get => _queuedReplayMessage; set => _queuedReplayMessage = value; }
+
         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService, NetConnectConfig netConfig)
         {
             _chatState = chatState;
@@ -46,7 +49,7 @@ namespace NetworkMonitorAgent
         public async Task Initialize(string siteId)
         {
             _siteId = siteId;
-            _queuedReplayMessage = "<|REPLAY_HISTORY|>";
+            QueuedReplayMessage = "<|REPLAY_HISTORY|>";
             _isConnectionReady = false;
            
             try
@@ -259,10 +262,10 @@ namespace NetworkMonitorAgent
 
         private async Task TrySendQueuedMessage()
         {
-            if (_isConnectionReady && !string.IsNullOrEmpty(_queuedReplayMessage))
+            if (_isConnectionReady && !string.IsNullOrEmpty(QueuedReplayMessage))
             {
-                await Send(_queuedReplayMessage);
-                _queuedReplayMessage = null;
+                await Send(QueuedReplayMessage);
+                QueuedReplayMessage = null;
             }
         }
         private void ProcessControlMessage(string message)

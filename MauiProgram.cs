@@ -12,6 +12,8 @@ using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
 using CommunityToolkit.Maui;
 using Microsoft.JSInterop;
+using System.Xml;
+using System.Text.Json;
 
 namespace NetworkMonitorAgent
 {
@@ -67,7 +69,8 @@ namespace NetworkMonitorAgent
 
             try
             {
-                LoadConfiguration(builder, os);
+                IConfigurationRoot? config=LoadConfiguration(builder);
+                LoadAssets(builder, os,config);
                 BuildRepoAndConfig(builder);
                 BuildServices(builder);
                 BuildViewModels(builder);
@@ -94,32 +97,69 @@ namespace NetworkMonitorAgent
             ServiceProvider = app.Services;
             return app;
         }
-        private static void LoadConfiguration(MauiAppBuilder builder, string os)
+
+        private static IConfigurationRoot? LoadConfiguration(MauiAppBuilder builder)
         {
-            IConfigurationRoot? config = null;
+            IConfigurationRoot? config=null;
             try
             {
-                string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, $"appsettings.json");
-                //string packagedAppSettingsPath = "NetworkMonitorAgent.appsettings.json";
-                // Check if a local copy of appsettings.json exists
+                string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, "appsettings.json");
+
+                // Load the packaged configuration first
+                using var stream = FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;
+                IConfigurationRoot packagedConfig = new ConfigurationBuilder()
+                    .AddJsonStream(stream)
+                    .Build();
+
+                // Convert to dictionary for easier comparison
+                var packagedDict = GetConfigDictionary(packagedConfig);
+
                 if (File.Exists(localAppSettingsPath))
                 {
-                    // Use the local copy
-                    config = new ConfigurationBuilder()
+                    // Load existing user configuration
+                    IConfigurationRoot userConfig = new ConfigurationBuilder()
                         .AddJsonFile(localAppSettingsPath, optional: false, reloadOnChange: false)
                         .Build();
+
+                    var userDict = GetConfigDictionary(userConfig);
+
+                    // Only add new fields that don't exist in user config
+                    foreach (var kvp in packagedDict)
+                    {
+                        if (!userDict.ContainsKey(kvp.Key))
+                        {
+                            userDict[kvp.Key] = kvp.Value; // Add new field
+                        }
+                        // Existing fields remain unchanged
+                    }
+
+                    // Save the augmented configuration
+                    File.WriteAllText(localAppSettingsPath,
+                        JsonSerializer.Serialize(userDict, new JsonSerializerOptions { WriteIndented = true }));
+                    config = new ConfigurationBuilder()
+                            .AddInMemoryCollection(ConvertToKeyValuePairs(userDict))
+                            .Build();
+                   
                 }
                 else
                 {
-                    using var stream = FileSystem.OpenAppPackageFileAsync($"appsettings.json").Result;
-                    config = new ConfigurationBuilder().AddJsonStream(stream).Build();
+                    // First run - just use the packaged config
+                    File.WriteAllText(localAppSettingsPath,
+                    JsonSerializer.Serialize(packagedDict, new JsonSerializerOptions { WriteIndented = true }));
+                    config = packagedConfig;
                 }
-                builder.Configuration.AddConfiguration(config);
             }
             catch (Exception ex)
             {
-                ExceptionHelper.HandleGlobalException(ex, $" Error could not load appsetting.json");
+                ExceptionHelper.HandleGlobalException(ex, "Error loading appsettings.json");
             }
+            builder.Configuration.AddConfiguration(config);
+            return config;
+
+        }
+
+        private static void LoadAssets(MauiAppBuilder builder, string os, IConfigurationRoot? config)
+        {
             try
             {
                 if (config != null)
@@ -311,5 +351,41 @@ namespace NetworkMonitorAgent
                 }
             });
         }
+        // Helper to convert configuration to flat dictionary
+        private static Dictionary<string, object> GetConfigDictionary(IConfiguration config)
+        {
+            var dict = new Dictionary<string, object>();
+            void RecurseChildren(IEnumerable<IConfigurationSection> children, string prefix = "")
+            {
+                foreach (var child in children)
+                {
+                    var key = string.IsNullOrEmpty(prefix) ? child.Key : $"{prefix}:{child.Key}";
+
+                    if (child.Value == null && child.GetChildren().Any())
+                    {
+                        // This is a section node with children
+                        RecurseChildren(child.GetChildren(), key);
+                    }
+                    else
+                    {
+                        // This is a value node
+                        dict[key] = child.Value;
+                    }
+                }
+            }
+
+            RecurseChildren(config.GetChildren());
+            return dict;
+        }
+
+        // Helper to convert dictionary back to key-value pairs for ConfigurationBuilder
+        private static IEnumerable<KeyValuePair<string, string>> ConvertToKeyValuePairs(Dictionary<string, object> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                yield return new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString());
+            }
+        }
+
     }
 }

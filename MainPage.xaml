@@ -7,12 +7,11 @@
              x:Class="NetworkMonitorAgent.MainPage">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="15"
+        <VerticalStackLayout Spacing="5"
                              Padding="5"
                              VerticalOptions="Center">
 
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                   Padding="20"
                    CornerRadius="10"
                    HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">

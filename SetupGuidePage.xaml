@@ -25,49 +25,50 @@
 
             <!-- Setup Steps Section -->
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="15" CornerRadius="10" HorizontalOptions="FillAndExpand">
-                <VerticalStackLayout>
-                    <Label  Padding="15"  HorizontalOptions="Center" Text="Setup Monitoring" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                <VerticalStackLayout x:Name="SetupStepsContainer">
+                    <!-- Default content (can be hidden/shown as needed) -->
+                    <VerticalStackLayout x:Name="DefaultSteps">
+                        <Label Padding="15" HorizontalOptions="Center" Text="Setup Monitoring" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
 
-                    <Label HorizontalOptions="Center" Padding="5" Text="Step 1: Enable the Agent" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="To begin, toggle the 'Enable Agent' slider to the 'on' position on the main screen. This activates the agent and displays additional setup options."/>
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 1: Enable the Agent" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label Text="To begin, toggle the 'Enable Agent' slider to the 'on' position on the main screen. This activates the agent and displays additional setup options."/>
 
-                    <Label HorizontalOptions="Center" Padding="5" Text="Step 2: Authorize Your Device" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="To operate as a network monitoring agent, your device needs authorization. Tap 'Authorize,' which will redirect you to an OAuth authentication page. Log in or create an account if needed. Once you see a confirmation message, close the browser window."/>
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 2: Authorize Your Device" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label Text="To operate as a network monitoring agent, your device needs authorization. Tap 'Authorize,' which will redirect you to an OAuth authentication page. Log in or create an account if needed. Once you see a confirmation message, close the browser window."/>
 
-                    <Label HorizontalOptions="Center" Padding="5" Text="Step 3: Access the Free Network Monitor Dashboard" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="After authorization, tap 'Login to Free Network Monitor' to access the dashboard at https://freenetworkmonitor.click/dashboard using the same email you used for authorization. This is where you manage and monitor network activities, and it’s also where the Free Network Monitor Assistant is available to help with advanced tasks and insights." />
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 3: Access the Free Network Monitor Dashboard" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label Text="After authorization, tap 'Login to Free Network Monitor' to access the dashboard at https://freenetworkmonitor.click/dashboard using the same email you used for authorization. This is where you manage and monitor network activities, and it's also where the website version of the Free Network Monitor Assistant is available to help with advanced tasks and insights." />
 
-                    <Label HorizontalOptions="Center" Padding="5" Text="Step 4: Add Hosts to Monitor" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 4: Add Hosts to Monitor" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <!-- Rest of your default content -->
+                    </VerticalStackLayout>
 
-                    <!-- Manual Host Addition -->
-                    <Label Padding="5" Text="Option 1: Manually Add Hosts" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="In the Free Network Monitor Dashboard, you can manually add hosts you want to monitor. For instance, to monitor a local router, enter its IP address (e.g., 192.168.1.1) and select 'icmp' as the endpoint type." />
+                    <!-- Alternate content (initially hidden) -->
+                    <VerticalStackLayout x:Name="AlternateSteps" IsVisible="False">
+                        <Label Padding="15" HorizontalOptions="Center" Text="Setup Monitoring" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
 
-                    <!-- Adding Hosts via the Network Monitor Assistant -->
-                    <Label Padding="5" Text="Option 2: Use the Network Monitor Assistant" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="You can also add hosts using the Network Monitor Assistant by providing host details, such as the IP address and endpoint type. This allows you to interactively set up monitoring for each host directly through the assistant." />
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 1: Enable the Agent" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label Text="To begin, toggle the 'Enable Agent' slider to the 'on' position on the main screen. This activates the agent and displays additional setup options."/>
 
-                    <!-- Scanning Local Network -->
-                    <Label Padding="5" Text="Option 3: Scan Local Network for Hosts" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="Alternatively, you can click on the 'Scan Local Network' option, which will scan the local network and automatically add all hosts that respond to a ping request. This feature is convenient for quickly adding multiple hosts by detecting active devices on your network." />
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 2: Authorize Your Device" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label Text="To operate as a network monitoring agent, your device needs authorization. Tap 'Authorize,' which will redirect you to an OAuth authentication page. Log in or create an account if needed. Once you see a confirmation message, close the browser window."/>
 
-                    <!-- Important Note on Monitor Location -->
-                    <Label Padding="5" Text="Important: Choosing the Monitor Location" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="When adding a host, make sure to select the appropriate Monitor Location to determine where monitoring will occur. If you want to use your local agent (e.g., 'your email address - agent id'), ensure it’s selected under Monitor Location. By default, this field will auto-assign a remote agent, so adjust it if you prefer monitoring through your local agent." />
+                        <Label HorizontalOptions="Center" Padding="5" Text="Step 3: Open the Free Network Monitor Assistant" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                        <Label Text="After authorization, you can directly access the Free Network Monitor Assistant for all your monitoring needs and advanced tasks." />
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
-
             <!-- Viewing Monitoring Data Section -->
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="15" CornerRadius="10" HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout>
                     <Label  Padding="15"  HorizontalOptions="Center" Text="Viewing Monitoring Data" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="You can view detailed monitoring data in three ways: through the Free Network Monitor Dashboard, within the app's Host Data tab, or by using the Network Monitor Assistant."/>
+                    <Label Text="You can view detailed monitoring data in three ways: through the Free Network Monitor Dashboard, within the app's Host Data tab, or by using the Free Network Monitor Assistant."/>
                     <Label Text="• Using the Free Network Monitor Dashboard: Access the dashboard to view comprehensive monitoring data and analyses for each host."/>
                     <Label Text="• Using the Host Data Tab in the App: Host data is visually represented in the app with indicator circles for each host. Each circle will appear green if the host is active or red if down."/>
                     <Label Text="  - Tap the Circle: Tap a circle to view detailed monitoring information for the corresponding host."/>
-                    <Label Text="  - Pulsing Circles: A pulsing circle signifies that the host is up, and the pulse rate reflects the response time—the faster the pulse, the quicker the response time."/>
+                    <Label Text="  - Pulsing Circles: A pulsing circle signifies that the host is up, and the pulse rate reflects the response time: the faster the pulse, the faster the response time"/>
                     <Label Text="  - Purple Beacon Effect: This effect represents the success rate of host responses. A smaller beacon indicates a lower success rate, providing a visual indicator of reliability for each host."/>
-                    <Label Text="• Using the Network Monitor Assistant: You can ask the assistant questions about your monitoring data. The assistant not only displays the requested data but also automatically switches views in the dashboard to show the relevant information, providing an interactive way to access insights and updates quickly."/>
+                    <Label Text="• Using the Free Network Monitor Assistant: You can ask the assistant questions about your monitoring data. The website version of the assistant not only displays the requested data but also automatically switches views in the dashboard to show the relevant information, providing an interactive way to access insights and updates quickly."/>
                 </VerticalStackLayout>
             </Frame>
 
@@ -75,7 +76,7 @@
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="15" CornerRadius="10" HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout>
                     <Label  Padding="15"  HorizontalOptions="Center" Text="Setting Up Alerts and Reports" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="To receive alerts when a host is down, verify your email. Weekly performance reports are also available. If you don't receive a verification email, ensure support@mahadeva.co.uk is added to your spam filter whitelist."/>
+                    <Label Text="To receive alerts when a host is down, verify your email. Weekly performance reports are also available. If you don't receive a verification email, ensure support@mahadeva.co.uk is whitelisted in your spam filte."/>
                 </VerticalStackLayout>
             </Frame>
 
@@ -83,18 +84,18 @@
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="15" CornerRadius="10" HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout>
                     <Label Padding="15"   HorizontalOptions="Center" Text="Using Advanced Features" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="The Network Monitor Assistant provides advanced capabilities, including Nmap scans, OpenSSL checks, and BusyBox commands. You can also perform internet searches for technical assistance directly via the Free Network Monitor Assistant on the dashboard."/>
+                    <Label Text="The Free Network Monitor Assistant provides advanced capabilities, including Nmap scans, OpenSSL checks, and BusyBox commands. You can also perform internet searches for technical assistance."/>
                     <Label Text="Note for Windows Users: The assistant can also utilize Metasploit for penetration testing, but you must install the Metasploit Framework separately. After installation, ensure 'msfconsole' is accessible from the system's PATH."/>
                     <Label Text="Note for Android Users: The Metasploit framework is not available for Android at the time of publishing."/>
                     <Label Text="Important: Ensure you have permission to run any security tests, scans, or commands on systems being tested. Unauthorized testing can lead to legal consequences."/>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Using the Network Monitor Assistant with Your Agent -->
+            <!-- Using the Free Network Monitor Assistant with Your Agent -->
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="15" CornerRadius="10" HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout>
-                    <Label  Padding="15"  HorizontalOptions="Center" Text="Using the Network Monitor Assistant with Your Agent" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
-                    <Label Text="The Network Monitor Assistant, available on https://freenetworkmonitor.click/dashboard, enables advanced security tests, penetration assessments, BusyBox commands, and internet search functions. Acting as an intermediary, the assistant supports these capabilities:"/>
+                    <Label  Padding="15"  HorizontalOptions="Center" Text="Using the Free Network Monitor Assistant with Your Agent" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                    <Label Text="The website version of the Free Network Monitor Assistant is available at https://freenetworkmonitor.click/dashboard ; click the assistant icon bottom right on the page. The in app Assistant is available in the Chat enabled version of The Free Network Monitor Agent. The Free Network Monitor Assistnat enables advanced security tests, penetration assessments, BusyBox commands, and internet search functions. Acting as an intermediary, the assistant supports these capabilities:"/>
                     <Label Text="• Nmap Scans: Initiate network scans to discover open ports, detect devices, and assess vulnerabilities. Simply request a scan on a specific host, and the assistant will display results, including open ports and running services."/>
                     <Label Text="• Metasploit Modules: Perform targeted penetration testing on Windows by running Metasploit modules. Request a module to simulate real-world attacks and receive a detailed vulnerability report."/>
                     <Label Text="• OpenSSL Checks: Audit SSL/TLS configurations on your network to ensure encryption settings are secure and up to date, helping protect data in transit."/>

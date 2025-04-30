@@ -19,15 +19,19 @@
 
     <div id="app">Loading...</div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-
     <script src="_framework/blazor.webview.js" autostart="false"></script>
-    <script src="js/chatInterop.js" ></script>
+    <script src="js/chatInterop.js"></script>
+    <script>
+        // Auto-detect system theme and apply CSS class
+        function updateTheme() {
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.classList.toggle('dark-theme', isDark);
+        }
 
+        // Run on load and when system theme changes
+        updateTheme();
+        window.matchMedia('(prefers-color-scheme: dark)').addListener(updateTheme);
+    </script>
 </body>
 
 </html>

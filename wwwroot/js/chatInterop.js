@@ -125,7 +125,7 @@ stopRecording: async function (sessionId) {
             return;
           }
 
-          const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/wav' });
+          const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/webm' });
           const arrayBuffer = await audioBlob.arrayBuffer();
           const uint8Array = new Uint8Array(arrayBuffer);
 
@@ -152,7 +152,7 @@ stopRecording: async function (sessionId) {
       console.log('MediaRecorder already inactive, creating blob immediately');
       (async () => {
         try {
-          const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/wav' });
+          const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/webm' });
           const arrayBuffer = await audioBlob.arrayBuffer();
           const uint8Array = new Uint8Array(arrayBuffer);
 

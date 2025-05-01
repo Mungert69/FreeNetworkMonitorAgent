@@ -43,12 +43,7 @@ namespace NetworkMonitorAgent
                 _ = NotifyStateChanged();
             }
         }
-        public SystemMessage Message { get; set; } = new SystemMessage
-        {
-            Info = "init",
-            Success = false,
-            Text = "Internal Error"
-        };
+        
 
         // In ChatStateService.cs
         public string LLMFeedback
@@ -155,6 +150,74 @@ namespace NetworkMonitorAgent
                     Console.WriteLine($"Error in state notification: {ex}");
                 }
             }
+        }
+        // Add to your ChatStateService class
+       
+
+        public List<Notification> Notifications { get; } = new List<Notification>();
+
+        private SystemMessage? _message;
+        public SystemMessage? Message
+        {
+            get => _message;
+            set
+            {
+                _message = value;
+                if (value != null)
+                {
+                    AddNotification(value);
+                }
+                NotifyStateChanged();
+            }
+        }
+
+        private void AddNotification(SystemMessage message)
+        {
+            var notification = new Notification
+            {
+                Message = message.Text,
+                Persist = message.Persist,
+                Duration = message.Persist ? 60000 : 10000 // Longer duration for persistent messages
+            };
+
+            // Determine notification type based on SystemMessage properties
+            if (message.Success)
+            {
+                notification.Type = "success";
+            }
+            else if (!string.IsNullOrEmpty(message.Warning))
+            {
+                notification.Type = "warning";
+            }
+            else if (!string.IsNullOrEmpty(message.Info))
+            {
+                notification.Type = "info";
+            }
+            else if (!message.Success) // Error case
+            {
+                notification.Type = "error";
+            }
+
+            Notifications.Add(notification);
+
+            // Auto-remove after duration if not persistent
+            if (!notification.Persist)
+            {
+                _ = RemoveNotificationAfterDelay(notification.Id, notification.Duration);
+            }
+        }
+
+        private async Task RemoveNotificationAfterDelay(string id, int delay)
+        {
+            await Task.Delay(delay);
+            Notifications.RemoveAll(n => n.Id == id);
+            await NotifyStateChanged();
+        }
+
+        public async Task DismissNotification(string id)
+        {
+            Notifications.RemoveAll(n => n.Id == id);
+            await NotifyStateChanged();
         }
     }
 }

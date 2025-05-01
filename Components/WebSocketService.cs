@@ -280,6 +280,7 @@ namespace NetworkMonitorAgent
                     Text = message.Substring("</llm-error>".Length),
                     Success = false
                 };
+                
             }
             else if (message.StartsWith("</llm-info>"))
             {

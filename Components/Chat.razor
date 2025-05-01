@@ -6,6 +6,22 @@
 @inject ILLMService LLMService
 
 <div class="chat-container @(ChatState.IsExpanded ? "expanded" : "")" style="@GetChatContainerStyle()">
+    <div class="notification-container">
+    @foreach (var notification in ChatState.Notifications.OrderByDescending(n => n.Persist))
+    {
+        <div class="notification @notification.Type" 
+             @onclick="() => DismissNotification(notification.Id)"
+             style="cursor: pointer;">
+            <div class="notification-content">
+                @notification.Message
+            </div>
+            @if (!notification.Persist)
+            {
+                <div class="notification-progress" style="animation-duration: @(notification.Duration)ms"></div>
+            }
+        </div>
+    }
+    </div>
     <div class="chat-card">
         @* Warning Message *@
         @if (!string.IsNullOrEmpty(ChatState.LoadWarning))
@@ -22,12 +38,12 @@
                     Network Monitor Assistant (@ChatState.LLMRunnerType)
                 </div>
 
-                @* Left-Aligned Actions *@
+                @* Left-Aligned Actions 
                 <div class="action-buttons-left">
                     <button @onclick="SaveFeedback" disabled="@(!ChatState.IsReady)" aria-label="Save chat">
                         <i class="material-icons">save</i>
                         <span class="tooltip">Save</span>
-                    </button>
+                    </button>*@
 
                     <button @onclick="ToggleLLMRunnerType" disabled="@ChatState.IsToggleDisabled" aria-label="Toggle LLM type">
                         <i class="material-icons">swap_horiz</i>
@@ -278,7 +294,10 @@
         await WebSocketService.Initialize(SiteId); // No longer passing sessionId here
     }
 
-
+private async Task DismissNotification(string id)
+{
+    await ChatState.DismissNotification(id);
+}
 
     private async Task ScrollToBottomIfNeeded()
     {

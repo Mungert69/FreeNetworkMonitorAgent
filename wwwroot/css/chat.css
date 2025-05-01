@@ -882,7 +882,22 @@ textarea {
         .dark-theme .input-buttons button:not(:disabled) {
             color: white !important;
         }
+/* Dark Theme Adjustments */
+.dark-theme .login-button {
+    color: var(--text-dark);
+}
 
+.dark-theme .login-button:hover {
+    background-color: var(--hover-dark);
+}
+
+.dark-theme a {
+    color: var(--primary-dark-theme);
+}
+
+.dark-theme a:hover {
+    color: var(--primary-light);
+}
 
 
 .recording-indicator {
@@ -983,3 +998,75 @@ textarea {
         transform: scaleX(0);
     }
   }
+
+  /* Login Button Styles */
+.login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    color: white;
+    text-decoration: none;
+    transition: var(--transition);
+    position: relative;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.login-button .tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.login-button:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* General Link Styles */
+a {
+    color: var(--primary-light);
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+
+
+/* Material Icons in Links */
+.login-button .material-icons {
+    font-size: 1.25rem;
+    margin-right: 4px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .login-button {
+        padding: 8px 12px;
+    }
+    
+    .login-button .material-icons {
+        margin-right: 6px;
+    }
+}

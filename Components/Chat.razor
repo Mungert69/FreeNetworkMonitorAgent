@@ -234,6 +234,8 @@
 
 
 @code {
+    private System.Timers.Timer _renderTimer;
+    private bool _needsRender;
     private DotNetObjectReference<Chat>? dotNetRef;
     private ElementReference outputContainerRef;
     private ElementReference historyButtonRef;
@@ -271,11 +273,13 @@
 
     private async Task HandleStateChange()
     {
-        if (ChatState.IsReady && ChatState.IsToggleDisabled)
-        {
-            _ = HandleLLMReady(); 
-        }
-        await InvokeAsync(StateHasChanged);
+       
+            if (ChatState.IsReady && ChatState.IsToggleDisabled)
+            {
+                _ = HandleLLMReady();
+            }
+            _needsRender = true;
+        
     }
 
     public void Dispose()
@@ -297,6 +301,18 @@
     private async Task InitializeChat()
     {
 
+
+
+        _renderTimer = new System.Timers.Timer(100); // 100ms debounce
+        _renderTimer.Elapsed += async (s, e) =>
+        {
+    if (_needsRender)
+    {
+        _needsRender = false;
+        await InvokeAsync(StateHasChanged);
+    }
+        };
+        _renderTimer.Start();
 
         await ChatState.Initialize(InitRunnerType);
         await WebSocketService.Initialize(SiteId); // No longer passing sessionId here

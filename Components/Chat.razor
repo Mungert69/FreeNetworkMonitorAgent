@@ -300,10 +300,7 @@
 
     private async Task InitializeChat()
     {
-
-
-
-        _renderTimer = new System.Timers.Timer(100); // 100ms debounce
+        _renderTimer = new System.Timers.Timer(200); // 200ms debounce
         _renderTimer.Elapsed += async (s, e) =>
         {
     if (_needsRender)

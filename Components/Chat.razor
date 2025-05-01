@@ -259,7 +259,7 @@
     {
         await Task.Delay(5000);
         ChatState.IsToggleDisabled = false;
-        await HandleStateChange();
+        _needsRender = true;
     }
     protected override async Task OnInitializedAsync()
     {

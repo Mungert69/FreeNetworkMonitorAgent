@@ -236,7 +236,6 @@
 @code {
     private System.Timers.Timer _renderTimer;
     private bool _needsRender;
-    private DotNetObjectReference<Chat>? dotNetRef;
     private ElementReference outputContainerRef;
     private ElementReference historyButtonRef;
     private bool IsHistoryOpen = false;
@@ -252,8 +251,6 @@
     [Parameter]
     public string InitRunnerType { get; set; } = "TurboLLM";
 
-    [Parameter]
-    public EventCallback<bool> SetIsChatOpen { get; set; }
 
     [Parameter]
     public string SiteId { get; set; } = "";
@@ -262,11 +259,10 @@
     {
         await Task.Delay(5000);
         ChatState.IsToggleDisabled = false;
-        await InvokeAsync(StateHasChanged);
+        await HandleStateChange();
     }
     protected override async Task OnInitializedAsync()
     {
-        dotNetRef = DotNetObjectReference.Create(this);
         ChatState.OnChange += HandleStateChange;
         await base.OnInitializedAsync();
     }
@@ -284,7 +280,6 @@
 
     public void Dispose()
     {
-        dotNetRef?.Dispose();
         ChatState.OnChange -= HandleStateChange;
     }
 
@@ -303,11 +298,11 @@
         _renderTimer = new System.Timers.Timer(200); // 200ms debounce
         _renderTimer.Elapsed += async (s, e) =>
         {
-    if (_needsRender)
-    {
-        _needsRender = false;
-        await InvokeAsync(StateHasChanged);
-    }
+         if (_needsRender)
+         {
+             _needsRender = false;
+              await InvokeAsync(StateHasChanged);
+         }
         };
         _renderTimer.Start();
 
@@ -355,10 +350,10 @@ private async Task DismissNotification(string id)
     {
         await AudioService.ClearQueue();
         ChatState.IsProcessing = true;
-        await InvokeAsync(StateHasChanged);
+        await HandleStateChange();
         await WebSocketService.SendMessage(transcription);
         ChatState.CurrentMessage = "";
-        await InvokeAsync(StateHasChanged);
+        await HandleStateChange();
     }
 
     private async Task HandleStartRecording()
@@ -417,7 +412,6 @@ private async Task DismissNotification(string id)
         {
 
             ChatState.IsProcessing = true;
-            //await InvokeAsync(StateHasChanged);
 
             var result = await AudioService.TranscribeAudio(audioBlob);
 
@@ -438,7 +432,7 @@ private async Task DismissNotification(string id)
         finally
         {
             ChatState.IsProcessing = false;
-            await InvokeAsync(StateHasChanged);
+            await HandleStateChange();
         }
     }
 
@@ -544,11 +538,6 @@ private async Task DismissNotification(string id)
         IsHistoryOpen = !IsHistoryOpen;
     }
 
-    private void CloseChat()
-    {
-        SetIsChatOpen.InvokeAsync(false);
-        IsHistoryOpen = false;
-    }
 
     private RenderFragment RenderLinks()
     {

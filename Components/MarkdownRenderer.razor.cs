@@ -15,10 +15,7 @@ namespace NetworkMonitorAgent.Components
 
             // Configure the pipeline with all advanced extensions
             var pipeline = new MarkdownPipelineBuilder()
-    .UseAdvancedExtensions() // Includes tables, task lists, etc.
-    .UseEmojiAndSmiley()    // Support for emoji
-    .UseMathematics()        // Support for math formulas
-    .UseBootstrap()          // Adds Bootstrap classes
+    .UseAdvancedExtensions()
     .Build();
 
             return Markdown.ToHtml(markdown, pipeline);

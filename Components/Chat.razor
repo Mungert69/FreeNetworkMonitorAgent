@@ -4,6 +4,7 @@
 @inject WebSocketService WebSocketService
 @inject AudioService AudioService
 @inject ILLMService LLMService
+@using System.Runtime.CompilerServices
 
 <div class="chat-container @(ChatState.IsExpanded ? "expanded" : "")" style="@GetChatContainerStyle()">
     <div class="notification-container">
@@ -35,7 +36,7 @@
         <div class="chat-header">
             <div class="header-actions">
                 <div class="header-title">
-                    Network Monitor Assistant (@ChatState.LLMRunnerType)
+                    @ChatState.LLMRunnerType
                 </div>
 
                 @* Left-Aligned Actions *@        
@@ -104,10 +105,9 @@
  <a href="@AppConstants.FrontendUrl/?assistant=open" 
        target="_blank" 
        class="login-button" 
-       style="text-decoration: none;">
+      >
         <i class="material-icons">login</i>
-        <span>Login</span>
-        <span class="tooltip">Login with FusionAuth</span>
+        <span class="tooltip">Login Free Network Monitor</span>
     </a>
                     @* <button @onclick="CloseChat" aria-label="Hide assistant">
                        <i class="material-icons">close</i>
@@ -234,12 +234,18 @@
 
 
 @code {
-    private DotNetObjectReference<Chat>? dotNetRef;
+    private string _cacheString="";
+    private System.Timers.Timer _renderTimer;
+    private bool _needsRender;
     private ElementReference outputContainerRef;
     private ElementReference historyButtonRef;
     private bool IsHistoryOpen = false;
     private bool IsRecording = false;
     private string recordingSessionId = Guid.NewGuid().ToString();
+
+      private record MessageBlock(string Type, string Content, string HtmlContent, int ContentHash);
+    private List<MessageBlock> _cachedBlocks = new();
+    private int _lastContentHash;
 
     [Parameter]
     public EventCallback<HostLink> OnHostLinkClick { get; set; }
@@ -250,8 +256,6 @@
     [Parameter]
     public string InitRunnerType { get; set; } = "TurboLLM";
 
-    [Parameter]
-    public EventCallback<bool> SetIsChatOpen { get; set; }
 
     [Parameter]
     public string SiteId { get; set; } = "";
@@ -260,27 +264,27 @@
     {
         await Task.Delay(5000);
         ChatState.IsToggleDisabled = false;
-        await InvokeAsync(StateHasChanged);
+        _needsRender = true;
     }
     protected override async Task OnInitializedAsync()
     {
-        dotNetRef = DotNetObjectReference.Create(this);
         ChatState.OnChange += HandleStateChange;
         await base.OnInitializedAsync();
     }
 
     private async Task HandleStateChange()
     {
-        if (ChatState.IsReady && ChatState.IsToggleDisabled)
-        {
-            _ = HandleLLMReady(); 
-        }
-        await InvokeAsync(StateHasChanged);
+       
+            if (ChatState.IsReady && ChatState.IsToggleDisabled)
+            {
+                _ = HandleLLMReady();
+            }
+            _needsRender = true;
+        
     }
 
     public void Dispose()
     {
-        dotNetRef?.Dispose();
         ChatState.OnChange -= HandleStateChange;
     }
 
@@ -296,7 +300,16 @@
 
     private async Task InitializeChat()
     {
-
+        _renderTimer = new System.Timers.Timer(200); // 200ms debounce
+        _renderTimer.Elapsed += async (s, e) =>
+        {
+         if (_needsRender)
+         {
+             _needsRender = false;
+              await InvokeAsync(StateHasChanged);
+         }
+        };
+        _renderTimer.Start();
 
         await ChatState.Initialize(InitRunnerType);
         await WebSocketService.Initialize(SiteId); // No longer passing sessionId here
@@ -342,10 +355,10 @@ private async Task DismissNotification(string id)
     {
         await AudioService.ClearQueue();
         ChatState.IsProcessing = true;
-        await InvokeAsync(StateHasChanged);
+        await HandleStateChange();
         await WebSocketService.SendMessage(transcription);
         ChatState.CurrentMessage = "";
-        await InvokeAsync(StateHasChanged);
+        await HandleStateChange();
     }
 
     private async Task HandleStartRecording()
@@ -404,7 +417,6 @@ private async Task DismissNotification(string id)
         {
 
             ChatState.IsProcessing = true;
-            //await InvokeAsync(StateHasChanged);
 
             var result = await AudioService.TranscribeAudio(audioBlob);
 
@@ -425,7 +437,7 @@ private async Task DismissNotification(string id)
         finally
         {
             ChatState.IsProcessing = false;
-            await InvokeAsync(StateHasChanged);
+            await HandleStateChange();
         }
     }
 
@@ -531,11 +543,6 @@ private async Task DismissNotification(string id)
         IsHistoryOpen = !IsHistoryOpen;
     }
 
-    private void CloseChat()
-    {
-        SetIsChatOpen.InvokeAsync(false);
-        IsHistoryOpen = false;
-    }
 
     private RenderFragment RenderLinks()
     {
@@ -578,133 +585,159 @@ private async Task DismissNotification(string id)
         OnHostLinkClick.InvokeAsync(linkItem);
     }
 
-  private string RenderMessages(string content)
-{
-    if (string.IsNullOrEmpty(content))
-    {
-        return "";
-    }
-
-    // Split content into distinct message blocks
-    var messageBlocks = ParseMessageBlocks(content);
-    
-    // Format the message blocks with proper styling
-    return FormatMessageBlocks(messageBlocks);
-}
+ 
 
 private List<(string Type, string Content)> ParseMessageBlocks(string content)
 {
     var messageBlocks = new List<(string Type, string Content)>();
-    var markers = new[] { "<User:>", "<Assistant:>", "<Function Call:>", "<Function Response:>" };
-    var currentPos = 0;
-    
+    if (string.IsNullOrEmpty(content)) return messageBlocks;
+
+    // Pre-defined markers with their resolved types
+    var markers = new (string Marker, string Type)[]
+    {
+        ("<User:>", "User"),
+        ("<Assistant:>", "Assistant"),
+        ("<Function Call:>", "Function Call"),
+        ("<Function Response:>", "Function Response")
+    };
+
+    int currentPos = 0;
     while (currentPos < content.Length)
     {
-        // Find the next marker
-        var nextMarkerPos = content.Length;
-        string nextMarker = null;
-        
-        foreach (var marker in markers)
+        // Find next marker
+        int nextMarkerPos = content.Length;
+        string nextMarkerType = "text";
+        string nextMarkerText = null;
+
+        foreach (var (marker, type) in markers)
         {
-            var pos = content.IndexOf(marker, currentPos);
+            int pos = content.IndexOf(marker, currentPos, StringComparison.Ordinal);
             if (pos >= 0 && pos < nextMarkerPos)
             {
                 nextMarkerPos = pos;
-                nextMarker = marker;
+                nextMarkerType = type;
+                nextMarkerText = marker;
             }
         }
-        
-        if (nextMarker == null)
-        {
-            // No more markers - add remaining as text
-            if (currentPos < content.Length)
-            {
-                messageBlocks.Add(("text", content.Substring(currentPos)));
-            }
-            break;
-        }
-        
-        // Add content before marker if it exists
+
+        // Add text content before marker
         if (nextMarkerPos > currentPos)
         {
             messageBlocks.Add(("text", content.Substring(currentPos, nextMarkerPos - currentPos)));
         }
-        
-        // Find the end of this message (either next marker or end of content)
-        var messageStart = nextMarkerPos + nextMarker.Length;
-        var nextMarkerEnd = content.Length;
-        
-        foreach (var marker in markers)
+
+        if (nextMarkerText == null) break; // No more markers
+
+        // Find message end
+        int messageStart = nextMarkerPos + nextMarkerText.Length;
+        int messageEnd = content.Length;
+
+        foreach (var (marker, _) in markers)
         {
-            var pos = content.IndexOf(marker, messageStart);
-            if (pos >= 0 && pos < nextMarkerEnd)
+            int pos = content.IndexOf(marker, messageStart, StringComparison.Ordinal);
+            if (pos >= 0 && pos < messageEnd)
             {
-                nextMarkerEnd = pos;
+                messageEnd = pos;
             }
         }
-        
-        var messageContent = content.Substring(messageStart, nextMarkerEnd - messageStart);
-        var messageType = nextMarker.Replace("<", "").Replace(">", "").Replace(":", "").Trim();
-        
-        messageBlocks.Add((messageType, messageContent));
-        currentPos = nextMarkerEnd;
+
+        messageBlocks.Add((nextMarkerType, content.Substring(messageStart, messageEnd - messageStart)));
+        currentPos = messageEnd;
     }
-    
+
     return messageBlocks;
 }
 
-private string FormatMessageBlocks(List<(string Type, string Content)> messageBlocks)
-{
-    var result = new System.Text.StringBuilder();
-    var currentType = "";
-    var currentContent = new StringBuilder();
-    
-    foreach (var block in messageBlocks)
+     private string RenderMessages(string content)
     {
-        if (block.Type == "text")
+        var currentHash = ComputeQuickHash(content);
+        if (currentHash == _lastContentHash) return _cacheString;
+
+        // Parse the new content into raw blocks
+        var parsedBlocks = ParseMessageBlocks(content);
+        var newBlocks = new List<MessageBlock>();
+
+        foreach (var parsedBlock in parsedBlocks)
         {
-            // Accumulate text blocks with the current type
-            currentContent.Append(block.Content);
-        }
-        else
-        {
-            // If we have accumulated content, flush it first
-            if (currentContent.Length > 0 && !string.IsNullOrEmpty(currentType))
-            {
-                AppendMessage(result, currentType, currentContent.ToString());
-                currentContent.Clear();
-            }
+            // Calculate hash for this block (type + content)
+            var blockHash = ComputeQuickHash(parsedBlock.Type + parsedBlock.Content);
             
-            currentType = block.Type;
-            currentContent.Append(block.Content);
+            // Try to find existing block with same hash
+          var existingBlock = _cachedBlocks.FirstOrDefault(b => b.ContentHash == blockHash);
+
+            if (existingBlock != null)
+            {
+                // Reuse existing block (including its HtmlContent)
+                newBlocks.Add(existingBlock);
+            }
+            else
+            {
+                // Create new block with markdown rendering (only if needed)
+                newBlocks.Add(new MessageBlock(
+                    parsedBlock.Type,
+                    parsedBlock.Content,
+                    parsedBlock.Type == "text" ? parsedBlock.Content : MarkdownRenderer.ToHtml(parsedBlock.Content.Trim()),
+                    blockHash
+                ));
+            }
         }
-    }
-    
-    // Flush any remaining content
-    if (currentContent.Length > 0 && !string.IsNullOrEmpty(currentType))
-    {
-        AppendMessage(result, currentType, currentContent.ToString());
-    }
-    
-    return result.ToString();
-}
 
-    private void AppendMessage(StringBuilder result, string type, string content)
+        _cachedBlocks = newBlocks;
+        _lastContentHash = currentHash;
+        _cacheString = BuildOutputFromCache();
+        return _cacheString;
+    }
+
+    private string BuildOutputFromCache()
     {
-        var cssClass = type.ToLower().Replace(" ", "-");
-        var displayName = type switch
+        var result = new StringBuilder();
+        var currentTextContent = new StringBuilder();
+
+        foreach (var block in _cachedBlocks)
         {
-            "User" => "User",
-            "Assistant" => "Assistant",
-            "Function Call" => "Function Call",
-            "Function Response" => "Function Response",
-            _ => type
-        };
+            if (block.Type == "text")
+            {
+                // Aggregate text blocks
+                currentTextContent.Append(block.HtmlContent);
+            }
+            else
+            {
+                // Flush any accumulated text first
+                if (currentTextContent.Length > 0)
+                {
+                    result.Append(currentTextContent.ToString());
+                    currentTextContent.Clear();
+                }
+                
+                // Add the formatted message block
+                var cssClass = block.Type.ToLower().Replace(" ", "-");
+                result.Append($"<div class='message-bubble {cssClass}'>");
+                result.Append($"<div class='message-header {cssClass}'>{block.Type}</div>");
+                result.Append($"<div class='message-content'>{block.HtmlContent}</div>");
+                result.Append("</div>");
+            }
+        }
 
-        result.Append($"<div class='message-bubble {cssClass}'>");
-        result.Append($"<div class='message-header {cssClass}'>{displayName}</div>"); // Added headerClass
-        result.Append($"<div class='message-content'>{MarkdownRenderer.ToHtml(content.Trim())}</div>");
-        result.Append("</div>");
+        // Add any remaining text content
+        if (currentTextContent.Length > 0)
+        {
+            result.Append(currentTextContent.ToString());
+        }
+
+        return result.ToString();
     }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+private static int ComputeQuickHash(string input)
+{
+    if (string.IsNullOrEmpty(input)) return 0;
+    
+    int hash = 5381;
+    for (int i = 0; i < input.Length; i++)
+    {
+        hash = ((hash << 5) + hash) ^ input[i];
+    }
+    return hash;
+}
   
 }

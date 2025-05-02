@@ -15,7 +15,7 @@
         <SelfContained>true</SelfContained>
 
         <!-- Display name -->
-        <ApplicationTitle>Free Network Monitor Agent</ApplicationTitle>
+        <ApplicationTitle>Network Monitor Agent</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
@@ -47,7 +47,7 @@
         </MauiIcon>
 
         <!-- Splash Screen -->
-
+<MauiSplashScreen Include="Resources\Splash\splash.svg" />
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
 

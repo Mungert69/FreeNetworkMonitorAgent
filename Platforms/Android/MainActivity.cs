@@ -5,13 +5,8 @@ using Android.Views;
 
 namespace NetworkMonitorAgent;
 
-[Activity(
-    Theme = "@style/Maui.SplashTheme", 
-    MainLauncher = true, 
-    ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | 
-                         ConfigChanges.UiMode | ConfigChanges.ScreenLayout | 
-                         ConfigChanges.SmallestScreenSize | ConfigChanges.Density,
-    WindowSoftInputMode = SoftInput.AdjustResize | SoftInput.StateAlwaysHidden)]
+    [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
+    
 public class MainActivity : MauiAppCompatActivity
 {
     protected override void OnCreate(Bundle savedInstanceState)

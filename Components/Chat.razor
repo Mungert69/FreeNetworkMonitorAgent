@@ -4,6 +4,7 @@
 @inject WebSocketService WebSocketService
 @inject AudioService AudioService
 @inject ILLMService LLMService
+@using System.Runtime.CompilerServices
 
 <div class="chat-container @(ChatState.IsExpanded ? "expanded" : "")" style="@GetChatContainerStyle()">
     <div class="notification-container">
@@ -35,7 +36,7 @@
         <div class="chat-header">
             <div class="header-actions">
                 <div class="header-title">
-                    (@ChatState.LLMRunnerType)
+                    @ChatState.LLMRunnerType
                 </div>
 
                 @* Left-Aligned Actions *@        
@@ -233,6 +234,7 @@
 
 
 @code {
+    private string _cacheString="";
     private System.Timers.Timer _renderTimer;
     private bool _needsRender;
     private ElementReference outputContainerRef;
@@ -240,6 +242,10 @@
     private bool IsHistoryOpen = false;
     private bool IsRecording = false;
     private string recordingSessionId = Guid.NewGuid().ToString();
+
+      private record MessageBlock(string Type, string Content, string HtmlContent, int ContentHash);
+    private List<MessageBlock> _cachedBlocks = new();
+    private int _lastContentHash;
 
     [Parameter]
     public EventCallback<HostLink> OnHostLinkClick { get; set; }
@@ -579,19 +585,7 @@ private async Task DismissNotification(string id)
         OnHostLinkClick.InvokeAsync(linkItem);
     }
 
-  private string RenderMessages(string content)
-{
-    if (string.IsNullOrEmpty(content))
-    {
-        return "";
-    }
-
-    // Split content into distinct message blocks
-    var messageBlocks = ParseMessageBlocks(content);
-    
-    // Format the message blocks with proper styling
-    return FormatMessageBlocks(messageBlocks);
-}
+ 
 
 private List<(string Type, string Content)> ParseMessageBlocks(string content)
 {
@@ -653,59 +647,96 @@ private List<(string Type, string Content)> ParseMessageBlocks(string content)
     
     return messageBlocks;
 }
-
-private string FormatMessageBlocks(List<(string Type, string Content)> messageBlocks)
-{
-    var result = new System.Text.StringBuilder();
-    var currentType = "";
-    var currentContent = new StringBuilder();
-    
-    foreach (var block in messageBlocks)
+     private string RenderMessages(string content)
     {
-        if (block.Type == "text")
+        var currentHash = ComputeQuickHash(content);
+        if (currentHash == _lastContentHash) return _cacheString;
+
+        // Parse the new content into raw blocks
+        var parsedBlocks = ParseMessageBlocks(content);
+        var newBlocks = new List<MessageBlock>();
+
+        foreach (var parsedBlock in parsedBlocks)
         {
-            // Accumulate text blocks with the current type
-            currentContent.Append(block.Content);
-        }
-        else
-        {
-            // If we have accumulated content, flush it first
-            if (currentContent.Length > 0 && !string.IsNullOrEmpty(currentType))
-            {
-                AppendMessage(result, currentType, currentContent.ToString());
-                currentContent.Clear();
-            }
+            // Calculate hash for this block (type + content)
+            var blockHash = ComputeQuickHash(parsedBlock.Type + parsedBlock.Content);
             
-            currentType = block.Type;
-            currentContent.Append(block.Content);
+            // Try to find existing block with same hash
+          var existingBlock = _cachedBlocks.FirstOrDefault(b => b.ContentHash == blockHash);
+
+            if (existingBlock != null)
+            {
+                // Reuse existing block (including its HtmlContent)
+                newBlocks.Add(existingBlock);
+            }
+            else
+            {
+                // Create new block with markdown rendering (only if needed)
+                newBlocks.Add(new MessageBlock(
+                    parsedBlock.Type,
+                    parsedBlock.Content,
+                    parsedBlock.Type == "text" ? parsedBlock.Content : MarkdownRenderer.ToHtml(parsedBlock.Content.Trim()),
+                    blockHash
+                ));
+            }
         }
-    }
-    
-    // Flush any remaining content
-    if (currentContent.Length > 0 && !string.IsNullOrEmpty(currentType))
-    {
-        AppendMessage(result, currentType, currentContent.ToString());
-    }
-    
-    return result.ToString();
-}
 
-    private void AppendMessage(StringBuilder result, string type, string content)
+        _cachedBlocks = newBlocks;
+        _lastContentHash = currentHash;
+        _cacheString = BuildOutputFromCache();
+        return _cacheString;
+    }
+
+    private string BuildOutputFromCache()
     {
-        var cssClass = type.ToLower().Replace(" ", "-");
-        var displayName = type switch
+        var result = new StringBuilder();
+        var currentTextContent = new StringBuilder();
+
+        foreach (var block in _cachedBlocks)
         {
-            "User" => "User",
-            "Assistant" => "Assistant",
-            "Function Call" => "Function Call",
-            "Function Response" => "Function Response",
-            _ => type
-        };
+            if (block.Type == "text")
+            {
+                // Aggregate text blocks
+                currentTextContent.Append(block.HtmlContent);
+            }
+            else
+            {
+                // Flush any accumulated text first
+                if (currentTextContent.Length > 0)
+                {
+                    result.Append(currentTextContent.ToString());
+                    currentTextContent.Clear();
+                }
+                
+                // Add the formatted message block
+                var cssClass = block.Type.ToLower().Replace(" ", "-");
+                result.Append($"<div class='message-bubble {cssClass}'>");
+                result.Append($"<div class='message-header {cssClass}'>{block.Type}</div>");
+                result.Append($"<div class='message-content'>{block.HtmlContent}</div>");
+                result.Append("</div>");
+            }
+        }
 
-        result.Append($"<div class='message-bubble {cssClass}'>");
-        result.Append($"<div class='message-header {cssClass}'>{displayName}</div>"); // Added headerClass
-        result.Append($"<div class='message-content'>{MarkdownRenderer.ToHtml(content.Trim())}</div>");
-        result.Append("</div>");
+        // Add any remaining text content
+        if (currentTextContent.Length > 0)
+        {
+            result.Append(currentTextContent.ToString());
+        }
+
+        return result.ToString();
     }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+private static int ComputeQuickHash(string input)
+{
+    if (string.IsNullOrEmpty(input)) return 0;
+    
+    int hash = 5381;
+    for (int i = 0; i < input.Length; i++)
+    {
+        hash = ((hash << 5) + hash) ^ input[i];
+    }
+    return hash;
+}
   
 }

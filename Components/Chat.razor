@@ -590,63 +590,64 @@ private async Task DismissNotification(string id)
 private List<(string Type, string Content)> ParseMessageBlocks(string content)
 {
     var messageBlocks = new List<(string Type, string Content)>();
-    var markers = new[] { "<User:>", "<Assistant:>", "<Function Call:>", "<Function Response:>" };
-    var currentPos = 0;
-    
+    if (string.IsNullOrEmpty(content)) return messageBlocks;
+
+    // Pre-defined markers with their resolved types
+    var markers = new (string Marker, string Type)[]
+    {
+        ("<User:>", "User"),
+        ("<Assistant:>", "Assistant"),
+        ("<Function Call:>", "Function Call"),
+        ("<Function Response:>", "Function Response")
+    };
+
+    int currentPos = 0;
     while (currentPos < content.Length)
     {
-        // Find the next marker
-        var nextMarkerPos = content.Length;
-        string nextMarker = null;
-        
-        foreach (var marker in markers)
+        // Find next marker
+        int nextMarkerPos = content.Length;
+        string nextMarkerType = "text";
+        string nextMarkerText = null;
+
+        foreach (var (marker, type) in markers)
         {
-            var pos = content.IndexOf(marker, currentPos);
+            int pos = content.IndexOf(marker, currentPos, StringComparison.Ordinal);
             if (pos >= 0 && pos < nextMarkerPos)
             {
                 nextMarkerPos = pos;
-                nextMarker = marker;
+                nextMarkerType = type;
+                nextMarkerText = marker;
             }
         }
-        
-        if (nextMarker == null)
-        {
-            // No more markers - add remaining as text
-            if (currentPos < content.Length)
-            {
-                messageBlocks.Add(("text", content.Substring(currentPos)));
-            }
-            break;
-        }
-        
-        // Add content before marker if it exists
+
+        // Add text content before marker
         if (nextMarkerPos > currentPos)
         {
             messageBlocks.Add(("text", content.Substring(currentPos, nextMarkerPos - currentPos)));
         }
-        
-        // Find the end of this message (either next marker or end of content)
-        var messageStart = nextMarkerPos + nextMarker.Length;
-        var nextMarkerEnd = content.Length;
-        
-        foreach (var marker in markers)
+
+        if (nextMarkerText == null) break; // No more markers
+
+        // Find message end
+        int messageStart = nextMarkerPos + nextMarkerText.Length;
+        int messageEnd = content.Length;
+
+        foreach (var (marker, _) in markers)
         {
-            var pos = content.IndexOf(marker, messageStart);
-            if (pos >= 0 && pos < nextMarkerEnd)
+            int pos = content.IndexOf(marker, messageStart, StringComparison.Ordinal);
+            if (pos >= 0 && pos < messageEnd)
             {
-                nextMarkerEnd = pos;
+                messageEnd = pos;
             }
         }
-        
-        var messageContent = content.Substring(messageStart, nextMarkerEnd - messageStart);
-        var messageType = nextMarker.Replace("<", "").Replace(">", "").Replace(":", "").Trim();
-        
-        messageBlocks.Add((messageType, messageContent));
-        currentPos = nextMarkerEnd;
+
+        messageBlocks.Add((nextMarkerType, content.Substring(messageStart, messageEnd - messageStart)));
+        currentPos = messageEnd;
     }
-    
+
     return messageBlocks;
 }
+
      private string RenderMessages(string content)
     {
         var currentHash = ComputeQuickHash(content);

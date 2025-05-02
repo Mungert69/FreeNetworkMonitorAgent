@@ -6,6 +6,8 @@ namespace NetworkMonitorAgent
 {
     public partial class SetupGuidePage : ContentPage
     {
+        public string FrontendUrl => AppConstants.FrontendUrl;
+
         private bool _isChatMode;
         public SetupGuidePage(NetConnectConfig netConfig)
         {
@@ -17,7 +19,7 @@ namespace NetworkMonitorAgent
 
         private async void OnDownloadLinkClicked(object sender, EventArgs e)
         {
-            await Browser.Default.OpenAsync("http://freenetworkmonitor.click/download");
+            await Browser.Default.OpenAsync($"{AppConstants.FrontendUrl}/download");
         }
 
         public void ShowDefaultSteps()

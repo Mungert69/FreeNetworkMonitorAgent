@@ -79,7 +79,7 @@
                                 FontSize="16"
                                 FontAttributes="Bold"
                                 TextColor="{DynamicResource Primary}"/>
-                        <Label Text=>
+                        <Label >
                             <FormattedString>
                                 <Span Text="After authorization, tap 'Login to Free Network Monitor' to access the dashboard at "/>
                                 <Span Text="{Binding FrontendUrl}"/>

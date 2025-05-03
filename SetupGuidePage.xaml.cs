@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Maui.Controls;
 using NetworkMonitor.Connection;
+using NetworkMonitor.Objects;
 
 namespace NetworkMonitorAgent
 {

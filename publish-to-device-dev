@@ -1,3 +1,3 @@
 cp ./Resources/Raw/appsettings-dev.json ./Resources/Raw/appsettings.json
-dotnet build NetworkMonitorNetworkMonitorAgent-Android.csproj -t:Run -f net9.0-android
+dotnet build NetworkMonitorAgent-Android.csproj -t:Run -f net9.0-android
 

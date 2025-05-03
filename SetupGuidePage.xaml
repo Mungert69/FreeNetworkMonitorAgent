@@ -80,11 +80,13 @@
                                                        FontAttributes="Bold"
                                                        TextColor="{DynamicResource Primary}"/>
                                                 <Label>
-                                                        <FormattedString>
-                                                                <Span Text="After authorization, tap 'Login to Free Network Monitor' to access the dashboard at "/>
-                                                                <Span Text="{Binding FrontendUrl}"/>
-                                                                <Span Text="/dashboard using the same email you used for authorization. This is where you manage and monitor network activities, and it's also where the website version of the Free Network Monitor Assistant is available to help with advanced tasks and insights."/>
-                                                        </FormattedString>
+                                                        <Label.FormattedText>
+                                                                <FormattedString>
+                                                                        <Span Text="After authorization, tap 'Login to Free Network Monitor' to access the dashboard at "/>
+                                                                        <Span Text="{Binding FrontendUrl}"/>
+                                                                        <Span Text="/dashboard using the same email you used for authorization. This is where you manage and monitor network activities, and it's also where the website version of the Free Network Monitor Assistant is available to help with advanced tasks and insights."/>
+                                                                </FormattedString>
+                                                        </Label.FormattedText>
                                                 </Label>
 
                                                 <Label HorizontalOptions="Center"
@@ -202,11 +204,13 @@
                                                 FontAttributes="Bold"
                                                 TextColor="{DynamicResource Primary}"/>
                                         <Label>
-                                        <FormattedString>
-                                                <Span Text="The website version of the Free Network Monitor Assistant is available at "/>
-                                                <Span Text="{Binding FrontendUrl}"/>
-                                                <Span Text="/dashboard ; click the assistant icon bottom right on the page. The in app Assistant is available in the Chat enabled version of The Free Network Monitor Agent. The Free Network Monitor Assistnat enables advanced security tests, penetration assessments, BusyBox commands, and internet search functions. Acting as an intermediary, the assistant supports these capabilities:"/>
-                                        </FormattedString>
+                                                <Label.FormattedText>
+                                                        <FormattedString>
+                                                                <Span Text="The website version of the Free Network Monitor Assistant is available at "/>
+                                                                <Span Text="{Binding FrontendUrl}"/>
+                                                                <Span Text="/dashboard ; click the assistant icon bottom right on the page. The in app Assistant is available in the Chat enabled version of The Free Network Monitor Agent. The Free Network Monitor Assistant enables advanced security tests, penetration assessments, BusyBox commands, and internet search functions. Acting as an intermediary, the assistant supports these capabilities:"/>
+                                                        </FormattedString>
+                                                </Label.FormattedText>
                                         </Label>
                                         <Label Text="• Nmap Scans: Initiate network scans to discover open ports, detect devices, and assess vulnerabilities. Simply request a scan on a specific host, and the assistant will display results, including open ports and running services."/>
                                         <Label Text="• Metasploit Modules: Perform targeted penetration testing on Windows by running Metasploit modules. Request a module to simulate real-world attacks and receive a detailed vulnerability report."/>

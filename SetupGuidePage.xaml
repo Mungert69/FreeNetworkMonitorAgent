@@ -201,7 +201,7 @@
                             FontSize="16"
                             FontAttributes="Bold"
                             TextColor="{DynamicResource Primary}"/>
-                    <Label Text=/>
+                    </Label >
                     <FormattedString>
                                 <Span Text="The website version of the Free Network Monitor Assistant is available at "/>
                                 <Span Text="{Binding FrontendUrl}"/>

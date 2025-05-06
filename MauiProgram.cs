@@ -111,7 +111,6 @@ namespace NetworkMonitorAgent
             "ChatServer",
             "ServiceDomain",
             "ServiceServer",
-            "FrontEndUrl",
             "TranscribeAudioUrl",
             "IsChatMode",
             "OpensslVersion",

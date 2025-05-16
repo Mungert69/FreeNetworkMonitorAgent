@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorAgent", "NetworkMonitorAgent.csproj", "{F1540838-880A-4528-8AC3-058ED2BD4F0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\NetworkMonitor\NetworkMonitor-Maui.csproj", "{42A6D244-B284-4C3D-9D64-2132D7505833}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\NetworkMonitorLib\NetworkMonitor-Maui.csproj", "{42A6D244-B284-4C3D-9D64-2132D7505833}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}"
 EndProject

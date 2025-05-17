@@ -437,7 +437,7 @@ namespace NetworkMonitorAgent.Components
 
             // Process alignment row if present
             bool hasAlignment = tableLines.Count > 1 && tableLines[1].Contains("-");
-            string[] alignments = new string[headerCells.Count];
+            string[] alignments = new string[headerCells.Count()];
             
             if (hasAlignment)
             {

@@ -15,8 +15,8 @@
                 <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
                 <ApplicationIdGuid>d4f21b0e-2c97-4c50-b003-dca43bd9a888</ApplicationIdGuid>
                 <!-- Versions -->
-                <ApplicationDisplayVersion>0.5.6</ApplicationDisplayVersion>
-                <ApplicationVersion>506</ApplicationVersion>
+                <ApplicationDisplayVersion>0.5.7</ApplicationDisplayVersion>
+                <ApplicationVersion>507</ApplicationVersion>
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
                 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
@@ -43,7 +43,7 @@
 
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
 
-     <MauiSplashScreen Include="Resources\Splash\splash.svg"  BaseSize="128,128" Color="#FFFFFF"/>
+     <MauiSplashScreen Include="Resources\Splash\splash.svg" BaseSize="128,128" Color="#FFFFFF" />
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
@@ -59,21 +59,21 @@
 
     
         <ItemGroup>
-                <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.60" />
-                <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
+                <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.70" />
+                <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
                 <PackageReference Include="CommunityToolkit.Maui" Version="11.2.0" />
                 <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-                <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.60" />
-                <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.60" />
-                <PackageReference Include="Microsoft.Maui.Core" Version="9.0.60" />
-                <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.60" />
-                <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.60" />
-                <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.4" />
+                <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.70" />
+                <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.70" />
+                <PackageReference Include="Microsoft.Maui.Core" Version="9.0.70" />
+                <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.70" />
+                <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.70" />
+                <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.5" />
                       <PackageReference Include="MatBlazor" Version="2.10.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.4" />
-    <PackageReference Include="Microsoft.JSInterop" Version="9.0.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.5" />
+    <PackageReference Include="Microsoft.JSInterop" Version="9.0.5" />
         </ItemGroup>
         <ItemGroup>
                 <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui-Android.csproj" />

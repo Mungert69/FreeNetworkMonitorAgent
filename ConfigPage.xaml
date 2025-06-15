@@ -12,14 +12,14 @@
             <!-- Logo and App Title -->
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
-                    <Image Source="logo.png" SemanticProperties.Description="Free Network Monitor Agent Logo. " HeightRequest="100" HorizontalOptions="Center" />
-                    <Label Text="Free Network Monitor Agent" FontSize="22" HorizontalOptions="Center" TextColor="#607466" />
+                    <Image Source="logo.png" SemanticProperties.Description="Quantum Network Monitor Agent Logo. " HeightRequest="100" HorizontalOptions="Center" />
+                    <Label Text="Quantum Network Monitor Agent" FontSize="22" HorizontalOptions="Center" TextColor="#607466" />
                 </VerticalStackLayout>
             </Frame>
 
             <!-- Config Header -->
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" Padding="20" CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="0,0,0,10">
-                <Label Text="Free Network Monitor Agent Agent Config" FontSize="16" HorizontalOptions="Center" />
+                <Label Text="Quantum Network Monitor Agent Agent Config" FontSize="16" HorizontalOptions="Center" />
             </Frame>
 
             <!-- Config Fields -->

@@ -10,7 +10,7 @@
                      ContentTemplate="{DataTemplate local:MainPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Free Network Monitor Assistant">
+    <FlyoutItem Title="Quantum Network Monitor Assistant">
         <ShellContent Route="Chat" 
                  ContentTemplate="{DataTemplate local:ChatPage}" />
     </FlyoutItem>

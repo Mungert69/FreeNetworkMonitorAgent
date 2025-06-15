@@ -16,10 +16,10 @@
                    HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
                     <Image Source="logo.png"
-                           SemanticProperties.Description="Free Network Monitor Agent Logo. "
+                           SemanticProperties.Description="Quantum Network Monitor Agent Logo. "
                            HeightRequest="100"
                            HorizontalOptions="Center"/>
-                    <Label Text="Free Network Monitor Agent"
+                    <Label Text="Quantum Network Monitor Agent"
                            FontSize="22"
                            HorizontalOptions="Center"
                            TextColor="{DynamicResource Primary}"/>
@@ -31,7 +31,7 @@
                    CornerRadius="10"
                    HorizontalOptions="FillAndExpand"
                    Margin="0,0,0,10">
-                <Label Text="Welcome to Free Network Monitor Agent"
+                <Label Text="Welcome to Quantum Network Monitor Agent"
                        FontSize="16"
                        HorizontalOptions="Center"
                        TextColor="{DynamicResource Primary}"/>

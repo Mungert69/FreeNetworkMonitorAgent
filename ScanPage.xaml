@@ -12,10 +12,10 @@
                                    Padding="20">
                      <!-- Logo and Title -->
                      <Image Source="logo.png"
-                            SemanticProperties.Description="Free Network Monitor Agent Logo"
+                            SemanticProperties.Description="Quantum Network Monitor Agent Logo"
                             HeightRequest="100"
                             HorizontalOptions="Center"/>
-                     <Label Text="Free Network Monitor Agent"
+                     <Label Text="Quantum Network Monitor Agent"
                             FontSize="24"
                             FontAttributes="Bold"
                             HorizontalOptions="Center"

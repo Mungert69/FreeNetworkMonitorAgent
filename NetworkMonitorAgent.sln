@@ -5,11 +5,11 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorAgent", "NetworkMonitorAgent.csproj", "{F1540838-880A-4528-8AC3-058ED2BD4F0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorMaui", "..\NetworkMonitorMaui\NetworkMonitorMaui.csproj", "{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\NetworkMonitorLib\NetworkMonitor-Maui.csproj", "{74B7BAA5-A048-E25D-7971-44BAEC0AAF3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,12 +24,6 @@ Global
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
 		{F1540838-880A-4528-8AC3-058ED2BD4F0A}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
-		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release|Any CPU.Build.0 = Release|Any CPU
-		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
-		{43A8613F-0F52-4281-BCCD-BDA9FFFA3296}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
 		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21E5B299-DB1C-4752-B2A9-EF009E8CBAA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,6 +36,12 @@ Global
 		{74B7BAA5-A048-E25D-7971-44BAEC0AAF3A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{74B7BAA5-A048-E25D-7971-44BAEC0AAF3A}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
 		{74B7BAA5-A048-E25D-7971-44BAEC0AAF3A}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
+		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

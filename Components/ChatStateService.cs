@@ -119,7 +119,8 @@ namespace NetworkMonitorAgent
 
             if (!string.IsNullOrEmpty(storedSessionId))
             {
-                return storedSessionId;
+                SessionId = storedSessionId;
+                return ;
             }
 
             // Create new session

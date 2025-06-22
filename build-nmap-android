@@ -1,0 +1,87 @@
+#!/bin/bash
+set -e
+
+# ====== Config ======
+export NDK_ROOT="/lib/android-sdk/ndk/28.1.13356709"
+export NDK_COMPILER_PREFIX="armv7a-linux-androideabi"
+export API_LEVEL="21"
+export INSTALL_DIR="/home/mahadeva/code/nmap-android-build"
+export WORKDIR="/home/mahadeva/code/nmap-build-deps"
+
+# ====== Toolchain ======
+export TOOLCHAIN_BIN="$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin"
+export PATH="$TOOLCHAIN_BIN:$PATH"
+export CC="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang"
+export CXX="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang++"
+export AR="llvm-ar"
+export RANLIB="llvm-ranlib"
+export CFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden"
+export CXXFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden"
+export LDFLAGS="-pie"
+
+# ====== Make Output Directories ======
+mkdir -p "$WORKDIR" "$INSTALL_DIR"
+
+# ====== Build Lua ======
+cd "$WORKDIR"
+if [ ! -f lua-install/lib/liblua.a ]; then
+    echo "=== Building Lua 5.4.7 ==="
+    rm -rf lua-build lua-5.4.7
+    mkdir -p lua-build && cd lua-build
+    wget -nc https://www.lua.org/ftp/lua-5.4.7.tar.gz
+    tar xzf lua-5.4.7.tar.gz
+    cd lua-5.4.7
+    sed -i 's/fseeko/fseek/g; s/ftello/ftell/g' src/liolib.c
+    export LUA_ANDROID_FLAGS="-DLUA_USE_LINUX -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+    for f in src/*.c; do
+        [ "$f" = "src/luac.c" ] && continue
+        $CC $CFLAGS $LUA_ANDROID_FLAGS -c $f -o ${f%.c}.o
+    done
+    $AR rcs src/liblua.a src/*.o
+    mkdir -p "$WORKDIR/lua-install"/{include,lib}
+    cp src/liblua.a "$WORKDIR/lua-install/lib"
+    cp src/lua.h src/luaconf.h src/lualib.h src/lauxlib.h src/lua.hpp "$WORKDIR/lua-install/include"
+    cd "$WORKDIR"
+fi
+
+# ====== Build Nmap ======
+cd /home/mahadeva/code/nmap-7.97
+
+make distclean || true
+find . -name '*.o' -delete
+find . -name '*.a' -delete
+find . -name '*.so' -delete
+
+# Force route-none backend for Android
+cp libdnet-stripped/src/route-none.c libdnet-stripped/src/route-linux.c
+
+# ====== Configure Nmap (with Lua) ======
+./configure \
+  --host=arm-linux-androideabi \
+  --without-subversion \
+  --without-zenmap \
+  --with-pcre=/usr \
+  --with-libpcap=included \
+  --with-pcap=linux \
+  --with-libdnet=included \
+  --without-ndiff \
+  --without-nmap-update \
+  --without-ncat \
+  --with-liblua="$WORKDIR/lua-install" \
+  --with-liblua-includes="$WORKDIR/lua-install/include" \
+  --without-nping \
+  --without-openssl \
+  --enable-static \
+  --prefix="$INSTALL_DIR"
+
+make
+
+# ====== Collect Artifacts ======
+mkdir -p "$INSTALL_DIR"
+cp nmap "$INSTALL_DIR/"
+cp -r nselib "$INSTALL_DIR/"
+for f in nmap-service-probes nmap-payloads nmap-services nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc nse_main.lua nmap.xsl nmap.dtd ; do 
+    [ -f "$f" ] && cp "$f" "$INSTALL_DIR/"
+done
+[ -d scripts ] && cp -r scripts "$INSTALL_DIR/"
+

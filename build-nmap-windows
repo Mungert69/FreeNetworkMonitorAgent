@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -e
+
+# === Config ===
+TARGET=x86_64-w64-mingw32           # Use i686-w64-mingw32 for 32-bit
+INSTALL_DIR="$PWD/nmap-win-build"
+WORKDIR="$PWD/nmap-win-deps"
+NMAP_VER=7.97
+
+# === Install Dependencies ===
+sudo apt-get update
+sudo apt-get install -y \
+  mingw-w64 gcc-mingw-w64 g++-mingw-w64 \
+  wget pkg-config autoconf automake libtool
+
+# === Workspace Setup ===
+mkdir -p "$WORKDIR" "$INSTALL_DIR"
+
+# === Build Lua for Windows ===
+cd "$WORKDIR"
+if [ ! -f lua-install/lib/liblua.a ]; then
+  echo ">>> Building Lua 5.4.7 for $TARGET"
+  rm -rf lua-5.4.7 lua-build
+  mkdir lua-build && cd lua-build
+  wget -nc https://www.lua.org/ftp/lua-5.4.7.tar.gz
+  tar xzf lua-5.4.7.tar.gz && cd lua-5.4.7
+  make clean || true                # ONLY clean, no distclean
+  make PLAT=mingw \
+       CC="${TARGET}-gcc" \
+       AR="${TARGET}-ar" \
+       RANLIB="${TARGET}-ranlib"
+  mkdir -p ../lua-install/{include,lib}
+  cp src/liblua.a ../lua-install/lib/
+  cp src/*.h ../lua-install/include/
+  cd "$WORKDIR"
+fi
+
+# === Clone & Build Nmap with Lua ===
+cd "$WORKDIR"
+rm -rf nmap
+git clone --branch "nmap-${NMAP_VER}" https://github.com/nmap/nmap.git
+cd nmap
+
+make distclean || true
+find . -name '*.o' -delete
+
+# Stub out platform routing to avoid build errors
+cp libdnet-stripped/src/route-none.c libdnet-stripped/src/route-linux.c
+
+# Configure for Windows with Lua support
+CC="${TARGET}-gcc" \
+CXX="${TARGET}-g++" \
+AR="${TARGET}-ar" \
+RANLIB="${TARGET}-ranlib" \
+./configure \
+  --host="$TARGET" \
+  --without-zenmap \
+  --without-ncat \
+  --without-nping \
+  --disable-ipv6 \
+  --enable-static \
+  --with-liblua="$WORKDIR/lua-install" \
+  --with-liblua-includes="$WORKDIR/lua-install/include" \
+  --prefix="$INSTALL_DIR"
+
+make -j$(nproc)
+
+# === Collect Artifacts ===
+cp nmap.exe "$INSTALL_DIR/"
+cp *.dll "$INSTALL_DIR/" 2>/dev/null || true
+for f in \
+  nmap-service-probes nmap-payloads nmap-services \
+  nmap-os-db nmap-mac-prefixes nmap-protocols \
+  nmap-rpc nmap.xsl; do
+  [ -f "$f" ] && cp "$f" "$INSTALL_DIR/"
+done
+
+echo "✅ Windows Nmap + Lua build complete."
+echo "Artifacts are in: $INSTALL_DIR"
+

@@ -1,5 +1,5 @@
 # Nmap OS Fingerprinting 2nd Generation DB. -*- mode: fundamental; -*-
-# $Id: nmap-os-db 38811 2024-03-21 18:20:48Z dmiller $
+# $Id: nmap-os-db 38811M 2025-05-06 19:09:24Z (local) $
 #
 # Contributions to this database are welcome.  If Nmap obtains a new
 # fingerprint (and test conditions are favorable), it will print out a
@@ -20,7 +20,6 @@
 #
 # For a complete description of Nmap OS detection and the format of
 # fingerprints in this file, see https://nmap.org/book/osdetect.html.
-This nmap-os-db is only valid for Nmap 7.94.2 and later
 
 # This first element provides the number of points every fingerprint
 # test is worth.  Tests like TTL or Don't fragment are worth less

@@ -6,9 +6,9 @@ export CC=armv7a-linux-androideabi21-clang
 export CXX=armv7a-linux-androideabi21-clang++
 export AR=llvm-ar
 export RANLIB=llvm-ranlib
-export CFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden"
-export CXXFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden"
-export LDFLAGS="-pie"
+export CFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden "
+export CXXFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden "
+export LDFLAGS="-pie "
 
 # Clean previous builds
 make distclean || true
@@ -62,6 +62,8 @@ cp nmap "$BUILDROOT/"                # <-- Copy the binary, always
 for f in nmap-service-probes nmap-payloads nmap-services nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc nmap.xsl; do
     [ -f "$f" ] && cp "$f" "$BUILDROOT/"
 done
+cp "$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" "$INSTALL_DIR/"
+
 [ -d scripts ] && cp -r scripts "$BUILDROOT/"
 
 

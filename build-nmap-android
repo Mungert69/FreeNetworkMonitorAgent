@@ -15,9 +15,9 @@ export CC="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang"
 export CXX="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang++"
 export AR="llvm-ar"
 export RANLIB="llvm-ranlib"
-export CFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden"
-export CXXFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden"
-export LDFLAGS="-pie"
+export CFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden "
+export CXXFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden "
+export LDFLAGS="-pie "
 
 # ====== Make Output Directories ======
 mkdir -p "$WORKDIR" "$INSTALL_DIR"
@@ -83,5 +83,7 @@ cp -r nselib "$INSTALL_DIR/"
 for f in nmap-service-probes nmap-payloads nmap-services nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc nse_main.lua nmap.xsl nmap.dtd ; do 
     [ -f "$f" ] && cp "$f" "$INSTALL_DIR/"
 done
+cp "$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" "$INSTALL_DIR/"
+
 [ -d scripts ] && cp -r scripts "$INSTALL_DIR/"
 

@@ -1,4 +1,5 @@
 ./bin/nse_main.lua
+./bin/openssl-old
 ./bin/curl-config
 ./bin/busybox
 ./bin/nmap-protocols
@@ -1632,6 +1633,7 @@
 ./bin-old/nmap-7.95-1.spec
 ./ssl/openssl.cnf
 ./lib64/libssl.pc
+./lib64/openssl.so
 ./lib64/libc++_shared.so
 ./lib64/AlgoTable.csv
 ./lib64/libcrypto.ld
@@ -2265,3 +2267,20 @@
 ./share/scripts/irc-brute.nse
 ./share/scripts/targets-ipv6-multicast-echo.nse
 ./share/ncat/ca-bundle.crt
+./lib64-old/libssl.pc
+./lib64-old/libc++_shared.so
+./lib64-old/AlgoTable.csv
+./lib64-old/libcrypto.ld
+./lib64-old/libcurl.a
+./lib64-old/curves
+./lib64-old/libcrypto.pc
+./lib64-old/algo_info.json
+./lib64-old/libcrypto.so.3
+./lib64-old/libcrypto.a
+./lib64-old/libssl.so.3
+./lib64-old/libssl.so
+./lib64-old/libcurl.la
+./lib64-old/libssl.ld
+./lib64-old/libssl.a
+./lib64-old/oqsprovider.so
+./lib64-old/libcrypto.so

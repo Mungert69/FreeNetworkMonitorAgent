@@ -76,6 +76,36 @@ cp libdnet-stripped/src/route-none.c libdnet-stripped/src/route-linux.c
 
 make
 
+# ====== Build lua-openssl ======
+cd "$WORKDIR"
+if [ ! -f openssl.so ]; then
+    echo "=== Building lua-openssl for $TARGET ==="
+    rm -rf lua-openssl
+    git clone --depth=1 https://github.com/zhaozg/lua-openssl.git
+    cd lua-openssl
+    # Download missing header
+    if [ ! -f src/auxiliar.h ]; then
+      wget -O src/auxiliar.h https://raw.githubusercontent.com/diegonehab/luasocket/master/src/auxiliar.h
+    fi
+    OPENSSL_INC="/home/mahadeva/code/openssl-3.4.1-android/include"
+    OPENSSL_LIB="/home/mahadeva/code/openssl-3.4.1-android"
+
+    for f in src/*.c; do
+        $CC $CFLAGS -I"$OPENSSL_INC" -I"$WORKDIR/lua-install/include" -c "$f" -o "$(basename "${f%.c}.o")"
+    done
+
+    $CC $CFLAGS -shared -o openssl.so ./*.o \
+        -L"$OPENSSL_LIB" -lssl -lcrypto -llog -landroid
+
+    mkdir -p "$INSTALL_DIR/nselib-bin/"
+    cp openssl.so "$INSTALL_DIR/nselib-bin/"
+    mkdir -p "$INSTALL_DIR/copy-to-lib64/"
+    cp openssl.so "$INSTALL_DIR/copy-to-lib64/"
+
+    cd "$WORKDIR"
+fi
+
+
 # ====== Collect Artifacts ======
 mkdir -p "$INSTALL_DIR"
 cp nmap "$INSTALL_DIR/"

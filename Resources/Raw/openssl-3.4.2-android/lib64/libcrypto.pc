@@ -1,11 +1,13 @@
-libdir=/home/mahadeva/openssl-3.3.1-android
-includedir=/home/mahadeva/openssl-3.3.1-android/include
-enginesdir=/home/mahadeva/openssl-3.3.1-android/engines
-modulesdir=/home/mahadeva/openssl-3.3.1-android/providers
+prefix=/home/mahadeva/code/openssl-3.4.1-android
+exec_prefix=${prefix}
+libdir=${exec_prefix}
+includedir=${prefix}/include ${prefix}/./include 
+enginesdir=${libdir}/engines
+modulesdir=${libdir}/providers
 
 Name: OpenSSL-libcrypto
 Description: OpenSSL cryptography library
-Version: 3.3.1
+Version: 3.4.1
 Libs: -L${libdir} -lcrypto
 Libs.private: -ldl -pthread
-Cflags: -I${includedir}
+Cflags: -I${prefix}/include  -I${prefix}/./include 

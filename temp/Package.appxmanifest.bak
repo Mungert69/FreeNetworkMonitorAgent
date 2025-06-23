@@ -28,7 +28,7 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Free Network Monitor Agent"
+        DisplayName="Quantum Network Monitor Agent"
         Description="$placeholder$"
         BackgroundColor="transparent"  Square150x150Logo="Resources\Images\SquareLogo\placeholder.png" Square44x44Logo="Resources\Images\SquareLogo\logosquare.png">
         <uap:DefaultTile   Square71x71Logo="Resources\Images\SquareLogo\placeholder.png" Square310x310Logo="Resources\Images\SquareLogo\logomediumsquare.png" Wide310x150Logo="Resources\Images\Logos\logosquare.png">

@@ -97,13 +97,12 @@ namespace NetworkMonitorAgent
         public async Task Initialize(string initRunnerType)
         {
             LLMRunnerType = initRunnerType;
-            SessionId = await GetSessionId();
+            await GetSessionId();
         }
         public async Task ClearSession()
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
-            SessionId = await GetSessionId();
+            await GetSessionId();
         }
 
 
@@ -111,27 +110,23 @@ namespace NetworkMonitorAgent
         {
             SessionId = newSessionId;
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
-
         }
 
-        private async Task<string> GetSessionId()
+        private async Task GetSessionId()
         {
-            // Check if we have a recent session in localStorage
+            // Check if we have a session in localStorage
             var storedSessionId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "sessionId");
-            var storedTimestamp = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "sessionTimestamp");
 
-            if (!string.IsNullOrEmpty(storedSessionId) && !string.IsNullOrEmpty(storedTimestamp))
+            if (!string.IsNullOrEmpty(storedSessionId))
             {
-
-                return storedSessionId;
+                SessionId = storedSessionId;
+                return ;
             }
 
             // Create new session
             var newSessionId = Guid.NewGuid().ToString();
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
-            return newSessionId;
+            await StoreNewSessionID(newSessionId);
+
         }
 
         public event Func<Task>? OnChange = null; // Changed from Action to Func<Task>

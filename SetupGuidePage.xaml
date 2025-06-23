@@ -16,10 +16,10 @@
                                HorizontalOptions="FillAndExpand">
                                 <VerticalStackLayout Spacing="10">
                                         <Image Source="logo.png"
-                                               SemanticProperties.Description="Free Network Monitor Logo"
+                                               SemanticProperties.Description="Quantum Network Monitor Logo"
                                                HeightRequest="100"
                                                HorizontalOptions="Center"/>
-                                        <Label Text="Free Network Monitor Agent Setup Guide"
+                                        <Label Text="Quantum Network Monitor Agent Setup Guide"
                                                FontSize="22"
                                                HorizontalOptions="Center"
                                                TextColor="{DynamicResource Primary}"/>
@@ -34,7 +34,7 @@
                                 <VerticalStackLayout>
                                         <Label  Padding="15"
                                                 HorizontalOptions="Center"
-                                                Text="Welcome to the Free Network Monitor Agent! This guide will help you set up and configure the app to monitor your network."
+                                                Text="Welcome to the Quantum Network Monitor Agent! This guide will help you set up and configure the app to monitor your network."
                                                 FontSize="16"
                                                 FontAttributes="Bold"
                                                 TextColor="{DynamicResource Primary}"/>
@@ -75,16 +75,16 @@
 
                                                 <Label HorizontalOptions="Center"
                                                        Padding="5"
-                                                       Text="Step 3: Access the Free Network Monitor Dashboard"
+                                                       Text="Step 3: Access the Quantum Network Monitor Dashboard"
                                                        FontSize="16"
                                                        FontAttributes="Bold"
                                                        TextColor="{DynamicResource Primary}"/>
                                                 <Label>
                                                         <Label.FormattedText>
                                                                 <FormattedString>
-                                                                        <Span Text="After authorization, tap 'Login to Free Network Monitor' to access the dashboard at "/>
+                                                                        <Span Text="After authorization, tap 'Login to Quantum Network Monitor' to access the dashboard at "/>
                                                                         <Span Text="{Binding FrontendUrl}"/>
-                                                                        <Span Text="/dashboard using the same email you used for authorization. This is where you manage and monitor network activities, and it's also where the website version of the Free Network Monitor Assistant is available to help with advanced tasks and insights."/>
+                                                                        <Span Text="/dashboard using the same email you used for authorization. This is where you manage and monitor network activities, and it's also where the website version of the Quantum Network Monitor Assistant is available to help with advanced tasks and insights."/>
                                                                 </FormattedString>
                                                         </Label.FormattedText>
                                                 </Label>
@@ -126,11 +126,11 @@
 
                                                 <Label HorizontalOptions="Center"
                                                        Padding="5"
-                                                       Text="Step 3: Open the Free Network Monitor Assistant"
+                                                       Text="Step 3: Open the Quantum Network Monitor Assistant"
                                                        FontSize="16"
                                                        FontAttributes="Bold"
                                                        TextColor="{DynamicResource Primary}"/>
-                                                <Label Text="After authorization, you can directly access the Free Network Monitor Assistant for all your monitoring needs and advanced tasks."/>
+                                                <Label Text="After authorization, you can directly access the Quantum Network Monitor Assistant for all your monitoring needs and advanced tasks."/>
                                         </VerticalStackLayout>
                                 </VerticalStackLayout>
                         </Frame>
@@ -146,13 +146,13 @@
                                                 FontSize="16"
                                                 FontAttributes="Bold"
                                                 TextColor="{DynamicResource Primary}"/>
-                                        <Label Text="You can view detailed monitoring data in three ways: through the Free Network Monitor Dashboard, within the app's Host Data tab, or by using the Free Network Monitor Assistant."/>
-                                        <Label Text="• Using the Free Network Monitor Dashboard: Access the dashboard to view comprehensive monitoring data and analyses for each host."/>
+                                        <Label Text="You can view detailed monitoring data in three ways: through the Quantum Network Monitor Dashboard, within the app's Host Data tab, or by using the Quantum Network Monitor Assistant."/>
+                                        <Label Text="• Using the Quantum Network Monitor Dashboard: Access the dashboard to view comprehensive monitoring data and analyses for each host."/>
                                         <Label Text="• Using the Host Data Tab in the App: Host data is visually represented in the app with indicator circles for each host. Each circle will appear green if the host is active or red if down."/>
                                         <Label Text="  - Tap the Circle: Tap a circle to view detailed monitoring information for the corresponding host."/>
                                         <Label Text="  - Pulsing Circles: A pulsing circle signifies that the host is up, and the pulse rate reflects the response time: the faster the pulse, the faster the response time"/>
                                         <Label Text="  - Purple Beacon Effect: This effect represents the success rate of host responses. A smaller beacon indicates a lower success rate, providing a visual indicator of reliability for each host."/>
-                                        <Label Text="• Using the Free Network Monitor Assistant: You can ask the assistant questions about your monitoring data. The website version of the assistant not only displays the requested data but also automatically switches views in the dashboard to show the relevant information, providing an interactive way to access insights and updates quickly."/>
+                                        <Label Text="• Using the Quantum Network Monitor Assistant: You can ask the assistant questions about your monitoring data. The website version of the assistant not only displays the requested data but also automatically switches views in the dashboard to show the relevant information, providing an interactive way to access insights and updates quickly."/>
                                 </VerticalStackLayout>
                         </Frame>
 
@@ -184,14 +184,14 @@
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                TextColor="{DynamicResource Primary}"/>
-                                        <Label Text="The Free Network Monitor Assistant provides advanced capabilities, including Nmap scans, OpenSSL checks, and BusyBox commands. You can also perform internet searches for technical assistance."/>
+                                        <Label Text="The Quantum Network Monitor Assistant provides advanced capabilities, including Nmap scans, OpenSSL checks, and BusyBox commands. You can also perform internet searches for technical assistance."/>
                                         <Label Text="Note for Windows Users: The assistant can also utilize Metasploit for penetration testing, but you must install the Metasploit Framework separately. After installation, ensure 'msfconsole' is accessible from the system's PATH."/>
                                         <Label Text="Note for Android Users: The Metasploit framework is not available for Android at the time of publishing."/>
                                         <Label Text="Important: Ensure you have permission to run any security tests, scans, or commands on systems being tested. Unauthorized testing can lead to legal consequences."/>
                                 </VerticalStackLayout>
                         </Frame>
 
-                        <!-- Using the Free Network Monitor Assistant with Your Agent -->
+                        <!-- Using the Quantum Network Monitor Assistant with Your Agent -->
                         <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
                                Padding="15"
                                CornerRadius="10"
@@ -199,16 +199,16 @@
                                 <VerticalStackLayout>
                                         <Label  Padding="15"
                                                 HorizontalOptions="Center"
-                                                Text="Using the Free Network Monitor Assistant with Your Agent"
+                                                Text="Using the Quantum Network Monitor Assistant with Your Agent"
                                                 FontSize="16"
                                                 FontAttributes="Bold"
                                                 TextColor="{DynamicResource Primary}"/>
                                         <Label>
                                                 <Label.FormattedText>
                                                         <FormattedString>
-                                                                <Span Text="The website version of the Free Network Monitor Assistant is available at "/>
+                                                                <Span Text="The website version of the Quantum Network Monitor Assistant is available at "/>
                                                                 <Span Text="{Binding FrontendUrl}"/>
-                                                                <Span Text="/dashboard ; click the assistant icon bottom right on the page. The in app Assistant is available in the Chat enabled version of The Free Network Monitor Agent. The Free Network Monitor Assistant enables advanced security tests, penetration assessments, BusyBox commands, and internet search functions. Acting as an intermediary, the assistant supports these capabilities:"/>
+                                                                <Span Text="/dashboard ; click the assistant icon bottom right on the page. The in app Assistant is available in the Chat enabled version of The Quantum Network Monitor Agent. The Quantum Network Monitor Assistant enables advanced security tests, penetration assessments, BusyBox commands, and internet search functions. Acting as an intermediary, the assistant supports these capabilities:"/>
                                                         </FormattedString>
                                                 </Label.FormattedText>
                                         </Label>
@@ -228,13 +228,13 @@
                                HorizontalOptions="FillAndExpand">
                                 <VerticalStackLayout>
                                         <Label  HorizontalOptions="Center"
-                                                Text="Download the Free Network Monitor Agent on Various Platforms:"
+                                                Text="Download the Quantum Network Monitor Agent on Various Platforms:"
                                                 FontSize="16"
                                                 FontAttributes="Bold"
                                                 Padding="15"
                                                 TextColor="{DynamicResource Primary}"/>
 
-                                        <Label Text="The Free Network Monitor Agent is available for multiple platforms, each offering unique benefits:"/>
+                                        <Label Text="The Quantum Network Monitor Agent is available for multiple platforms, each offering unique benefits:"/>
                                         <Label Text="• Android Version: Ideal for portable network monitoring, accessible directly on your mobile device. Note: Android’s battery-saving features may affect polling frequency when the device is not charging. The Metasploit framework is not available for Android."/>
                                         <Label Text="• Windows Version: Provides full functionality, including support for advanced security tools like Metasploit. Install the Metasploit framework separately to enable penetration testing features. This version is well-suited for in-depth network assessments."/>
                                         <Label Text="• Docker Version: Offers flexible deployment on servers or containers, ideal for centralized monitoring across network environments. The Docker version supports all major monitoring tools and functions, making it highly scalable and customizable."/>

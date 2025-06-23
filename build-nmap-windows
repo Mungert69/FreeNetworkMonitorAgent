@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -e
+
+# ====== Config ======
+export TARGET="x86_64-w64-mingw32"
+export INSTALL_DIR="/home/mahadeva/code/nmap-win-build"
+export WORKDIR="/home/mahadeva/code/nmap-win-deps"
+export NMAP_VER="7.97"
+export LUA_VER="5.4.7"
+
+# ====== Toolchain ======
+export CC="${TARGET}-gcc"
+export CXX="${TARGET}-g++"
+export AR="${TARGET}-ar"
+export RANLIB="${TARGET}-ranlib"
+export CFLAGS="-fPIC"
+export CXXFLAGS="-fPIC"
+export LDFLAGS=""
+
+# ====== Make Output Directories ======
+mkdir -p "$WORKDIR" "$INSTALL_DIR"
+
+# ====== Build Lua ======
+cd "$WORKDIR"
+if [ ! -f lua-install/lib/liblua.a ]; then
+    echo "=== Building Lua 5.4.7 for $TARGET ==="
+    rm -rf lua-build lua-5.4.7
+    mkdir -p lua-build && cd lua-build
+    wget -nc https://www.lua.org/ftp/lua-5.4.7.tar.gz
+    tar xzf lua-5.4.7.tar.gz
+    cd lua-5.4.7
+
+    # Compile all core Lua sources EXCEPT luac.c
+    for f in src/*.c; do
+        [ "$f" = "src/luac.c" ] && continue
+        $CC $CFLAGS -DLUA_COMPAT_5_3 -c $f -o ${f%.c}.o
+    done
+
+    # Archive into liblua.a
+    $AR rcs src/liblua.a src/*.o
+
+    # Install
+    mkdir -p "$WORKDIR/lua-install"/{include,lib}
+    cp src/liblua.a "$WORKDIR/lua-install/lib"
+    cp src/lua.h src/luaconf.h src/lualib.h src/lauxlib.h src/lua.hpp "$WORKDIR/lua-install/include"
+    cd "$WORKDIR"
+fi
+
+# ====== Build Nmap ======
+cd /home/mahadeva/code/nmap-$NMAP_VER
+
+make distclean || true
+find . -name '*.o' -delete
+find . -name '*.a' -delete
+find . -name '*.so' -delete
+find . -name '*.dll' -delete
+find . -name '*.exe' -delete
+
+# Force route-none backend for Windows (to avoid build errors)
+cp libdnet-stripped/src/route-none.c libdnet-stripped/src/route-linux.c
+
+# ====== Configure Nmap (with Lua) ======
+./configure \
+  --host="$TARGET" \
+  --without-subversion \
+  --without-zenmap \
+  --with-pcre=/usr \
+  --with-pcap=win32 \  
+  --with-libdnet=included \
+  --without-ndiff \
+  --without-nmap-update \
+  --without-ncat \
+  --with-liblua="$WORKDIR/lua-install" \
+  --with-liblua-includes="$WORKDIR/lua-install/include" \
+  --without-nping \
+  --without-openssl \
+  --enable-static \
+  --prefix="$INSTALL_DIR"
+
+make
+
+# ====== Collect Artifacts ======
+mkdir -p "$INSTALL_DIR"
+cp nmap.exe "$INSTALL_DIR/" || true
+cp *.dll "$INSTALL_DIR/" 2>/dev/null || true
+for f in nmap-service-probes nmap-payloads nmap-services nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc nmap.xsl nmap.dtd; do 
+    [ -f "$f" ] && cp "$f" "$INSTALL_DIR/"
+done
+
+[ -d scripts ] && cp -r scripts "$INSTALL_DIR/"
+[ -d nselib ] && cp -r nselib "$INSTALL_DIR/"
+
+echo "✅ Windows Nmap + Lua build complete."
+echo "Artifacts are in: $INSTALL_DIR"
+

@@ -11,7 +11,6 @@ ssl/libssl-shlib-bio_ssl.obj
 ssl/libssl-shlib-d1_lib.obj
 ssl/libssl-shlib-d1_msg.obj
 ssl/libssl-shlib-d1_srtp.obj
-ssl/libssl-shlib-event_queue.obj
 ssl/libssl-shlib-methods.obj
 ssl/libssl-shlib-pqueue.obj
 ssl/libssl-shlib-priority_queue.obj

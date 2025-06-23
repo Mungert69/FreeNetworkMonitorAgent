@@ -1,11 +1,13 @@
-libdir=/home/mahadeva/openssl-3.3.1-windows
-includedir=/home/mahadeva/openssl-3.3.1-windows/include
-enginesdir=/home/mahadeva/openssl-3.3.1-windows/engines
-modulesdir=/home/mahadeva/openssl-3.3.1-windows/providers
+prefix=/home/mahadeva/code/openssl-3.4.1-windows
+exec_prefix=${prefix}
+libdir=${exec_prefix}
+includedir=${prefix}/include ${prefix}/./include 
+enginesdir=${libdir}/engines
+modulesdir=${libdir}/providers
 
 Name: OpenSSL-libcrypto
 Description: OpenSSL cryptography library
-Version: 3.3.1
+Version: 3.4.1
 Libs: -L${libdir} -lcrypto
 Libs.private: -lws2_32 -lgdi32 -lcrypt32
-Cflags: -I${includedir}
+Cflags: -I${prefix}/include  -I${prefix}/./include 

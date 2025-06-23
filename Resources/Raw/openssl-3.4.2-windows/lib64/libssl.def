@@ -87,6 +87,7 @@ EXPORTS
     SSL_CTX_dane_set_flags
     SSL_CTX_enable_ct
     SSL_CTX_flush_sessions
+    SSL_CTX_flush_sessions_ex
     SSL_CTX_free
     SSL_CTX_get0_CA_list
     SSL_CTX_get0_certificate
@@ -150,6 +151,7 @@ EXPORTS
     SSL_CTX_set_async_callback
     SSL_CTX_set_async_callback_arg
     SSL_CTX_set_block_padding
+    SSL_CTX_set_block_padding_ex
     SSL_CTX_set_cert_cb
     SSL_CTX_set_cert_store
     SSL_CTX_set_cert_verify_callback
@@ -342,6 +344,7 @@ EXPORTS
     SSL_get0_security_ex_data
     SSL_get0_server_cert_type
     SSL_get0_verified_chain
+    SSL_get1_builtin_sigalgs
     SSL_get1_compressed_cert
     SSL_get1_peer_certificate
     SSL_get1_session
@@ -485,6 +488,7 @@ EXPORTS
     SSL_set_async_callback_arg
     SSL_set_bio
     SSL_set_block_padding
+    SSL_set_block_padding_ex
     SSL_set_blocking_mode
     SSL_set_cert_cb
     SSL_set_cipher_list

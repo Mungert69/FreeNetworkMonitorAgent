@@ -1,7 +1,6 @@
 ./bin/nse_main.lua
 ./bin/curl-config
 ./bin/busybox
-./bin/libc++_shared.so
 ./bin/nmap-protocols
 ./bin/nmap
 ./bin/nmap-services
@@ -1633,6 +1632,7 @@
 ./bin-old/nmap-7.95-1.spec
 ./ssl/openssl.cnf
 ./lib64/libssl.pc
+./lib64/libc++_shared.so
 ./lib64/AlgoTable.csv
 ./lib64/libcrypto.ld
 ./lib64/libcurl.a

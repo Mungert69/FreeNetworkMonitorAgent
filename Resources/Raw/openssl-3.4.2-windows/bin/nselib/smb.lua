@@ -458,7 +458,7 @@ function start_raw(host, port)
   return true, socket
 end
 
---- This function will take a string like "a.b.c.d" and return "a", "a.b", "a.b.c", and "a.b.c.d".
+-- This function will take a string like "a.b.c.d" and return "a", "a.b", "a.b.c", and "a.b.c.d".
 --
 --  This is used for discovering NetBIOS names. If a NetBIOS name is unknown, the substrings of the
 --  DNS name can be used in this way.
@@ -687,7 +687,7 @@ function smb_encode_header(smb, command, overrides)
   return header
 end
 
---- Converts a string containing the parameters section into the encoded
+-- Converts a string containing the parameters section into the encoded
 --  parameters string.
 --
 -- The encoding is simple:
@@ -705,7 +705,7 @@ local function smb_encode_parameters(parameters, overrides)
   return string.pack("<B", overrides['parameters_length'] or (#parameters / 2)) .. parameters
 end
 
---- Converts a string containing the data section into the encoded data string.
+-- Converts a string containing the data section into the encoded data string.
 --
 -- The encoding is simple:
 -- * (2 bytes)  The number of bytes in the data section
@@ -722,7 +722,7 @@ local function smb_encode_data(data, overrides)
   return string.pack("<I2", overrides['data_length'] or #data) .. data
 end
 
----Sign the message, if possible. This is done by replacing the signature with the sequence
+--Sign the message, if possible. This is done by replacing the signature with the sequence
 -- number, creating a hash, then putting that hash in the signature location.
 --@param smb  The smb state object.
 --@param body The body of the packet that's being signed.
@@ -749,7 +749,7 @@ local function message_sign(smb, body)
   return string.sub(body, 1, 14) .. signature .. string.sub(body, 23)
 end
 
----Check the signature of the message.
+--Check the signature of the message.
 --
 -- This is the opposite of <code>message_sign</code>, and works the same way
 -- (replaces the signature with the sequence number, calculates hash, checks)
@@ -1089,7 +1089,6 @@ end
 -- @return Table of supported dialects or error message
 ---
 function list_dialects(host, overrides)
-  local smb2_dialects = {0x0202, 0x0210, 0x0300, 0x0302, 0x0311}
   local supported_dialects = {}
   local status, smb1_dialect
   local smbstate
@@ -1107,28 +1106,44 @@ function list_dialects(host, overrides)
   if status then --Add SMBv1 as a dialect
     table.insert(supported_dialects, smb1_dialect)
   end
-  stop(smbstate)
-  status = false -- Finish SMBv1 and close connection
+  stop(smbstate) -- Finish SMBv1 and close connection
 
-  -- Check SMB2 and SMB3 dialects
-  for i, dialect in pairs(smb2_dialects) do
-    local dialect_human = stdnse.tohex(dialect, {separator = ".", group = 2})
+  status, smbstate = start(host)
+  if(status == false) then
+    return false, smbstate
+  end
+  stdnse.debug2("Checking if SMB 2+ is supported in general")
+  overrides['Dialects'] = nil
+  local max_dialect
+  status, max_dialect = smb2.negotiate_v2(smbstate, overrides)
+  stop(smbstate)
+  if not status then -- None of SMB2 dialects accepted by the target
+    return true, supported_dialects
+  end
+  stdnse.debug2("SMB2: Dialect '%s' is the highest supported", smb2.dialect_name(max_dialect))
+
+  -- Check individual SMB2 and SMB3 dialects
+  for i, dialect in pairs(smb2.dialects()) do
+    if dialect == max_dialect then
+      break
+    end
+    local dialect_name = smb2.dialect_name(dialect)
     -- we need a clean connection for each negotiate request
     status, smbstate = start(host)
     if(status == false) then
       return false, smbstate
     end
-    stdnse.debug2("Checking if dialect '%s' is supported", dialect_human)
+    stdnse.debug2("SMB2: Checking if dialect '%s' is supported", dialect_name)
     overrides['Dialects'] = {dialect}
-    status, dialect = smb2.negotiate_v2(smbstate, overrides)
-    if status then
-      stdnse.debug2("SMB2: Dialect '%s' is supported", dialect_human)
-      table.insert(supported_dialects, dialect_human)
-    end
+    status = smb2.negotiate_v2(smbstate, overrides)
     --clean smb connection
     stop(smbstate)
-    status = false
+    if status then
+      stdnse.debug2("SMB2: Dialect '%s' is supported", dialect_name)
+      table.insert(supported_dialects, dialect_name)
+    end
   end
+  table.insert(supported_dialects, smb2.dialect_name(max_dialect))
 
   return true, supported_dialects
 end
@@ -2127,7 +2142,7 @@ function delete_file(smb, path, overrides)
   return true
 end
 
----
+--
 -- Implements SMB_COM_TRANSACTION2 to support the find_files function
 -- This function has not been extensively tested
 --

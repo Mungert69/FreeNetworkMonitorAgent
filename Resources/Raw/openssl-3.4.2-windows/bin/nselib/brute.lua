@@ -357,8 +357,8 @@ Options = {
     return (val == "true" or val == true or tonumber(val) == 1)
   end,
 
-  --- Sets the brute mode to either iterate over users or passwords
-  -- @see description for more information.
+  --- Sets the brute mode to either iterate over users or passwords.
+  --  See description for more information.
   --
   -- @param mode string containing either "user" or "password"
   -- @return status true on success else false
@@ -995,10 +995,10 @@ Engine = {
     local passwords = self.passwords
 
     if "function" ~= type(usernames) then
-      return false, "Invalid usernames iterator"
+      return false, ("Invalid usernames iterator: %s"):format(usernames)
     end
     if "function" ~= type(passwords) then
-      return false, "Invalid passwords iterator"
+      return false, ("Invalid passwords iterator: %s"):format(passwords)
     end
 
     local mode = self.options.mode or stdnse.get_script_args "brute.mode"
@@ -1300,7 +1300,7 @@ Engine = {
 function usernames_iterator ()
   local status, usernames = unpwdb.usernames()
   if not status then
-    return "Failed to load usernames"
+    return usernames or "Failed to load usernames"
   end
   return usernames
 end
@@ -1310,7 +1310,7 @@ end
 function passwords_iterator ()
   local status, passwords = unpwdb.passwords()
   if not status then
-    return "Failed to load passwords"
+    return passwords or "Failed to load passwords"
   end
   return passwords
 end

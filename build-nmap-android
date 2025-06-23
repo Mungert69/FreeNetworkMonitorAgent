@@ -8,6 +8,12 @@ export API_LEVEL="21"
 export INSTALL_DIR="/home/mahadeva/code/nmap-android-build"
 export WORKDIR="/home/mahadeva/code/nmap-build-deps"
 
+# ====== OpenSSL ======
+export OPENSSL_ROOT_DIR="/home/mahadeva/code/openssl-3.4.1-android"
+export OPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include"
+export OPENSSL_CRYPTO_LIBRARY="$OPENSSL_ROOT_DIR/libcrypto.a"
+export OPENSSL_SSL_LIBRARY="$OPENSSL_ROOT_DIR/libssl.a"
+
 # ====== Toolchain ======
 export TOOLCHAIN_BIN="$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin"
 export PATH="$TOOLCHAIN_BIN:$PATH"
@@ -18,6 +24,9 @@ export RANLIB="llvm-ranlib"
 export CFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden "
 export CXXFLAGS="-fPIE -fPIC -DANDROID -fvisibility=hidden "
 export LDFLAGS="-pie "
+
+# NMAP SOURCE DIRECTORY
+export NMAP_SRC_DIR="/home/mahadeva/code/nmap-7.97"
 
 # ====== Make Output Directories ======
 mkdir -p "$WORKDIR" "$INSTALL_DIR"
@@ -44,6 +53,33 @@ if [ ! -f lua-install/lib/liblua.a ]; then
     cd "$WORKDIR"
 fi
 
+# ====== Build libssh2 for Android (AUTOTOOLS) ======
+cd /home/mahadeva/code
+LIBSSH2_INSTALL="$WORKDIR/libssh2-install"
+export LIBSSH2_SRC="libssh2-1.11.1"
+
+rm -rf "$LIBSSH2_INSTALL"
+cd "$LIBSSH2_SRC"
+
+./configure \
+  --host=arm-linux-androideabi \
+  --with-openssl \
+  --with-libssl-prefix="$OPENSSL_ROOT_DIR" \
+  --with-libssl-include="$OPENSSL_INCLUDE_DIR" \
+  --prefix="$LIBSSH2_INSTALL" \
+  --disable-examples-build \
+  --disable-tests-build \
+  CC="$CC" \
+  AR="$AR" \
+  RANLIB="$RANLIB" \
+  CFLAGS="$CFLAGS" \
+  LDFLAGS="$LDFLAGS"
+
+make -j$(nproc)
+make install
+
+cd "$WORKDIR"
+
 # ====== Build Nmap ======
 cd /home/mahadeva/code/nmap-7.97
 
@@ -55,7 +91,14 @@ find . -name '*.so' -delete
 # Force route-none backend for Android
 cp libdnet-stripped/src/route-none.c libdnet-stripped/src/route-linux.c
 
-# ====== Configure Nmap (with Lua) ======
+# ====== Ensure OpenSSL .a files are in lib/ subdirectory for Nmap ======
+cd "$OPENSSL_ROOT_DIR"
+mkdir -p lib
+if [ -f libcrypto.a ]; then mv -f libcrypto.a lib/; fi
+if [ -f libssl.a ]; then mv -f libssl.a lib/; fi
+cd "$NMAP_SRC_DIR"
+
+# ====== Configure Nmap (with Lua & OpenSSL) ======
 ./configure \
   --host=arm-linux-androideabi \
   --without-subversion \
@@ -70,51 +113,37 @@ cp libdnet-stripped/src/route-none.c libdnet-stripped/src/route-linux.c
   --with-liblua="$WORKDIR/lua-install" \
   --with-liblua-includes="$WORKDIR/lua-install/include" \
   --without-nping \
-  --without-openssl \
+  --with-openssl="$OPENSSL_ROOT_DIR" \
+  --with-openssl-includes="$OPENSSL_INCLUDE_DIR" \
+  --with-libssh2="$WORKDIR/libssh2-install" \
+  --with-libssh2-includes="$WORKDIR/libssh2-install/include" \
+  --with-libssh2-libraries="$WORKDIR/libssh2-install/lib" \
   --enable-static \
   --prefix="$INSTALL_DIR"
 
 make
 
-# ====== Build lua-openssl ======
-cd "$WORKDIR"
-if [ ! -f openssl.so ]; then
-    echo "=== Building lua-openssl for $TARGET ==="
-    rm -rf lua-openssl
-    git clone --depth=1 https://github.com/zhaozg/lua-openssl.git
-    cd lua-openssl
-    # Download missing header
-    if [ ! -f src/auxiliar.h ]; then
-      wget -O src/auxiliar.h https://raw.githubusercontent.com/diegonehab/luasocket/master/src/auxiliar.h
-    fi
-    OPENSSL_INC="/home/mahadeva/code/openssl-3.4.1-android/include"
-    OPENSSL_LIB="/home/mahadeva/code/openssl-3.4.1-android"
-
-    for f in src/*.c; do
-        $CC $CFLAGS -I"$OPENSSL_INC" -I"$WORKDIR/lua-install/include" -c "$f" -o "$(basename "${f%.c}.o")"
-    done
-
-    $CC $CFLAGS -shared -o openssl.so ./*.o \
-        -L"$OPENSSL_LIB" -lssl -lcrypto -llog -landroid
-
-    mkdir -p "$INSTALL_DIR/nselib-bin/"
-    cp openssl.so "$INSTALL_DIR/nselib-bin/"
-    mkdir -p "$INSTALL_DIR/copy-to-lib64/"
-    cp openssl.so "$INSTALL_DIR/copy-to-lib64/"
-
-    cd "$WORKDIR"
-fi
-
 
 # ====== Collect Artifacts ======
+echo "Collecting final artifacts..."
 mkdir -p "$INSTALL_DIR"
-cp nmap "$INSTALL_DIR/"
-cp -r nselib "$INSTALL_DIR/"
-for f in nmap-service-probes nmap-payloads nmap-services nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc nse_main.lua nmap.xsl nmap.dtd ; do 
-    [ -f "$f" ] && cp "$f" "$INSTALL_DIR/"
+cp nmap "$INSTALL_DIR/" || true
+cp -r nselib "$INSTALL_DIR/" || true
+
+for f in nmap-service-probes nmap-payloads nmap-services \
+         nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc \
+         nse_main.lua nmap.xsl nmap.dtd; do
+  [ -f "/home/mahadeva/code/nmap-7.97/$f" ] && \
+    cp "/home/mahadeva/code/nmap-7.97/$f" "$INSTALL_DIR/"
 done
-mkdir "$INSTALL_DIR/copy-to-lib64/"
-cp "$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" "$INSTALL_DIR/copy-to-lib64"
+
+# Copy libc++_shared and openssl.so already included in copy-to-lib64
+mkdir -p "$INSTALL_DIR/copy-to-lib64/"
+cp "$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" \
+   "$INSTALL_DIR/copy-to-lib64/"
 
 [ -d scripts ] && cp -r scripts "$INSTALL_DIR/"
+
+echo "✅ Build and packaging complete. Artifacts in: $INSTALL_DIR"
+echo "NOW build openssl.so ie lua-openssl this is for lua to work . try using the script build_lua_openssl_objects.sh "
 

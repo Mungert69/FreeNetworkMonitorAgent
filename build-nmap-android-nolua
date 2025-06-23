@@ -62,7 +62,9 @@ cp nmap "$BUILDROOT/"                # <-- Copy the binary, always
 for f in nmap-service-probes nmap-payloads nmap-services nmap-mac-prefixes nmap-os-db nmap-protocols nmap-rpc nmap.xsl; do
     [ -f "$f" ] && cp "$f" "$BUILDROOT/"
 done
-cp "$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" "$INSTALL_DIR/"
+mkdir "$INSTALL_DIR/copy-to-lib64/"
+cp "$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" "$INSTALL_DIR/copy-to-lib64"
+
 
 [ -d scripts ] && cp -r scripts "$BUILDROOT/"
 

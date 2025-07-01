@@ -1,34 +1,111 @@
-install android ndk
-  sudo apt install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind
+#!/usr/bin/env bash
+set -e
+###############################################################################
+#  build-android-provider (Kyber-enabled, generator fix)
+###############################################################################
 
- export ANDROID_NDK_ROOT=/opt/android-ndk-r26d
-PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
-not sure if this is needed /setenv-android-ndk
-unzip openssl-3.3.1.zip
-rename openssl-3.3.1-android
-cd openssl-3.3.1-android
-export CFLAGS="-fPIC"
-export CXXFLAGS="-fPIC"
-./Configure android-arm -D__ANDROID_API__=21
-sed -E -i -e '/[.]hidden.*OPENSSL_armcap_P/d' -e '/[.]extern.*OPENSSL_armcap_P/ {p; s/extern/hidden/; }' crypto/*arm*pl crypto/*/asm/*arm*pl
-make
+# ───── Config ────────────────────────────────────────────────────────────────
+export NDK_ROOT="${NDK_ROOT:-/usr/lib/android-sdk/ndk/28.1.13356709}"
+export ABI="${ABI:-armeabi-v7a}"          # armeabi-v7a | arm64-v8a | x86 | x86_64
+export API_LEVEL="${API_LEVEL:-21}"
+export JOBS="${JOBS:-$(nproc)}"
 
+export WORKDIR="$HOME/code/oqs-android-build"
+export LIBOQS_INSTALL_DIR="$HOME/code/liboqs-android"
+export OQS_PROVIDER_INSTALL_DIR="$HOME/code/oqs-provider-android"
 
-unzip liboqs 
-cd to it
-cd liboqs
-mkdir build && cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=android.toolchain.cmake-liboqs -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DOQS_USE_OPENSSL=OFF ..
-make
-make install DESTDIR=~/liboqs-android
+# ───── OpenSSL (already built) ───────────────────────────────────────────────
+export OPENSSL_ROOT_DIR="$HOME/code/openssl-3.4.1-android"
+export OPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include"
+export OPENSSL_CRYPTO_LIBRARY="$OPENSSL_ROOT_DIR/lib/libcrypto.a"
+export OPENSSL_SSL_LIBRARY="$OPENSSL_ROOT_DIR/lib/libssl.a"
 
-unzip  oqs-provider dir
-cd to it
-cmake -S . -B _build \
-  -DCMAKE_TOOLCHAIN_FILE=android.toolchain.cmake \
-  -DOPENSSL_ROOT_DIR=/home/mahadeva/openssl-3.3.1-android \
-  -DOPENSSL_CRYPTO_LIBRARY=/home/mahadeva/openssl-3.3.1-android/libcrypto.a \
-  -DOPENSSL_SSL_LIBRARY=/home/mahadeva/openssl-3.3.1-android/libssl.a \
-  -DOPENSSL_INCLUDE_DIR=/home/mahadeva/openssl-3.3.1-android/include \
-  -Dliboqs_DIR=/home/mahadeva/liboqs-android/usr/local/lib/cmake/liboqs
-cmake --build _build
+# ───── Tool-chain & compiler vars ────────────────────────────────────────────
+export TOOLCHAIN_BIN="$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin"
+export PATH="$TOOLCHAIN_BIN:$PATH"
+
+case "$ABI" in
+  armeabi-v7a)  export NDK_COMPILER_PREFIX="armv7a-linux-androideabi" ;;
+  arm64-v8a)    export NDK_COMPILER_PREFIX="aarch64-linux-android" ;;
+  x86)          export NDK_COMPILER_PREFIX="i686-linux-android" ;;
+  x86_64)       export NDK_COMPILER_PREFIX="x86_64-linux-android" ;;
+  *) echo "❌ Unsupported ABI: $ABI"; exit 1 ;;
+esac
+
+export CC="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang"
+export CXX="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang++"
+export AR="llvm-ar"  RANLIB="llvm-ranlib"
+export CFLAGS="-fPIC -fPIE -DANDROID -fvisibility=hidden"
+export CXXFLAGS="$CFLAGS"  LDFLAGS="-pie"
+
+GEN=$(command -v ninja >/dev/null 2>&1 && echo "Ninja" || echo "Unix Makefiles")
+cmake_gen() { cmake -G "$GEN" "$@"; }
+build_gen() { cmake --build "$1" -- -j"$JOBS"; }
+
+# ───── Source archives (already downloaded) ─────────────────────────────────
+LIBOQS_ZIP="$PWD/0.11.0.zip"
+OQSPROV_ZIP="$PWD/0.7.0.zip"
+LIBOQS_SRC="$WORKDIR/liboqs-0.11.0"
+OQS_PROVIDER_SRC="$WORKDIR/oqs-provider-0.7.0"
+
+# ───── Prep ─────────────────────────────────────────────────────────────────
+mkdir -p "$WORKDIR" "$LIBOQS_INSTALL_DIR" "$OQS_PROVIDER_INSTALL_DIR"
+cd "$WORKDIR"
+
+# ───── Unpack sources (once) ────────────────────────────────────────────────
+[ -d "$LIBOQS_SRC" ] || { unzip -q "$LIBOQS_ZIP"   -d "$WORKDIR"; mv "$WORKDIR"/liboqs-*        "$LIBOQS_SRC"; }
+[ -d "$OQS_PROVIDER_SRC" ] || { unzip -q "$OQSPROV_ZIP" -d "$WORKDIR"; mv "$WORKDIR"/oqs-provider-*  "$OQS_PROVIDER_SRC"; }
+
+# ───── Build liboqs with Kyber ──────────────────────────────────────────────
+if [ ! -f "$LIBOQS_INSTALL_DIR/usr/local/lib/liboqs.a" ]; then
+  cmake_gen -S "$LIBOQS_SRC" -B "$LIBOQS_SRC/build-$ABI" \
+            -DCMAKE_TOOLCHAIN_FILE="$NDK_ROOT/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI="$ABI" \
+            -DANDROID_PLATFORM="android-$API_LEVEL" \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DOQS_USE_OPENSSL=OFF \
+            -DOQS_ALGS_ENABLED=All \
+            -DOQS_ENABLE_KEM_KYBER=ON 
+  build_gen "$LIBOQS_SRC/build-$ABI"
+  DESTDIR="$LIBOQS_INSTALL_DIR" cmake --install "$LIBOQS_SRC/build-$ABI" --prefix /usr/local
+fi
+
+# ───── Re-enable Kyber inside oqs-provider ──────────────────────────────────
+export LIBOQS_SRC_DIR="$LIBOQS_SRC"
+
+sed -i "/family: .*CRYSTALS-Kyber/,/enable_kem/ s/enable_kem: false/enable_kem: true/" \
+       "$OQS_PROVIDER_SRC/oqs-template/generate.yml"
+
+REQS="$OQS_PROVIDER_SRC/oqs-template/requirements.txt"
+if [[ -n "$VIRTUAL_ENV" ]]; then
+    python3 -m pip install -q -r "$REQS"
+else
+    python3 -m pip install -q -r "$REQS"
+fi
+
+# run generator from **provider root** so its relative paths resolve
+(
+  cd "$OQS_PROVIDER_SRC"
+  python3 oqs-template/generate.py
+)
+
+# ───── Build oqs-provider (shared .so) ───────────────────────────────────────
+cmake_gen -S "$OQS_PROVIDER_SRC" -B "$OQS_PROVIDER_SRC/_build-$ABI" \
+          -DCMAKE_TOOLCHAIN_FILE="$NDK_ROOT/build/cmake/android.toolchain.cmake" \
+          -DANDROID_ABI="$ABI" \
+          -DANDROID_PLATFORM="android-$API_LEVEL" \
+          -DOPENSSL_ROOT_DIR="$OPENSSL_ROOT_DIR" \
+          -DOPENSSL_CRYPTO_LIBRARY="$OPENSSL_CRYPTO_LIBRARY" \
+          -DOPENSSL_SSL_LIBRARY="$OPENSSL_SSL_LIBRARY" \
+          -DOPENSSL_INCLUDE_DIR="$OPENSSL_INCLUDE_DIR" \
+          -DOPENSSL_MODULES_DIR=lib/ossl-modules \
+          -Dliboqs_DIR="$LIBOQS_INSTALL_DIR/usr/local/lib/cmake/liboqs"
+build_gen "$OQS_PROVIDER_SRC/_build-$ABI"
+
+DESTDIR="$OQS_PROVIDER_INSTALL_DIR" \
+cmake --install "$OQS_PROVIDER_SRC/_build-$ABI" --prefix /usr/local
+
+echo -e "\n🎉  Build complete. Kyber hybrids are now included."
+echo "    liboqs       → $LIBOQS_INSTALL_DIR"
+echo "    oqs-provider → $OQS_PROVIDER_INSTALL_DIR"
+

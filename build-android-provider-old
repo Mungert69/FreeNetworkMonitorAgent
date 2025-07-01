@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -e
+###############################################################################
+#  build-android-provider
+#  Builds liboqs-0.13.0 (static) and oqs-provider-0.9.0 for Android,
+#  linking against an already-built OpenSSL-3.4.2 for the same ABI.
+###############################################################################
+
+# ───── Config ────────────────────────────────────────────────────────────────
+export NDK_ROOT="${NDK_ROOT:-/usr/lib/android-sdk/ndk/28.1.13356709}"  # your NDK
+export ABI="${ABI:-armeabi-v7a}"                # armeabi-v7a | arm64-v8a | x86 | x86_64
+export API_LEVEL="${API_LEVEL:-21}"             # min Android API
+export JOBS="${JOBS:-$(nproc)}"
+
+export WORKDIR="$HOME/code/oqs-android-build"
+export LIBOQS_INSTALL_DIR="$HOME/code/liboqs-android"
+export OQS_PROVIDER_INSTALL_DIR="$HOME/code/oqs-provider-android"
+
+# ───── OpenSSL (already built) ──────────────────────────────────────
+export OPENSSL_ROOT_DIR="$HOME/code/openssl-3.4.1-android"
+export OPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include"
+export OPENSSL_CRYPTO_LIBRARY="$OPENSSL_ROOT_DIR/lib/libcrypto.a"  # <- add /lib/
+export OPENSSL_SSL_LIBRARY="$OPENSSL_ROOT_DIR/lib/libssl.a"        # <- add /lib/
+
+# ───── Tool-chain & compiler vars ────────────────────────────────────────────
+export TOOLCHAIN_BIN="$NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin"
+export PATH="$TOOLCHAIN_BIN:$PATH"
+
+case "$ABI" in
+  armeabi-v7a)  export NDK_COMPILER_PREFIX="armv7a-linux-androideabi" ;;
+  arm64-v8a)    export NDK_COMPILER_PREFIX="aarch64-linux-android" ;;
+  x86)          export NDK_COMPILER_PREFIX="i686-linux-android" ;;
+  x86_64)       export NDK_COMPILER_PREFIX="x86_64-linux-android" ;;
+  *) echo "❌ Unsupported ABI: $ABI"; exit 1 ;;
+esac
+
+export CC="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang"
+export CXX="${NDK_COMPILER_PREFIX}${API_LEVEL}-clang++"
+export AR="llvm-ar"
+export RANLIB="llvm-ranlib"
+export CFLAGS="-fPIC -fPIE -DANDROID -fvisibility=hidden"
+export CXXFLAGS="$CFLAGS"
+export LDFLAGS="-pie"
+
+# ───── CMake generator & tool-chain file ─────────────────────────────────────
+export ANDROID_TOOLCHAIN_FILE="$NDK_ROOT/build/cmake/android.toolchain.cmake"
+[[ -f "$ANDROID_TOOLCHAIN_FILE" ]] || { echo "❌ Tool-chain file not found: $ANDROID_TOOLCHAIN_FILE"; exit 1; }
+
+if command -v ninja >/dev/null 2>&1; then
+    GEN="Ninja"
+else
+    GEN="Unix Makefiles"
+fi
+
+cmake_gen() { cmake -G "$GEN" "$@"; }
+build_gen() { cmake --build "$1" -- -j"$JOBS"; }
+
+# ───── Source archives (already downloaded) ─────────────────────────────────
+LIBOQS_ZIP="$PWD/0.13.0.zip"      # liboqs-0.13.0
+OQSPROV_ZIP="$PWD/0.9.0.zip"      # oqs-provider-0.9.0
+LIBOQS_SRC="$WORKDIR/liboqs-0.13.0"
+OQS_PROVIDER_SRC="$WORKDIR/oqs-provider-0.9.0"
+
+# ───── Prep ─────────────────────────────────────────────────────────────────
+mkdir -p "$WORKDIR" "$LIBOQS_INSTALL_DIR" "$OQS_PROVIDER_INSTALL_DIR"
+cd "$WORKDIR"
+
+echo "────────────────────────────────────────────────────────"
+echo "NDK_ROOT            : $NDK_ROOT"
+echo "ABI/API             : $ABI / $API_LEVEL"
+echo "OpenSSL dir         : $OPENSSL_ROOT_DIR"
+echo "Generator           : $GEN"
+echo "Install - liboqs    : $LIBOQS_INSTALL_DIR"
+echo "Install - provider  : $OQS_PROVIDER_INSTALL_DIR"
+echo "JOBS                : $JOBS"
+echo "────────────────────────────────────────────────────────"
+
+# ───── Unpack sources ───────────────────────────────────────────────────────
+if [ ! -d "$LIBOQS_SRC" ]; then
+  unzip -q "$LIBOQS_ZIP" -d "$WORKDIR"
+  mv "$WORKDIR"/liboqs-* "$LIBOQS_SRC" 2>/dev/null || true
+fi
+
+if [ ! -d "$OQS_PROVIDER_SRC" ]; then
+  unzip -q "$OQSPROV_ZIP" -d "$WORKDIR"
+  mv "$WORKDIR"/oqs-provider-* "$OQS_PROVIDER_SRC" 2>/dev/null || true
+fi
+
+# ───── Build liboqs ─────────────────────────────────────────────────────────
+if [ ! -f "$LIBOQS_INSTALL_DIR/usr/local/lib/liboqs.a" ]; then
+  echo "🍃  Building liboqs..."
+  cmake_gen -S "$LIBOQS_SRC" -B "$LIBOQS_SRC/build-$ABI" \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_TOOLCHAIN_FILE" \
+            -DANDROID_ABI="$ABI" \
+            -DANDROID_PLATFORM="android-$API_LEVEL" \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DOQS_USE_OPENSSL=OFF
+  build_gen "$LIBOQS_SRC/build-$ABI"
+DESTDIR="$LIBOQS_INSTALL_DIR" \
+cmake --install "$LIBOQS_SRC/build-$ABI" \
+      --prefix /usr/local 
+else
+  echo "✓ liboqs already built."
+fi
+
+# ───── Build oqs-provider ───────────────────────────────────────────────────
+echo "🔗  Building oqs-provider..."
+cmake_gen -S "$OQS_PROVIDER_SRC" -B "$OQS_PROVIDER_SRC/_build-$ABI" \
+          -DCMAKE_TOOLCHAIN_FILE="$ANDROID_TOOLCHAIN_FILE" \
+          -DANDROID_ABI="$ABI" \
+          -DANDROID_PLATFORM="android-$API_LEVEL" \
+          -DOPENSSL_ROOT_DIR="$OPENSSL_ROOT_DIR" \
+          -DOPENSSL_CRYPTO_LIBRARY="$OPENSSL_CRYPTO_LIBRARY" \
+          -DOPENSSL_SSL_LIBRARY="$OPENSSL_SSL_LIBRARY" \
+          -DOPENSSL_INCLUDE_DIR="$OPENSSL_INCLUDE_DIR" \
+          -DOPENSSL_MODULES_DIR=lib/ossl-modules \
+          -Dliboqs_DIR="$LIBOQS_INSTALL_DIR/usr/local/lib/cmake/liboqs"
+build_gen "$OQS_PROVIDER_SRC/_build-$ABI"
+
+DESTDIR="$OQS_PROVIDER_INSTALL_DIR" \
+cmake --install "$OQS_PROVIDER_SRC/_build-$ABI" \
+      --prefix /usr/local 
+
+# ───── Summary ──────────────────────────────────────────────────────────────
+echo
+echo "🎉  Build complete."
+echo "    liboqs       → $LIBOQS_INSTALL_DIR"
+echo "    oqs-provider → $OQS_PROVIDER_INSTALL_DIR"
+

@@ -1,0 +1,4 @@
+./config
+make -j$(nproc)
+mkdir lib
+cp lib* ./lib

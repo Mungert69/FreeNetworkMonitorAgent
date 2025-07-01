@@ -1,25 +1,81 @@
-openssl
-sudo apt install mingw-w64
-./Configure mingw64 --cross-compile-prefix=x86_64-w64-mingw32-
+#!/usr/bin/env bash
+set -e
+###############################################################################
+#  build-windows-provider.sh  (Linux → Windows x86-64 bundle)
+###############################################################################
 
-liboqs
-mkdir build
-cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=windows.toolchain.cmake-liboqs -DOQS_USE_OPENSSL=OFF ..
-make install DESTDIR=~/liboqs-windows
+# ── Config ──
+HOST="x86_64-w64-mingw32"
+JOBS="${JOBS:-$(nproc)}"
 
-oqs-provider
-cmake -S . -B _build \
-  -DCMAKE_TOOLCHAIN_FILE=windows.toolchain.cmake \
-  -DOPENSSL_ROOT_DIR=/home/mahadeva/openssl-3.3.1-windows \
-  -DOPENSSL_CRYPTO_LIBRARY=/home/mahadeva/openssl-3.3.1-windows/libcrypto-3-x64.dll \
-  -DOPENSSL_SSL_LIBRARY=/home/mahadeva/openssl-3.3.1-windows/libssl-3-x64.dll \
-  -DOPENSSL_INCLUDE_DIR=/home/mahadeva/openssl-3.3.1-windows/include \
-  -Dliboqs_DIR=/home/mahadeva/liboqs-windows/usr/local/lib/cmake/liboqs
-  
-  this will fail but after it has built the lib so its fine
+WORKDIR="$HOME/code/oqs-win-build"
+LIBOQS_INSTALL_DIR="$HOME/code/liboqs-windows"
+OQS_PROVIDER_INSTALL_DIR="$HOME/code/oqs-provider-windows"
 
+OPENSSL_ROOT_DIR="$HOME/code/openssl-3.4.1-windows"
+OPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include"
+OPENSSL_CRYPTO_LIBRARY="$OPENSSL_ROOT_DIR/lib/libcrypto.a"
+OPENSSL_SSL_LIBRARY="$OPENSSL_ROOT_DIR/lib/libssl.a"
 
+# ── MinGW toolchain ──
+export CC="$HOST-gcc" CXX="$HOST-g++" AR="$HOST-ar" RANLIB="$HOST-ranlib"
+export RC="$HOST-windres" STRIP="$HOST-strip"
+export CFLAGS="-O2 -fPIC" CXXFLAGS="$CFLAGS" LDFLAGS=""
 
+# ── CMake helpers ──
+GEN=$(command -v ninja >/dev/null 2>&1 && echo "Ninja" || echo "Unix Makefiles")
+cmake_gen()  { cmake -G "$GEN" "$@"; }
+build_gen()  { cmake --build "$1" -- -j"$JOBS"; }
 
+# ── Sources ──
+LIBOQS_ZIP="$PWD/0.13.0.zip"
+OQSPROV_ZIP="$PWD/0.9.0.zip"
+LIBOQS_SRC="$WORKDIR/liboqs-0.13.0"
+OQS_PROVIDER_SRC="$WORKDIR/oqs-provider-0.9.0"
+
+# ── Prep ──
+mkdir -p "$WORKDIR" "$LIBOQS_INSTALL_DIR" "$OQS_PROVIDER_INSTALL_DIR"
+cd "$WORKDIR"
+echo "Target: $HOST | Generator: $GEN | Jobs: $JOBS"
+
+# ── Unpack ──
+[ -d "$LIBOQS_SRC" ]     || { unzip -q "$LIBOQS_ZIP"    -d "$WORKDIR"; mv "$WORKDIR"/liboqs-*        "$LIBOQS_SRC"; }
+[ -d "$OQS_PROVIDER_SRC" ]|| { unzip -q "$OQSPROV_ZIP"  -d "$WORKDIR"; mv "$WORKDIR"/oqs-provider-*  "$OQS_PROVIDER_SRC"; }
+
+# ── Build liboqs ──
+if [ ! -f "$LIBOQS_INSTALL_DIR/usr/local/lib/liboqs.a" ]; then
+  cmake_gen -S "$LIBOQS_SRC" -B "$LIBOQS_SRC/build-win" \
+            -DCMAKE_SYSTEM_NAME=Windows \
+            -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DOQS_USE_OPENSSL=OFF -DOQS_PERMIT_UNSUPPORTED_ARCHITECTURE=ON
+  build_gen "$LIBOQS_SRC/build-win"
+  DESTDIR="$LIBOQS_INSTALL_DIR" cmake --install "$LIBOQS_SRC/build-win" --prefix /usr/local
+fi
+
+# ── Build oqs-provider ──
+cmake_gen -S "$OQS_PROVIDER_SRC" -B "$OQS_PROVIDER_SRC/build-win" \
+          -DCMAKE_SYSTEM_NAME=Windows \
+          -DCMAKE_INSTALL_LIBDIR=lib \
+          -DCMAKE_INSTALL_BINDIR=bin \
+          -DBUILD_TESTING=OFF -DOQS_PERMIT_UNSUPPORTED_ARCHITECTURE=ON \
+          -Dliboqs_DIR="$LIBOQS_INSTALL_DIR/usr/local/lib/cmake/liboqs" \
+          -DOPENSSL_INCLUDE_DIR="$OPENSSL_INCLUDE_DIR" \
+          -DOPENSSL_CRYPTO_LIBRARY="$OPENSSL_CRYPTO_LIBRARY" \
+          -DOPENSSL_SSL_LIBRARY="$OPENSSL_SSL_LIBRARY"
+build_gen "$OQS_PROVIDER_SRC/build-win"
+cmake --install "$OQS_PROVIDER_SRC/build-win" --prefix "$OQS_PROVIDER_INSTALL_DIR/usr/local"
+
+# ── Manual stage of the DLL ──
+DLL_SRC=$(find "$OQS_PROVIDER_SRC/build-win" -name 'oqsprovider*.dll' | head -n1)
+install -d "$OQS_PROVIDER_INSTALL_DIR/usr/local/lib/ossl-modules"
+install -m755 "$DLL_SRC" "$OQS_PROVIDER_INSTALL_DIR/usr/local/lib/ossl-modules/"
+
+# ── Summary ──
+echo
+echo "🎉  Bundle contents:"
+command -v tree >/dev/null && tree -L 3 "$OQS_PROVIDER_INSTALL_DIR/usr/local" || \
+  find "$OQS_PROVIDER_INSTALL_DIR/usr/local" -maxdepth 3 -print
+echo
+echo "Package with:"
+echo "  tar czf oqs-win-bundle.tar.gz -C $OQS_PROVIDER_INSTALL_DIR usr"
 

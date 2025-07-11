@@ -51,7 +51,7 @@ def main():
                     'versionCodes': [version_code],
                     'releaseNotes': [{
                         'language': 'en-GB',
-                        'text': 'Automated upload via API.'
+                        'text': 'Automated upload .'
                     }]
                 }]
             }
@@ -59,9 +59,9 @@ def main():
         print(f"Assigned to track: {track_response['track']}")
 
         # 4. Commit the edit (publish)
-        print("Committing/publishing the edit...")
+        print("Committing/publishing ...")
         commit_request = service.edits().commit(editId=edit_id, packageName=PACKAGE_NAME).execute()
-        print('✅ App uploaded and published to production!')
+        print('✅ App uploaded and published ')
 
     except Exception as e:
         print(f"❌ Error: {e}")

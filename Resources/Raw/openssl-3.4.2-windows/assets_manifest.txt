@@ -629,6 +629,8 @@
 ./bin/libssh2.dll
 ./bin/libcrypto-3.dll
 ./bin/libssl-3.dll
+./bin/libssl-3-x64.dll
+./bin/libcrypto-3-x64.dll
 ./bin/ssl_helper
 ./bin/libcrypto-1_1.dll
 ./bin/nmap_performance.reg

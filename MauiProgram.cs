@@ -263,7 +263,7 @@ namespace NetworkMonitorAgent
         private static void BuildServices(MauiAppBuilder builder)
         {
          
-            
+            builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
             builder.Services.AddScoped<ILLMService,LLMService>();
             builder.Services.AddScoped<AudioService>(provider =>
               new AudioService(provider.GetService<IJSRuntime>(),provider.GetRequiredService<NetConnectConfig>()));
@@ -304,7 +304,8 @@ namespace NetworkMonitorAgent
                     var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                     var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
                     var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                    return new CmdProcessorProvider(loggerFactory, rabbitRepo, netConfig);
+                    var launchHelper = provider.GetRequiredService<ILaunchHelper>();
+                    return new CmdProcessorProvider(loggerFactory, rabbitRepo, netConfig, launchHelper);
                 });
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
@@ -331,7 +332,8 @@ namespace NetworkMonitorAgent
                     var processorStates = provider.GetRequiredService<LocalProcessorStates>();
                     var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
                     var monitorPingInfoView = provider.GetRequiredService<IMonitorPingInfoView>();
-                    return new BackgroundService(logger, netConfig, loggerFactory, rabbitRepo, fileRepo, processorStates, monitorPingInfoView, cmdProcessorProvider);
+                    var launchHelper = provider.GetRequiredService<ILaunchHelper>();
+                    return new BackgroundService(logger, netConfig, loggerFactory, rabbitRepo, fileRepo, processorStates, monitorPingInfoView, cmdProcessorProvider,launchHelper);
                 });
 #endif
         }

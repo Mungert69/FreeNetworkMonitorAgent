@@ -608,8 +608,6 @@
 ./bin/scripts/http-robtex-shared-ns.nse
 ./bin/msvcp120_clr0400.dll
 ./bin/nmap.exe
-./bin/openssl-3.3.1.exe
-./bin/ncat.exe
 ./bin/licenses/LIBLINEAR-license.txt
 ./bin/licenses/LGPL-2
 ./bin/licenses/LGPL-2.1
@@ -640,10 +638,7 @@
 ./bin/busybox.exe
 ./bin/nmap-payloads
 ./bin/nmap-services
-./bin/nping.exe
-./bin/NDIFF_README
 ./bin/ca-bundle.crt
-./bin/ndiff.bat
 ./bin/msvcp120.dll
 ./bin/libssl-1_1.dll
 ./bin/msvcr120_clr0400.dll
@@ -652,7 +647,6 @@
 ./bin/nmap-service-probes
 ./bin/msvcr120.dll
 ./bin/LICENSE
-./bin/CHANGELOG
 ./bin/nmap-os-db
 ./bin/nselib/nbd.lua
 ./bin/nselib/ike.lua
@@ -839,7 +833,6 @@
 ./bin/nselib/giop.lua
 ./bin/nselib/knx.lua
 ./bin/nselib/rpcap.lua
-./bin/README-WIN32
 ./assets_manifest.txt
 ./lib64/libssl.a
 ./lib64/curves
@@ -855,8 +848,6 @@
 ./lib64/libcrypto.def
 ./lib64/libcrypto-3-x64.dll.args
 ./lib64/AlgoTable.csv
-./lib64/libcrypto.lib
-./lib64/libssl.lib
 ./lib64/libcrypto.dll.a
 ./lib64/libssl.def
 ./lib64/libssl.pc

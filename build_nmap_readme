@@ -1,7 +1,0 @@
-1: build openssl with script . it should be autotools not cmake
-2: copy all tar balls to /home/mahadeva/code
-2: run build nmap script
-4: run build lua-openssl script.
-5: copt files (lib files and openssl binary) from openssl folder to agent Resouces dir
-6: copy .so files from copy-to-lib64 folder to lib64 folder in openssl resouces folder
-7: nmap files from nmap build dir to Resources folder . 

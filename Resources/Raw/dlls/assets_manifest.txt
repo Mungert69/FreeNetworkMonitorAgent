@@ -95,6 +95,7 @@
 ./System.Windows.dll
 ./Microsoft.Extensions.Logging.dll
 ./System.IO.dll
+./System.Diagnostics.EventLog.dll
 ./System.Threading.Tasks.dll
 ./System.IO.FileSystem.AccessControl.dll
 ./System.Runtime.Serialization.Json.dll

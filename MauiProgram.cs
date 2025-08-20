@@ -66,8 +66,8 @@ namespace NetworkMonitorAgent
 
             try
             {
-                IConfigurationRoot? config=LoadConfiguration(builder);
-                LoadAssets(builder, os,config);
+                IConfigurationRoot? config = LoadConfiguration(builder);
+                LoadAssets(builder, os, config);
                 BuildRepoAndConfig(builder);
                 BuildServices(builder);
                 BuildViewModels(builder);
@@ -95,17 +95,17 @@ namespace NetworkMonitorAgent
             return app;
         }
 
-    private static IConfigurationRoot? LoadConfiguration(MauiAppBuilder builder)
-{
-    IConfigurationRoot? config = null;
-    try
-    {
-        string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, "appsettings.json");
-
-        // List of fields that should always be overwritten by the packaged version
-        var fieldsToOverwrite = new List<string>
+        private static IConfigurationRoot? LoadConfiguration(MauiAppBuilder builder)
         {
-            "ClientId",  
+            IConfigurationRoot? config = null;
+            try
+            {
+                string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, "appsettings.json");
+
+                // List of fields that should always be overwritten by the packaged version
+                var fieldsToOverwrite = new List<string>
+        {
+            "ClientId",
             "BaseFusionAuthURL",
             "LoadServer",
             "ChatServer",
@@ -119,62 +119,62 @@ namespace NetworkMonitorAgent
 
         };
 
-        // Load the packaged configuration first
-        using var stream = FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;
-        IConfigurationRoot packagedConfig = new ConfigurationBuilder()
-            .AddJsonStream(stream)
-            .Build();
-
-        // Convert to dictionary for easier comparison
-        var packagedDict = GetConfigDictionary(packagedConfig);
-
-        if (File.Exists(localAppSettingsPath))
-        {
-            // Load existing user configuration
-            IConfigurationRoot userConfig = new ConfigurationBuilder()
-                .AddJsonFile(localAppSettingsPath, optional: false, reloadOnChange: false)
-                .Build();
-
-            var userDict = GetConfigDictionary(userConfig);
-
-            // Process all fields
-            foreach (var kvp in packagedDict)
-            {
-                if (!userDict.ContainsKey(kvp.Key))
-                {
-                    // Add new field if it doesn't exist in user config
-                    userDict[kvp.Key] = kvp.Value;
-                }
-                else if (fieldsToOverwrite.Contains(kvp.Key))
-                {
-                    // Overwrite the field if it's in our overwrite list
-                    userDict[kvp.Key] = kvp.Value;
-                }
-                // Existing fields not in the overwrite list remain unchanged
-            }
-
-            // Save the augmented configuration
-            File.WriteAllText(localAppSettingsPath,
-                JsonSerializer.Serialize(userDict, new JsonSerializerOptions { WriteIndented = true }));
-            config = new ConfigurationBuilder()
-                    .AddInMemoryCollection(ConvertToKeyValuePairs(userDict))
+                // Load the packaged configuration first
+                using var stream = FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;
+                IConfigurationRoot packagedConfig = new ConfigurationBuilder()
+                    .AddJsonStream(stream)
                     .Build();
+
+                // Convert to dictionary for easier comparison
+                var packagedDict = GetConfigDictionary(packagedConfig);
+
+                if (File.Exists(localAppSettingsPath))
+                {
+                    // Load existing user configuration
+                    IConfigurationRoot userConfig = new ConfigurationBuilder()
+                        .AddJsonFile(localAppSettingsPath, optional: false, reloadOnChange: false)
+                        .Build();
+
+                    var userDict = GetConfigDictionary(userConfig);
+
+                    // Process all fields
+                    foreach (var kvp in packagedDict)
+                    {
+                        if (!userDict.ContainsKey(kvp.Key))
+                        {
+                            // Add new field if it doesn't exist in user config
+                            userDict[kvp.Key] = kvp.Value;
+                        }
+                        else if (fieldsToOverwrite.Contains(kvp.Key))
+                        {
+                            // Overwrite the field if it's in our overwrite list
+                            userDict[kvp.Key] = kvp.Value;
+                        }
+                        // Existing fields not in the overwrite list remain unchanged
+                    }
+
+                    // Save the augmented configuration
+                    File.WriteAllText(localAppSettingsPath,
+                        JsonSerializer.Serialize(userDict, new JsonSerializerOptions { WriteIndented = true }));
+                    config = new ConfigurationBuilder()
+                            .AddInMemoryCollection(ConvertToKeyValuePairs(userDict))
+                            .Build();
+                }
+                else
+                {
+                    // First run - just use the packaged config
+                    File.WriteAllText(localAppSettingsPath,
+                        JsonSerializer.Serialize(packagedDict, new JsonSerializerOptions { WriteIndented = true }));
+                    config = packagedConfig;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.HandleGlobalException(ex, "Error loading appsettings.json");
+            }
+            builder.Configuration.AddConfiguration(config);
+            return config;
         }
-        else
-        {
-            // First run - just use the packaged config
-            File.WriteAllText(localAppSettingsPath,
-                JsonSerializer.Serialize(packagedDict, new JsonSerializerOptions { WriteIndented = true }));
-            config = packagedConfig;
-        }
-    }
-    catch (Exception ex)
-    {
-        ExceptionHelper.HandleGlobalException(ex, "Error loading appsettings.json");
-    }
-    builder.Configuration.AddConfiguration(config);
-    return config;
-}
         private static void LoadAssets(MauiAppBuilder builder, string os, IConfigurationRoot? config)
         {
             try
@@ -226,51 +226,57 @@ namespace NetworkMonitorAgent
         }
         private static void BuildRepoAndConfig(MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton<LocalProcessorStates>(provider =>
-         {
-             return new LocalProcessorStates();
-         });
-            builder.Services.AddSingleton<IFileRepo>(provider =>
-            {
-                try
-                {
-                    bool isRunningOnMauiAndroid = true;
-                    string prefixPath = FileSystem.AppDataDirectory;
-                    var fileRepo = new FileRepo(isRunningOnMauiAndroid, prefixPath);
-                    return fileRepo;
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
-                    return new FileRepo();
-                }
-            });
-            builder.Services.AddSingleton<IRabbitRepo>(provider =>
-           {
-               var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
-               var netConfig = provider.GetRequiredService<NetConnectConfig>();
-               // Choose the appropriate constructor
-               return new RabbitRepo(logger, netConfig);
-           });
             builder.Services.AddSingleton<NetConnectConfig>(provider =>
-            {
-                // Assuming Configuration is properly set up
-                var configuration = provider.GetRequiredService<IConfiguration>();
-                var appDataDirectory = FileSystem.AppDataDirectory;
-                return new NetConnectConfig(configuration, appDataDirectory);
-            });
+               {
+                   // Assuming Configuration is properly set up
+                   var configuration = provider.GetRequiredService<IConfiguration>();
+                   string appDataDirectory = FileSystem.AppDataDirectory;
+                   string nativeLibDir = string.Empty;
+#if ANDROID
+                nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
+#endif
+
+                   return new NetConnectConfig(configuration, appDataDirectory, nativeLibDir);
+               });
+            builder.Services.AddSingleton<LocalProcessorStates>(provider =>
+                {
+                    return new LocalProcessorStates();
+                });
+            builder.Services.AddSingleton<IFileRepo>(provider =>
+                {
+                    try
+                    {
+                        bool isRunningOnMauiAndroid = true;
+                        string prefixPath = FileSystem.AppDataDirectory;
+                        var fileRepo = new FileRepo(isRunningOnMauiAndroid, prefixPath);
+                        return fileRepo;
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
+                        return new FileRepo();
+                    }
+                });
+            builder.Services.AddSingleton<IRabbitRepo>(provider =>
+                {
+                    var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
+                    var netConfig = provider.GetRequiredService<NetConnectConfig>();
+                    // Choose the appropriate constructor
+                    return new RabbitRepo(logger, netConfig);
+                });
         }
         private static void BuildServices(MauiAppBuilder builder)
         {
-         
+
             builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
-            builder.Services.AddScoped<ILLMService,LLMService>();
+            builder.Services.AddScoped<ILLMService, LLMService>();
             builder.Services.AddScoped<AudioService>(provider =>
-              new AudioService(provider.GetService<IJSRuntime>(),provider.GetRequiredService<NetConnectConfig>()));
+              new AudioService(provider.GetService<IJSRuntime>(), provider.GetRequiredService<NetConnectConfig>()));
             builder.Services.AddScoped<ChatStateService>(provider =>
                 new ChatStateService(provider.GetService<IJSRuntime>()));
 
-            builder.Services.AddScoped<WebSocketService>(provider => {
+            builder.Services.AddScoped<WebSocketService>(provider =>
+            {
 
                 return new WebSocketService(
                     provider.GetRequiredService<ChatStateService>(),
@@ -280,16 +286,22 @@ namespace NetworkMonitorAgent
                     provider.GetRequiredService<NetConnectConfig>());
             });
 
-          
+
 
             builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
             builder.Services.AddSingleton<IApiService>(provider =>
-    {
-        var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-        var configuration = provider.GetRequiredService<IConfiguration>();
-        var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
-        return new ApiService(loggerFactory, configuration, cmdProcessorProvider, FileSystem.AppDataDirectory);
-    });
+                {
+                    var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                    var configuration = provider.GetRequiredService<IConfiguration>();
+                    string appDataDirectory = FileSystem.AppDataDirectory;
+                    string nativeLibDir = string.Empty;
+#if ANDROID
+                    nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
+#endif
+                    var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
+                    return new ApiService(loggerFactory, configuration, cmdProcessorProvider, appDataDirectory, nativeLibDir);
+                });
+
             builder.Services.AddSingleton<IAuthService>(provider =>
          {
              var logger = provider.GetRequiredService<ILogger<AuthService>>();

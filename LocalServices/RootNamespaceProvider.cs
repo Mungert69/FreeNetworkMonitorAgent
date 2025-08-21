@@ -1,3 +1,9 @@
+#if ANDROID
+using Android.Content.Res;
+using Android.App;
+using Android.Graphics;
+using AndroidX.Core.Content;
+#endif
 
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.Controls;

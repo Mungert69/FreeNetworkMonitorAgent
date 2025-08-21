@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
     public class ChatStateService
     {

@@ -1,7 +1,7 @@
 // Models/ChatHistory.cs
 using System.Text.Json.Serialization;
 
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
     public class ChatHistory
     {

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitorAgent.Views;
+using NetworkMonitorChat;
 
 namespace NetworkMonitorAgent
 {

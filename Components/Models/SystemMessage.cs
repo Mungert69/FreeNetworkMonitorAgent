@@ -1,4 +1,4 @@
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
     public class SystemMessage
     {

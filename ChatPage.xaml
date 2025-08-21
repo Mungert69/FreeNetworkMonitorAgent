@@ -2,53 +2,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Maui;assembly=Microsoft.AspNetCore.Components.WebView.Maui"
              xmlns:local="clr-namespace:NetworkMonitorAgent"
+             xmlns:chat="clr-namespace:NetworkMonitorChat"
              x:Class="NetworkMonitorAgent.ChatPage">
 
     <Grid>
+
         <!-- Blazor WebView (Bottom Layer) -->
-        <StackLayout x:Name="ChatView" 
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand"
-                    IsVisible="False">
-            <blazor:BlazorWebView 
+        <StackLayout x:Name="ChatView"
+                     HorizontalOptions="FillAndExpand"
+                     VerticalOptions="FillAndExpand"
+                     IsVisible="False">
+            <blazor:BlazorWebView
                 HostPage="wwwroot/index.html"
                 HorizontalOptions="FillAndExpand"
                 VerticalOptions="FillAndExpand"
                 x:Name="blazorWebView">
                 <blazor:BlazorWebView.RootComponents>
-                    <blazor:RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
+                    <blazor:RootComponent Selector="#app"
+                            ComponentType="{x:Type chat:Routes}"/>
                 </blazor:BlazorWebView.RootComponents>
             </blazor:BlazorWebView>
         </StackLayout>
 
         <!-- Disabled Message (Top Layer) -->
         <StackLayout x:Name="AgentDisabledMessage"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand">
+                     HorizontalOptions="FillAndExpand"
+                     VerticalOptions="FillAndExpand">
             <VerticalStackLayout Spacing="20"
-                                Padding="20">
+                                 Padding="20">
                 <!-- Logo and Title -->
                 <Image Source="logo.png"
-        SemanticProperties.Description="Quantum Network Monitor Agent Logo"
-        HeightRequest="100"
-        HorizontalOptions="Center"/>
+                       SemanticProperties.Description="Quantum Network Monitor Agent Logo"
+                       HeightRequest="100"
+                       HorizontalOptions="Center"/>
                 <Label Text="Quantum Network Monitor Assitant"
-        FontSize="24"
-        FontAttributes="Bold"
-        HorizontalOptions="Center"
-        TextColor="{DynamicResource Primary}"/>
-                <StackLayout Spacing="10"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center">
-                    <Label Text="The Agent must be enabled and authorized before you can use the Assistant"
-                       FontSize="18"
-                       TextColor="{DynamicResource Secondary}"
+                       FontSize="24"
+                       FontAttributes="Bold"
                        HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
+                       TextColor="{DynamicResource Primary}"/>
+                <StackLayout Spacing="10"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center">
+                    <Label Text="The Agent must be enabled and authorized before you can use the Assistant"
+                           FontSize="18"
+                           TextColor="{DynamicResource Secondary}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
                     <Button Text="Go to Home"
-                        Clicked="OnGoHomeClicked"
-                        HorizontalOptions="Center"
-                        WidthRequest="200"/>
+                            Clicked="OnGoHomeClicked"
+                            HorizontalOptions="Center"
+                            WidthRequest="200"/>
                 </StackLayout>
             </VerticalStackLayout>
 

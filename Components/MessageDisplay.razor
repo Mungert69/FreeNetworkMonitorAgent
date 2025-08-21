@@ -1,4 +1,6 @@
 
+@using NetworkMonitorChat
+
 <div class="message @(Message.Success ? "success" : !string.IsNullOrEmpty(Message.Info) ? "info" : "error")">
     @Message.Text
 </div>

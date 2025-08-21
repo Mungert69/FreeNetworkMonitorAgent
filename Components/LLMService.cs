@@ -1,6 +1,6 @@
 using NetworkMonitor.Connection;
 
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
 
     public interface ILLMService

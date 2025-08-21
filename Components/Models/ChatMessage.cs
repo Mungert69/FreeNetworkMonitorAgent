@@ -1,5 +1,5 @@
 // Models/ChatMessage.cs
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
     public class ChatMessage
     {

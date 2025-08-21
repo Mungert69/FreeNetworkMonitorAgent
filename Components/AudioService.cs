@@ -7,7 +7,7 @@ using NetworkMonitor.Objects;
 using System.IO;
 using System.Text.Json;
 
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
     public class AudioService : IAsyncDisposable
     {

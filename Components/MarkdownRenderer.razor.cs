@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NetworkMonitorAgent.Components
+namespace NetworkMonitorChat
 {
     public partial class MarkdownRenderer
     {

@@ -17,10 +17,7 @@
                 HorizontalOptions="FillAndExpand"
                 VerticalOptions="FillAndExpand"
                 x:Name="blazorWebView">
-                <blazor:BlazorWebView.RootComponents>
-                    <blazor:RootComponent Selector="#app"
-                            TypeName="NetworkMonitorChat.Routes"/>
-                </blazor:BlazorWebView.RootComponents>
+                <!-- RootComponent registration moved to code-behind -->
             </blazor:BlazorWebView>
         </StackLayout>
 

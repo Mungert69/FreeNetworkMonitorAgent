@@ -19,6 +19,12 @@ namespace NetworkMonitorAgent
             InitializeComponent();
             _platformService = platformService;
 
+            // Register the root Razor component here
+            blazorWebView.RootComponents.Add(new RootComponent
+            {
+                Selector = "#app",
+                ComponentType = typeof(NetworkMonitorChat.Routes)
+            });
 
             if (this.Content is BlazorWebView bw)
             {

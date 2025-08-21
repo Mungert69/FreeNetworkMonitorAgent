@@ -20,10 +20,14 @@ namespace NetworkMonitorAgent
             _platformService = platformService;
 
             // Register the root Razor component here
+            var routesType = Type.GetType("NetworkMonitorChat.Routes, NetworkMonitorAgent");
+            if (routesType == null)
+                throw new Exception("Could not find type NetworkMonitorChat.Routes in assembly NetworkMonitorAgent. Make sure the component is public and the namespace/assembly are correct.");
+
             blazorWebView.RootComponents.Add(new RootComponent
             {
                 Selector = "#app",
-                ComponentType = typeof(NetworkMonitorChat.Routes)
+                ComponentType = routesType
             });
 
             if (this.Content is BlazorWebView bw)

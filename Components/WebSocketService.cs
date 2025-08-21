@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 
-namespace NetworkMonitorAgent
+namespace NetworkMonitorChat
 {
     public class WebSocketService : IDisposable
     {

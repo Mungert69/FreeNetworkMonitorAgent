@@ -10,6 +10,7 @@ using NetworkMonitor.Maui;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
+using NetworkMonitorChat;
 using CommunityToolkit.Maui;
 using Microsoft.JSInterop;
 using System.Xml;

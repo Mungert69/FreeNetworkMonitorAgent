@@ -20,7 +20,7 @@
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
                 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
-                </PropertyGroup>
+        </PropertyGroup>
         <PropertyGroup Condition="'$(Configuration)'=='Release-Dev'">
                 <DefineConstants>DEV</DefineConstants>
         </PropertyGroup>
@@ -34,38 +34,38 @@
                 <Optimize>true</Optimize>
                 <PublishTrimmed>false</PublishTrimmed>
                 <RunAOTCompilation>false</RunAOTCompilation>
-  <EnableDefaultStaticWebAssets>true</EnableDefaultStaticWebAssets>
-</PropertyGroup>
+                <EnableDefaultStaticWebAssets>true</EnableDefaultStaticWebAssets>
+        </PropertyGroup>
 
-     
+
         <ItemGroup>
-        <!-- App Icon -->
+                <!-- App Icon -->
 
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
+                <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFFFFF" />
 
-     <MauiSplashScreen Include="Resources\Splash\splash.svg" BaseSize="128,128" Color="#FFFFFF" />
+                <MauiSplashScreen Include="Resources\Splash\splash.svg" BaseSize="128,128" Color="#FFFFFF" />
 
-        <!-- Images -->
-        <MauiImage Include="Resources\Images\*" />
+                <!-- Images -->
+                <MauiImage Include="Resources\Images\*" />
 
-        <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*" />
+                <!-- Custom Fonts -->
+                <MauiFont Include="Resources\Fonts\*" />
 
-        <MauiAsset Include="Resources\Raw\appsettings.json" />
-         <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.4.2-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-        
-    </ItemGroup>
+                <MauiAsset Include="Resources\Raw\appsettings.json" />
+                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.4.2-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
-  <ItemGroup>
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libc++_shared.so" />
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libcrypto.so" />
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libssl.so" />
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\nmap.so" />
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\openssl.so" />
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\oqsprovider.so" />
-    <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\ssl_helper.so" />
-  </ItemGroup>
-    
+        </ItemGroup>
+
+        <ItemGroup>
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libc++_shared.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libcrypto.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libssl.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\nmap.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\openssl.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\oqsprovider.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\ssl_helper.so" />
+        </ItemGroup>
+
         <ItemGroup>
                 <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.90" />
                 <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
@@ -77,11 +77,11 @@
                 <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.90" />
                 <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.90" />
                 <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.6" />
-                      <PackageReference Include="MatBlazor" Version="2.10.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
-    <PackageReference Include="Microsoft.JSInterop" Version="9.0.8" />
+                <PackageReference Include="MatBlazor" Version="2.10.0" />
+                <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.8" />
+                <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.8" />
+                <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
+                <PackageReference Include="Microsoft.JSInterop" Version="9.0.8" />
         </ItemGroup>
         <ItemGroup>
                 <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui-Android.csproj" />
@@ -92,7 +92,7 @@
                         <Private>true</Private>
                 </Reference>
         </ItemGroup>
-         <ItemGroup>
+        <ItemGroup>
                 <ProjectReference Include="..\NetworkMonitorChatLib\NetworkMonitorChatLib.csproj" />
         </ItemGroup>
         <ItemGroup>
@@ -110,5 +110,5 @@
                 <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         </PropertyGroup>
 
-        
+
 </Project>

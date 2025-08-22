@@ -15,8 +15,8 @@
                 <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
                 <ApplicationIdGuid>d4f21b0e-2c97-4c50-b003-dca43bd9a888</ApplicationIdGuid>
                 <!-- Versions -->
-                <ApplicationDisplayVersion>0.5.18</ApplicationDisplayVersion>
-                <ApplicationVersion>518</ApplicationVersion>
+                <ApplicationDisplayVersion>0.5.19</ApplicationDisplayVersion>
+                <ApplicationVersion>519</ApplicationVersion>
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
                 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
@@ -52,7 +52,7 @@
                 <MauiFont Include="Resources\Fonts\*" />
 
                 <MauiAsset Include="Resources\Raw\appsettings.json" />
-                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.4.2-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
         </ItemGroup>
 
@@ -60,7 +60,8 @@
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libc++_shared.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libcrypto.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libssl.so" />
-                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\nmap.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\nmap-exe.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\openssl-exe.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\openssl.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\oqsprovider.so" />
         </ItemGroup>

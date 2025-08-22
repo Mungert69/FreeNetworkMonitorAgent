@@ -52,7 +52,7 @@
                 <MauiFont Include="Resources\Fonts\*" />
 
                 <MauiAsset Include="Resources\Raw\appsettings.json" />
-                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-3.4.2-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+                <MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\openssl-windows\**;Resources\Raw\windowsdlls\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
         </ItemGroup>
 
@@ -60,10 +60,10 @@
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libc++_shared.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libcrypto.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\libssl.so" />
-                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\nmap.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\nmap-exe.so" />
+                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\openssl-exe.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\openssl.so" />
                 <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\oqsprovider.so" />
-                <AndroidNativeLibrary Include="Platforms\Android\jniLibs\arm64-v8a\ssl_helper.so" />
         </ItemGroup>
 
         <ItemGroup>

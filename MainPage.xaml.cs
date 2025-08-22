@@ -5,6 +5,7 @@ using NetworkMonitorAgent.Views;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Maui.Controls;
 namespace NetworkMonitorAgent;
+
 public partial class MainPage : ContentPage
 {
     private CancellationTokenSource _cancellationTokenSource;
@@ -20,7 +21,7 @@ public partial class MainPage : ContentPage
         BindingContext = _mainPageViewModel;
         CustomPopupView.BindingContext = processorStatesViewModel;
         ProcessorStatesView.BindingContext = processorStatesViewModel;
-       TaskCollectionView.ItemsSource = _mainPageViewModel.Tasks;
+        TaskCollectionView.ItemsSource = _mainPageViewModel.Tasks;
         _cancellationTokenSource = new CancellationTokenSource();
         _mainPageViewModel.PollingCts = _cancellationTokenSource;
         _mainPageViewModel.ShowLoadingMessage += (sender, args) =>

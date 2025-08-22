@@ -92,6 +92,15 @@
                         <Private>true</Private>
                 </Reference>
         </ItemGroup>
+         <ItemGroup>
+                <ProjectReference Include="..\NetworkMonitorChatLib\NetworkMonitorChatLib.csproj" />
+        </ItemGroup>
+        <ItemGroup>
+                <Reference Include="NetworkMonitorChatLib">
+                        <HintPath>..\NetworkMonitorChatLib\bin\Debug\net9.0-android\NetworkMonitorChatLib.dll</HintPath>
+                        <Private>true</Private>
+                </Reference>
+        </ItemGroup>
         <ItemGroup>
                 <AndroidAsset Include="$(OutputPath)/*.dll">
                         <Link>assemblies\%(FileName)%(Extension)</Link>

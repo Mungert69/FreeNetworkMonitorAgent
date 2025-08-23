@@ -70,20 +70,26 @@
 
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <!-- Root element for DataTemplate -->
                             <AbsoluteLayout
                                 WidthRequest="{Binding DiameterPixels, Converter={StaticResource MinTapSizeConverter}}"
                                 HeightRequest="{Binding DiameterPixels, Converter={StaticResource MinTapSizeConverter}}"
                                 AbsoluteLayout.LayoutBounds="{Binding ., Converter={StaticResource BoundsConverter}}"
                                 AbsoluteLayout.LayoutFlags="PositionProportional">
 
-                                <controls:StatusIndicator
-                                    IsUp="{Binding MonitorStatus.IsUp}"
-                                    PacketsLostPercentage="{Binding PacketsLostPercentage}"
-                                    RoundTripTimeAverage="{Binding RoundTripTimeAverage}"
-                                    DiameterPixels="{Binding DiameterPixels}"
-                                    IsAnimated="{Binding IsAnimated}"
-                                    Tapped="OnStatusIndicatorTapped"/>
+                                <!-- Wrap the circle in a Grid to center it -->
+                                <Grid HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                    <controls:StatusIndicator
+                                        WidthRequest="{Binding DiameterPixels}"
+                                        HeightRequest="{Binding DiameterPixels}"
+                                        IsUp="{Binding MonitorStatus.IsUp}"
+                                        PacketsLostPercentage="{Binding PacketsLostPercentage}"
+                                        RoundTripTimeAverage="{Binding RoundTripTimeAverage}"
+                                        DiameterPixels="{Binding DiameterPixels}"
+                                        IsAnimated="{Binding IsAnimated}"
+                                        Tapped="OnStatusIndicatorTapped"/>
+                                </Grid>
+
                             </AbsoluteLayout>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorChatLib", "..\NetworkMonitorChatLib\NetworkMonitorChatLib.csproj", "{726636B7-E057-E19C-AF36-E7A9D6C2A68C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,12 @@ Global
 		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
 		{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
+		{726636B7-E057-E19C-AF36-E7A9D6C2A68C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726636B7-E057-E19C-AF36-E7A9D6C2A68C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726636B7-E057-E19C-AF36-E7A9D6C2A68C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726636B7-E057-E19C-AF36-E7A9D6C2A68C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726636B7-E057-E19C-AF36-E7A9D6C2A68C}.Release-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{726636B7-E057-E19C-AF36-E7A9D6C2A68C}.Release-Dev|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

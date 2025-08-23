@@ -7,83 +7,87 @@
 
     <ScrollView>
         <VerticalStackLayout Spacing="15"
-                Padding="5"
-                VerticalOptions="Center">
+                             Padding="5"
+                             VerticalOptions="Center">
 
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                    Padding="10"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand">
+                   Padding="10"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand">
                 <VerticalStackLayout Spacing="10">
                     <Image Source="logo.png"
-                            SemanticProperties.Description="Quantum Network Monitor Agent Logo. "
-                            HeightRequest="100"
-                            HorizontalOptions="Center"/>
+                           SemanticProperties.Description="Quantum Network Monitor Agent Logo. "
+                           HeightRequest="100"
+                           HorizontalOptions="Center"/>
                     <Label Text="Quantum Network Monitor Agent"
-                            FontSize="22"
-                            HorizontalOptions="Center"
-                            TextColor="#607466"/>
+                           FontSize="22"
+                           HorizontalOptions="Center"
+                           TextColor="#607466"/>
                 </VerticalStackLayout>
             </Frame>
 
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                    Padding="10"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand"
-                    Margin="0,0,0,10">
-                <Label Text="Quantum Network Monitor Agent Agent Data"
-                        FontSize="16"
-                        HorizontalOptions="Center"/>
+                   Padding="10"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand"
+                   Margin="0,0,0,10">
+                <Label Text="Quantum Network Monitor Agent Data"
+                       FontSize="16"
+                       HorizontalOptions="Center"/>
             </Frame>
 
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                    Padding="0"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand"
-                    IsVisible="{Binding HasData}">
+                   Padding="0"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand"
+                   IsVisible="{Binding HasData}">
                 <StackLayout Orientation="Horizontal"
-                        HorizontalOptions="CenterAndExpand">
+                             HorizontalOptions="CenterAndExpand">
                     <Label Text="Toggle Animations"
-                            VerticalOptions="Center"/>
+                           VerticalOptions="Center"/>
                     <Switch  IsToggled="{Binding IsAnimationOn}"
-                            VerticalOptions="Center"/>
+                             VerticalOptions="Center"/>
                 </StackLayout>
             </Frame>
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                    Padding="10"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand"
-                    IsVisible="{Binding HasNoData}">
+                   Padding="10"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand"
+                   IsVisible="{Binding HasNoData}">
                 <Label Text="Waiting for data. Add monitored hosts to see data here."
-                        HorizontalOptions="Center"
-                        HorizontalTextAlignment="Center"/>
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
             </Frame>
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                    Padding="5"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand">
+                   Padding="5"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand">
 
                 <AbsoluteLayout x:Name="circleLayout"
                                 WidthRequest="300"
                                 HeightRequest="250"
                                 BindableLayout.ItemsSource="{Binding MPIndicators}">
+
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <ContentView AbsoluteLayout.LayoutBounds="{Binding ., Converter={StaticResource BoundsConverter}}"
-                                         AbsoluteLayout.LayoutFlags="PositionProportional">
-                                <controls:StatusIndicator IsUp="{Binding MonitorStatus.IsUp}"
-                                                          PacketsLostPercentage="{Binding PacketsLostPercentage}"
-                                                          RoundTripTimeAverage="{Binding RoundTripTimeAverage}"
-                                                          DiameterPixels="{Binding DiameterPixels}"
-                                                          IsAnimated="{Binding IsAnimated}">
-                                    <controls:StatusIndicator.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnStatusIndicatorTapped"/>
+                            <!-- Root element for DataTemplate -->
+                            <AbsoluteLayout
+                                WidthRequest="{Binding DiameterPixels, Converter={StaticResource MinTapSizeConverter}}"
+                                HeightRequest="{Binding DiameterPixels, Converter={StaticResource MinTapSizeConverter}}"
+                                AbsoluteLayout.LayoutBounds="{Binding ., Converter={StaticResource BoundsConverter}}"
+                                AbsoluteLayout.LayoutFlags="PositionProportional">
 
-                                    </controls:StatusIndicator.GestureRecognizers>
-                                </controls:StatusIndicator>
-                            </ContentView>
+                                <controls:StatusIndicator
+                                    IsUp="{Binding MonitorStatus.IsUp}"
+                                    PacketsLostPercentage="{Binding PacketsLostPercentage}"
+                                    RoundTripTimeAverage="{Binding RoundTripTimeAverage}"
+                                    DiameterPixels="{Binding DiameterPixels}"
+                                    IsAnimated="{Binding IsAnimated}"
+                                    Tapped="OnStatusIndicatorTapped"/>
+                            </AbsoluteLayout>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
+
                 </AbsoluteLayout>
 
             </Frame>

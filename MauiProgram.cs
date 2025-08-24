@@ -7,6 +7,7 @@ using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Api.Services;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui;
+using NetworkMonitor.Maui.Helpers;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
 using NetworkMonitor.Utils.Helpers;
@@ -67,8 +68,9 @@ namespace NetworkMonitorAgent
 
             try
             {
-                IConfigurationRoot? config = LoadConfiguration(builder);
-                LoadAssets(builder, os, config);
+                var fullAppName = AppInfo.Current.Name;
+                MauiProgramHelper.LoadConfiguration(builder, fullAppName);
+                LoadAssets(builder, os);
                 BuildRepoAndConfig(builder);
                 BuildServices(builder);
                 BuildViewModels(builder);
@@ -95,91 +97,12 @@ namespace NetworkMonitorAgent
             ServiceProvider = app.Services;
             return app;
         }
-
-        private static IConfigurationRoot? LoadConfiguration(MauiAppBuilder builder)
-        {
-            IConfigurationRoot? config = null;
-            try
-            {
-                string localAppSettingsPath = Path.Combine(FileSystem.AppDataDirectory, "appsettings.json");
-
-                // List of fields that should always be overwritten by the packaged version
-                var fieldsToOverwrite = new List<string>
-        {
-            "ClientId",
-            "BaseFusionAuthURL",
-            "LoadServer",
-            "ChatServer",
-            "ServiceDomain",
-            "ServiceServer",
-            "TranscribeAudioUrl",
-            "IsChatMode",
-            "OpensslVersion",
-            "LocalSystemUrl:RabbitHostName",
-            "LocalSystemUrl:RabbitPort"
-
-        };
-
-                // Load the packaged configuration first
-                using var stream = FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;
-                IConfigurationRoot packagedConfig = new ConfigurationBuilder()
-                    .AddJsonStream(stream)
-                    .Build();
-
-                // Convert to dictionary for easier comparison
-                var packagedDict = GetConfigDictionary(packagedConfig);
-
-                if (File.Exists(localAppSettingsPath))
-                {
-                    // Load existing user configuration
-                    IConfigurationRoot userConfig = new ConfigurationBuilder()
-                        .AddJsonFile(localAppSettingsPath, optional: false, reloadOnChange: false)
-                        .Build();
-
-                    var userDict = GetConfigDictionary(userConfig);
-
-                    // Process all fields
-                    foreach (var kvp in packagedDict)
-                    {
-                        if (!userDict.ContainsKey(kvp.Key))
-                        {
-                            // Add new field if it doesn't exist in user config
-                            userDict[kvp.Key] = kvp.Value;
-                        }
-                        else if (fieldsToOverwrite.Contains(kvp.Key))
-                        {
-                            // Overwrite the field if it's in our overwrite list
-                            userDict[kvp.Key] = kvp.Value;
-                        }
-                        // Existing fields not in the overwrite list remain unchanged
-                    }
-
-                    // Save the augmented configuration
-                    File.WriteAllText(localAppSettingsPath,
-                        JsonSerializer.Serialize(userDict, new JsonSerializerOptions { WriteIndented = true }));
-                    config = new ConfigurationBuilder()
-                            .AddInMemoryCollection(ConvertToKeyValuePairs(userDict))
-                            .Build();
-                }
-                else
-                {
-                    // First run - just use the packaged config
-                    File.WriteAllText(localAppSettingsPath,
-                        JsonSerializer.Serialize(packagedDict, new JsonSerializerOptions { WriteIndented = true }));
-                    config = packagedConfig;
-                }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHelper.HandleGlobalException(ex, "Error loading appsettings.json");
-            }
-            builder.Configuration.AddConfiguration(config);
-            return config;
-        }
-        private static void LoadAssets(MauiAppBuilder builder, string os, IConfigurationRoot? config)
+       
+        private static void LoadAssets(MauiAppBuilder builder, string os)
         {
             try
             {
+                var config = builder.Configuration;
                 if (config != null)
                     Task.Run(async () =>
                     {
@@ -270,7 +193,11 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
-            builder.Services.AddScoped<ILLMService, LLMService>();
+            builder.Services.AddScoped<ILLMService>(provider =>
+            {
+                return new LLMService(
+                    provider.GetRequiredService<NetConnectConfig>());
+            });
             builder.Services.AddScoped<AudioService>(provider =>
               new AudioService(provider.GetService<IJSRuntime>(), provider.GetRequiredService<NetConnectConfig>()));
             builder.Services.AddScoped<ChatStateService>(provider =>
@@ -286,7 +213,6 @@ namespace NetworkMonitorAgent
                     provider.GetRequiredService<ILLMService>(),
                     provider.GetRequiredService<NetConnectConfig>());
             });
-
 
 
             builder.Services.AddSingleton<IMonitorPingInfoView, MonitorPingInfoView>();
@@ -322,14 +248,16 @@ namespace NetworkMonitorAgent
                 });
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
+                var netConfig = provider.GetRequiredService<NetConnectConfig>();
+
 #if ANDROID
 				  var logger = provider.GetRequiredService<ILogger<AndroidPlatformService>>();
-				   return new AndroidPlatformService(logger);
+				   return new AndroidPlatformService(logger,netConfig);
 #endif
 #if WINDOWS
                 var logger = provider.GetRequiredService<ILogger<WindowsPlatformService>>();
                  var backgroundService = provider.GetRequiredService<IBackgroundService>();
-                return new WindowsPlatformService(backgroundService, logger);
+                return new WindowsPlatformService(backgroundService, logger,netConfig);
 #endif
                 // throw new NotImplementedException("Unsupported platform");
             });
@@ -383,41 +311,7 @@ namespace NetworkMonitorAgent
                 }
             });
         }
-        // Helper to convert configuration to flat dictionary
-        private static Dictionary<string, object> GetConfigDictionary(IConfiguration config)
-        {
-            var dict = new Dictionary<string, object>();
-            void RecurseChildren(IEnumerable<IConfigurationSection> children, string prefix = "")
-            {
-                foreach (var child in children)
-                {
-                    var key = string.IsNullOrEmpty(prefix) ? child.Key : $"{prefix}:{child.Key}";
-
-                    if (child.Value == null && child.GetChildren().Any())
-                    {
-                        // This is a section node with children
-                        RecurseChildren(child.GetChildren(), key);
-                    }
-                    else
-                    {
-                        // This is a value node
-                        dict[key] = child.Value;
-                    }
-                }
-            }
-
-            RecurseChildren(config.GetChildren());
-            return dict;
-        }
-
-        // Helper to convert dictionary back to key-value pairs for ConfigurationBuilder
-        private static IEnumerable<KeyValuePair<string, string>> ConvertToKeyValuePairs(Dictionary<string, object> dict)
-        {
-            foreach (var kvp in dict)
-            {
-                yield return new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString());
-            }
-        }
+        
 
     }
 }

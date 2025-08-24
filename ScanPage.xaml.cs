@@ -49,8 +49,8 @@ public partial class ScanPage : ContentPage
         {
             MainThread.BeginInvokeOnMainThread(() =>
                      {
-                         ScanView.IsVisible = _platformService.IsServiceStarted;
-                         AgentDisabledMessage.IsVisible = !_platformService.IsServiceStarted;
+                         ScanView.IsVisible = _platformService.IsAuthorised;
+                         AgentDisabledMessage.IsVisible = !_platformService.IsAuthorised;
                      });
         }
         catch (Exception ex)

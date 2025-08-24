@@ -1,8 +1,10 @@
+crypto/hashtable/libssl-shlib-hashfunc.obj
 crypto/libssl-shlib-ctype.obj
 crypto/libssl-shlib-getenv.obj
 crypto/libssl-shlib-packet.obj
 crypto/libssl-shlib-quic_vlint.obj
 crypto/libssl-shlib-time.obj
+crypto/siphash/libssl-shlib-siphash.obj
 crypto/thread/arch/libssl-shlib-thread_none.obj
 crypto/thread/arch/libssl-shlib-thread_posix.obj
 crypto/thread/arch/libssl-shlib-thread_win.obj
@@ -22,7 +24,6 @@ ssl/libssl-shlib-ssl_cert.obj
 ssl/libssl-shlib-ssl_cert_comp.obj
 ssl/libssl-shlib-ssl_ciph.obj
 ssl/libssl-shlib-ssl_conf.obj
-ssl/libssl-shlib-ssl_err.obj
 ssl/libssl-shlib-ssl_err_legacy.obj
 ssl/libssl-shlib-ssl_init.obj
 ssl/libssl-shlib-ssl_lib.obj
@@ -53,9 +54,11 @@ ssl/quic/libssl-shlib-quic_fifd.obj
 ssl/quic/libssl-shlib-quic_impl.obj
 ssl/quic/libssl-shlib-quic_lcidm.obj
 ssl/quic/libssl-shlib-quic_method.obj
+ssl/quic/libssl-shlib-quic_obj.obj
 ssl/quic/libssl-shlib-quic_port.obj
 ssl/quic/libssl-shlib-quic_rcidm.obj
 ssl/quic/libssl-shlib-quic_reactor.obj
+ssl/quic/libssl-shlib-quic_reactor_wait_ctx.obj
 ssl/quic/libssl-shlib-quic_record_rx.obj
 ssl/quic/libssl-shlib-quic_record_shared.obj
 ssl/quic/libssl-shlib-quic_record_tx.obj
@@ -70,6 +73,7 @@ ssl/quic/libssl-shlib-quic_statm.obj
 ssl/quic/libssl-shlib-quic_stream_map.obj
 ssl/quic/libssl-shlib-quic_thread_assist.obj
 ssl/quic/libssl-shlib-quic_tls.obj
+ssl/quic/libssl-shlib-quic_tls_api.obj
 ssl/quic/libssl-shlib-quic_trace.obj
 ssl/quic/libssl-shlib-quic_tserver.obj
 ssl/quic/libssl-shlib-quic_txp.obj
@@ -89,7 +93,9 @@ ssl/record/methods/libssl-shlib-tls_common.obj
 ssl/record/methods/libssl-shlib-tls_multib.obj
 ssl/record/methods/libssl-shlib-tls_pad.obj
 ssl/record/methods/libssl-shlib-tlsany_meth.obj
+ssl/rio/libssl-shlib-poll_builder.obj
 ssl/rio/libssl-shlib-poll_immediate.obj
+ssl/rio/libssl-shlib-rio_notifier.obj
 ssl/statem/libssl-shlib-extensions.obj
 ssl/statem/libssl-shlib-extensions_clnt.obj
 ssl/statem/libssl-shlib-extensions_cust.obj

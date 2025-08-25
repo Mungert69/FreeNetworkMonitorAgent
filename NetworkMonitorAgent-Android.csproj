@@ -87,19 +87,7 @@
                 <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui-Android.csproj" />
         </ItemGroup>
         <ItemGroup>
-                <Reference Include="NetworkMonitorMaui">
-                        <HintPath>..\NetworkMonitorMaui\bin\Debug\net9.0-android\NetworkMonitorMaui-Android.dll</HintPath>
-                        <Private>true</Private>
-                </Reference>
-        </ItemGroup>
-        <ItemGroup>
-                <ProjectReference Include="..\NetworkMonitorChatLib\NetworkMonitorChatLib-Android.csproj" />
-        </ItemGroup>
-        <ItemGroup>
-                <Reference Include="NetworkMonitorChatLib">
-                        <HintPath>..\NetworkMonitorChatLib\bin\Debug\net9.0-android\NetworkMonitorChatLib-Android.dll</HintPath>
-                        <Private>true</Private>
-                </Reference>
+                <ProjectReference Include="..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib-Android.csproj" />
         </ItemGroup>
         <ItemGroup>
                 <AndroidAsset Include="$(OutputPath)/*.dll">

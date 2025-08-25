@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor-Maui", "..\N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorProcessor-Maui", "..\NetworkMonitorProcessor\NetworkMonitorProcessor-Maui.csproj", "{9CC69A7E-3EC2-E80D-1E99-47B61EE41045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorChatLib", "..\NetworkMonitorChatLib\NetworkMonitorChatLib.csproj", "{726636B7-E057-E19C-AF36-E7A9D6C2A68C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorChatRazorLib", "..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib.csproj", "{726636B7-E057-E19C-AF36-E7A9D6C2A68C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

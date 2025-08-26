@@ -15,16 +15,6 @@
                  ContentTemplate="{DataTemplate local:ChatPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Check a Host">
-        <ShellContent Route="Check" 
-                     ContentTemplate="{DataTemplate local:NetworkMonitorPage}" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Scan Local Network">
-        <ShellContent Route="Scan" 
-                     ContentTemplate="{DataTemplate local:ScanPage}" />
-    </FlyoutItem>
-
     <FlyoutItem Title="Monitored Hosts">
         <ShellContent Route="Data" 
                      ContentTemplate="{DataTemplate local:DataViewPage}" />

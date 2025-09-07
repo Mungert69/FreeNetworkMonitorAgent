@@ -171,10 +171,10 @@
 
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\NetworkMonitorMaui\NetworkMonitorMaui.csproj" />
-    </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib.csproj" />
+    </ItemGroup>
 
 
 

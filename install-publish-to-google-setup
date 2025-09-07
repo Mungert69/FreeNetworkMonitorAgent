@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# Setup Python environment for Google Play AAB uploader
+# - Creates a venv
+# - Installs google-api-python-client + auth libraries
+# - Optional sanity check
+
+set -Eeuo pipefail
+
+# -------- config (defaults) --------
+PYTHON_BIN="python3"         # override with --python /path/to/python
+VENV_DIR="venv"              # override with --venv path
+DO_CHECK=0                   # --check to run a quick import test
+NO_SYSTEM=0                  # --no-system to skip apt/brew hints
+
+# -------- parse args --------
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --python) PYTHON_BIN="${2:?}"; shift 2;;
+    --venv)   VENV_DIR="${2:?}"; shift 2;;
+    --check)  DO_CHECK=1; shift;;
+    --no-system) NO_SYSTEM=1; shift;;
+    -h|--help)
+      cat <<EOF
+Usage: $0 [--python /path/to/python] [--venv DIR] [--check] [--no-system]
+
+Options:
+  --python PATH   Use a specific python interpreter (default: python3)
+  --venv DIR      Virtualenv directory (default: venv)
+  --check         After install, run a quick import sanity check
+  --no-system     Don't suggest system package commands if venv creation fails
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown arg: $1" >&2; exit 2;;
+  esac
+done
+
+log(){ printf "%s\n" "$*" >&2; }
+have(){ command -v "$1" >/dev/null 2>&1; }
+
+trap 'log "❌ Failed at line $LINENO"' ERR
+
+# -------- find python --------
+if ! have "$PYTHON_BIN"; then
+  echo "❌ Python not found: $PYTHON_BIN" >&2
+  exit 1
+fi
+
+PYVER="$("$PYTHON_BIN" -c 'import sys; print(".".join(map(str,sys.version_info[:2])))')"
+log "▶ Using $PYTHON_BIN (Python $PYVER)"
+
+# -------- ensure venv module --------
+if ! "$PYTHON_BIN" -c "import venv" >/dev/null 2>&1; then
+  echo "❌ The 'venv' module is missing for $PYTHON_BIN." >&2
+  if [[ $NO_SYSTEM -eq 0 ]]; then
+    if have apt; then
+      echo "   Try: sudo apt update && sudo apt install -y python3-venv python3-dev" >&2
+    elif have brew; then
+      echo "   On macOS: Python from Homebrew ships venv; install with: brew install python" >&2
+    fi
+  fi
+  exit 1
+fi
+
+# -------- create & activate venv --------
+log "▶ Creating virtual environment: $VENV_DIR"
+"$PYTHON_BIN" -m venv "$VENV_DIR"
+# shellcheck source=/dev/null
+source "$VENV_DIR/bin/activate"
+
+VENV_PY="$(python -c 'import sys; print(sys.executable)')"
+log "   ✔ venv python: $VENV_PY"
+
+# -------- upgrade pip toolchain --------
+log "▶ Upgrading pip/setuptools/wheel"
+python -m pip install --upgrade pip setuptools wheel
+
+# -------- install requirements --------
+# Minimal, compatible set for google play androidpublisher v3:
+# - google-api-python-client: discovery/build + MediaFileUpload
+# - google-auth + google-auth-httplib2: service account creds + transport
+# - (httplib2 is pulled in transitively)
+REQS=(
+  "google-api-python-client>=2.118.0"
+  "google-auth>=2.23.0"
+  "google-auth-httplib2>=0.2.0"
+)
+
+log "▶ Installing Python packages…"
+python -m pip install "${REQS[@]}"
+
+# -------- optional sanity check --------
+if [[ $DO_CHECK -eq 1 ]]; then
+  log "▶ Running import sanity check…"
+  python - <<'PY'
+import sys
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+
+print("   ✔ Imports OK")
+print("   i  google-api-python-client version:",
+      __import__("googleapiclient").__version__)
+print("   i  google-auth version:",
+      __import__("google").auth.__version__)
+PY
+fi
+
+log "✅ Done. Activate with:  source \"$VENV_DIR/bin/activate\""
+

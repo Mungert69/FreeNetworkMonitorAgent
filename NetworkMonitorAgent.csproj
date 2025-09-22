@@ -148,28 +148,33 @@
       <Content Include="Resources\Images\SquareLogo\placeholder.scale-200.png" />
       <Content Include="Resources\Images\SquareLogo\placeholder.scale-400.png" />
     </ItemGroup>
-
-
     <ItemGroup>
-        <!-- MAUI Core -->
-        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.100" />
-
-       
-        <!-- Other Dependencies -->
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
+        <PackageReference Include="MetroLog.Maui" Version="2.1.0" />
         <PackageReference Include="CommunityToolkit.Maui" Version="11.2.0" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
-        <PackageReference Include="Syncfusion.Maui.Core" Version="30.2.6" />
-        <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.6" />
-        <PackageReference Include="MatBlazor" Version="2.10.0" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
-        <PackageReference Include="Microsoft.JSInterop" Version="9.0.8" />
-        <PackageReference Update="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.100" />
+        <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
 
+        <!-- MAUI core: keep Controls only (it brings the right assets) -->
+        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.110" />
+
+        <!-- MAUI Blazor host -->
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.110" />
+
+        <!-- Ensure WebView2 native loader is copied -->
+        <PackageReference Include="Microsoft.Web.WebView2" />
+
+        <!-- Your UI libs -->
+        <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.7" />
+        <PackageReference Include="MatBlazor" Version="2.10.0" />
+
+        <!-- ASP.NET Core client bits you’re already using -->
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
+        <PackageReference Include="Microsoft.JSInterop" Version="9.0.9" />
     </ItemGroup>
+
 
 
     <ItemGroup>

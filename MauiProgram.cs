@@ -193,6 +193,7 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
+            builder.Services.AddSingleton<IBrowserHost, BrowserHost>();
             builder.Services.AddScoped<ILLMService>(provider =>
             {
                 return new LLMService(
@@ -243,8 +244,8 @@ namespace NetworkMonitorAgent
                     var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                     var rabbitRepo = provider.GetRequiredService<IRabbitRepo>();
                     var netConfig = provider.GetRequiredService<NetConnectConfig>();
-                    var launchHelper = provider.GetRequiredService<ILaunchHelper>();
-                    return new CmdProcessorProvider(loggerFactory, rabbitRepo, netConfig, launchHelper);
+                    var browserHost = provider.GetRequiredService<IBrowserHost>();
+                    return new CmdProcessorProvider(loggerFactory, rabbitRepo, netConfig, browserHost);
                 });
             builder.Services.AddSingleton<IPlatformService>(provider =>
             {
@@ -273,8 +274,8 @@ namespace NetworkMonitorAgent
                     var processorStates = provider.GetRequiredService<LocalProcessorStates>();
                     var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
                     var monitorPingInfoView = provider.GetRequiredService<IMonitorPingInfoView>();
-                    var launchHelper = provider.GetRequiredService<ILaunchHelper>();
-                    return new BackgroundService(logger, netConfig, loggerFactory, rabbitRepo, fileRepo, processorStates, monitorPingInfoView, cmdProcessorProvider,launchHelper);
+                    var browserHost = provider.GetRequiredService<IBrowserHost>();
+                    return new BackgroundService(logger, netConfig, loggerFactory, rabbitRepo, fileRepo, processorStates, monitorPingInfoView, cmdProcessorProvider,browserHost);
                 });
 #endif
         }

@@ -97,7 +97,7 @@ namespace NetworkMonitorAgent
             ServiceProvider = app.Services;
             return app;
         }
-       
+
         private static void LoadAssets(MauiAppBuilder builder, string os)
         {
             try
@@ -193,7 +193,16 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
-            builder.Services.AddSingleton<IBrowserHost, BrowserHost>();
+
+            builder.Services.AddScoped<IBrowserHost>(provider =>
+            {
+                var launchHelper = provider.GetRequiredService<ILaunchHelper>();
+                var logger = provider.GetRequiredService<ILogger<AuthService>>();
+                var netConfig = provider.GetRequiredService<NetConnectConfig>();
+
+                return new BrowserHost(launchHelper, netConfig, logger, maxConcurrentPages: 1);
+            });
+
             builder.Services.AddScoped<ILLMService>(provider =>
             {
                 return new LLMService(
@@ -312,7 +321,7 @@ namespace NetworkMonitorAgent
                 }
             });
         }
-        
+
 
     }
 }

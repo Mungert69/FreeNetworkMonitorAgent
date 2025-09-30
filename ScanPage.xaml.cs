@@ -1,18 +1,15 @@
-
+using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
-using Microsoft.Extensions.Logging;
 using NetworkMonitor.Objects;
 
 namespace NetworkMonitorAgent;
 
 public partial class ScanPage : ContentPage
 {
-
     private readonly ILogger _logger;
-
     private readonly ScanProcessorStatesViewModel _scanProcessorStatesViewModel;
-
+    private readonly IUiDispatcher _dispatcher;
     private readonly IPlatformService _platformService;
 
     public ScanPage(ILogger<ScanPage> logger, ScanProcessorStatesViewModel scanProcessorStatesViewModel, IPlatformService platformService)
@@ -23,6 +20,7 @@ public partial class ScanPage : ContentPage
             _scanProcessorStatesViewModel = scanProcessorStatesViewModel;
             _logger = logger;
             _platformService = platformService;
+            _dispatcher = ServiceInitializer.Dispatcher;
             CustomPopupView.BindingContext = scanProcessorStatesViewModel;
             BindingContext = scanProcessorStatesViewModel;
             EndpointTypePicker.SelectedIndexChanged += OnEndpointTypePickerSelectedIndexChanged;
@@ -31,9 +29,8 @@ public partial class ScanPage : ContentPage
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : Unable to load ScanPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : Unable to load ScanPage. Error was: {ex.Message}");
         }
-
     }
 
     protected override void OnAppearing()
@@ -47,17 +44,16 @@ public partial class ScanPage : ContentPage
     {
         try
         {
-            MainThread.BeginInvokeOnMainThread(() =>
-                     {
-                         ScanView.IsVisible = _platformService.IsAuthorised;
-                         AgentDisabledMessage.IsVisible = !_platformService.IsAuthorised;
-                     });
+            _dispatcher.Dispatch(() =>
+            {
+                ScanView.IsVisible = _platformService.IsAuthorised;
+                AgentDisabledMessage.IsVisible = !_platformService.IsAuthorised;
+            });
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : in UpdateVisibility on ScanPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : in UpdateVisibility on ScanPage. Error was: {ex.Message}");
         }
-
     }
 
     private void OnEndpointTypePickerSelectedIndexChanged(object? sender, EventArgs e)
@@ -71,13 +67,12 @@ public partial class ScanPage : ContentPage
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : in OnEndpointTypePickerSelectedIndexChanged on ScanPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : in OnEndpointTypePickerSelectedIndexChanged on ScanPage. Error was: {ex.Message}");
         }
     }
 
     private async void OpenLoginWebsite()
     {
-
         try
         {
             await Browser.Default.OpenAsync($"{AppConstants.FrontendUrl}/dashboard", BrowserLaunchMode.SystemPreferred);
@@ -86,10 +81,8 @@ public partial class ScanPage : ContentPage
         {
             // Handle any exceptions
             await DisplayAlert("Error", $"Could not open browser . Error was : {ex.Message}", "OK");
-            _logger.LogError($"Could not open browser. Error was : {ex.ToString()}");
-
+            _logger?.LogError($"Could not open browser. Error was : {ex}");
         }
-
     }
 
     private async void OnScanClicked(object sender, EventArgs e)
@@ -120,7 +113,7 @@ public partial class ScanPage : ContentPage
             LoadingSection.IsVisible = false;
             ScanSection.IsVisible = true;
             await DisplayAlert("Error", $"Could not scan local hosts. Error was: {ex.Message}", "OK");
-            _logger.LogError($"Could not scan local hosts. Error was: {ex}");
+            _logger?.LogError($"Could not scan local hosts. Error was: {ex}");
         }
     }
 
@@ -130,12 +123,11 @@ public partial class ScanPage : ContentPage
         {
             await _scanProcessorStatesViewModel.AddServices();
             await DisplayAlert("Success", $"Added {_scanProcessorStatesViewModel.SelectedDevices.Count} services to be monitored. You will receive alerts if any of these servers are down. View host monitoring details under the Monitored Hosts tab. Alternatively you can manage and view more detailed host data at {AppConstants.FrontendUrl}/dashboard. Login using the same email you registerd this agent with.", "OK");
-
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Could not add services. Error was: {ex.Message}", "OK");
-            _logger.LogError($"Could not add services. Error was: {ex}");
+            _logger?.LogError($"Could not add services. Error was: {ex}");
         }
     }
 
@@ -150,10 +142,9 @@ public partial class ScanPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Could not clear services. Error was: {ex.Message}", "OK");
-            _logger.LogError($"Could not clear services. Error was: {ex}");
+            _logger?.LogError($"Could not clear services. Error was: {ex}");
         }
     }
-
 
     private async void OnCheckServicesClicked(object sender, EventArgs e)
     {
@@ -165,12 +156,11 @@ public partial class ScanPage : ContentPage
             await DisplayAlert("Success", $"Checked {_scanProcessorStatesViewModel.SelectedDevices.Count} Services. Check the Result Output for the status of each service checked.", "OK");
             LoadingSection.IsVisible = false;
             ResultsSection.IsVisible = true;
-
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Could not check services. Error was: {ex.Message}", "OK");
-            _logger.LogError($"Could not check services. Error was: {ex.Message}");
+            _logger?.LogError($"Could not check services. Error was: {ex.Message}");
         }
     }
 
@@ -185,9 +175,10 @@ public partial class ScanPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Could not complete Cancel click. Error was: {ex.Message}", "OK");
-            _logger.LogError($"Could not complete Cancel click. Error was: {ex}");
+            _logger?.LogError($"Could not complete Cancel click. Error was: {ex}");
         }
     }
+
     private void OnHostsSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         try
@@ -200,11 +191,10 @@ public partial class ScanPage : ContentPage
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : in OnHostsSelectionChanged on ScanPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : in OnHostsSelectionChanged on ScanPage. Error was: {ex.Message}");
         }
-
-
     }
+
     private async void OnGoHomeClicked(object sender, EventArgs e)
     {
         try
@@ -213,8 +203,7 @@ public partial class ScanPage : ContentPage
         }
         catch (Exception ex)
         {
-            if (_logger != null) _logger.LogError($" Error : in OnGoHomeClicked on LogsPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : in OnGoHomeClicked on LogsPage. Error was: {ex.Message}");
         }
     }
 }
-

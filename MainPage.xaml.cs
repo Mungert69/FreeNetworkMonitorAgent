@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using NetworkMonitor.Maui.ViewModels;
-using NetworkMonitor.Maui;
-using NetworkMonitorAgent.Views;
-using NetworkMonitor.Maui.ViewModels;
+using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.Controls;
+using NetworkMonitor.Maui.Services;
+using NetworkMonitor.Maui.ViewModels;
+using NetworkMonitorAgent.Views;
+
 namespace NetworkMonitorAgent;
 
 public partial class MainPage : ContentPage
@@ -11,51 +11,63 @@ public partial class MainPage : ContentPage
     private CancellationTokenSource _cancellationTokenSource;
     private readonly MainPageViewModel _mainPageViewModel;
     private readonly ILogger _logger;
+    private readonly IUiDispatcher _dispatcher;
     private bool _isUpdatingSwitch = false;
     private bool _isNavigating = false;
+
     public MainPage(ILogger<MainPage> logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
     {
         InitializeComponent();
         _logger = logger;
         _mainPageViewModel = mainPageViewModel;
+        _dispatcher = ServiceInitializer.Dispatcher;
         BindingContext = _mainPageViewModel;
         CustomPopupView.BindingContext = processorStatesViewModel;
         ProcessorStatesView.BindingContext = processorStatesViewModel;
         TaskCollectionView.ItemsSource = _mainPageViewModel.Tasks;
         _cancellationTokenSource = new CancellationTokenSource();
         _mainPageViewModel.PollingCts = _cancellationTokenSource;
+
         _mainPageViewModel.ShowLoadingMessage += (sender, args) =>
         {
             (bool show, bool showCancel) = args;
-            MainThread.BeginInvokeOnMainThread(() =>
+            _dispatcher.Dispatch(() =>
             {
                 ProgressIndicator.IsVisible = show;
                 ProgressIndicator.IsRunning = show;
                 CancelButton.IsVisible = showCancel;
-            }
-            );
-        };
-        _mainPageViewModel.ShowAlertRequested += (sender, args) =>
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-                await DisplayAlert(args.Title, args.Message, "OK"));
-        };
-        _mainPageViewModel.OpenBrowserRequested += (sender, url) =>
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-                await Browser.Default.OpenAsync(url, BrowserLaunchMode.SystemPreferred));
-        };
-        _mainPageViewModel.NavigateRequested += (sender, route) =>
-       {
-           if (_isNavigating) return;
-           _isNavigating = true;
-           MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await Shell.Current.GoToAsync(route);
-                _isNavigating = false;
             });
-       };
+        };
+
+        _mainPageViewModel.ShowAlertRequested += async (sender, args) =>
+        {
+            await _dispatcher.DispatchAsync(() => DisplayAlert(args.Title, args.Message, "OK"));
+        };
+
+        _mainPageViewModel.OpenBrowserRequested += async (sender, url) =>
+        {
+            await _dispatcher.DispatchAsync(() => Browser.Default.OpenAsync(url, BrowserLaunchMode.SystemPreferred));
+        };
+
+        _mainPageViewModel.NavigateRequested += async (sender, route) =>
+        {
+            if (_isNavigating) return;
+            _isNavigating = true;
+
+            await _dispatcher.DispatchAsync(async () =>
+            {
+                try
+                {
+                    await Shell.Current.GoToAsync(route);
+                }
+                finally
+                {
+                    _isNavigating = false;
+                }
+            });
+        };
     }
+
     private async void OnSwitchToggled(object sender, ToggledEventArgs e)
     {
         try
@@ -63,30 +75,37 @@ public partial class MainPage : ContentPage
             // Safely handle casting the sender to Switch
             var switchControl = sender as Switch ?? throw new InvalidCastException("Sender is not a Switch.");
             bool originalState = switchControl.IsToggled;
+
             // Prevent re-entry for programmatic changes
             if (_isUpdatingSwitch)
             {
                 return;
             }
+
             _isUpdatingSwitch = true;
+
             // Check if assets are ready
             if (!RootNamespaceProvider.AssetsReady)
             {
                 switchControl.IsToggled = false;
-                await DisplayAlert("Warning",
+                await DisplayAlert(
+                    "Warning",
                     "Resource files still copying please wait. Check out the Setup Guide for information on the app's features. You may find the Network Monitor Assistant interesting.",
                     "OK");
                 _isUpdatingSwitch = false;
                 return;
             }
+
             try
             {
                 // Disable the switch temporarily while the service is starting
                 switchControl.IsEnabled = false;
                 _mainPageViewModel.ServiceMessage = "Starting service...";
                 ShowLoading(true);
+
                 // Attempt to start/stop the service
                 bool isStarted = await _mainPageViewModel.SetServiceStartedAsync(e.Value);
+
                 // Reflect the actual service state on the toggle
                 switchControl.IsToggled = isStarted;
             }
@@ -127,12 +146,14 @@ public partial class MainPage : ContentPage
             await DisplayAlert("Error", $"An unexpected error occurred: {ex.Message}", "OK");
         }
     }
+
     private void ShowLoading(bool show)
     {
         ProgressIndicator.IsVisible = show;
         ProgressIndicator.IsRunning = show;
         CancelButton.IsVisible = show;
     }
+
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         try

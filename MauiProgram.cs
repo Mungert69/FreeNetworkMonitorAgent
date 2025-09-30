@@ -307,7 +307,8 @@ namespace NetworkMonitorAgent
         private static void ShowAlertBlocking(string title, string? message)
         {
             var fullMessage = string.IsNullOrWhiteSpace(message) ? title : $"{title}\n{message}";
-            MainThread.BeginInvokeOnMainThread(() =>
+            var dispatcher = ServiceInitializer.Dispatcher;
+            dispatcher.Dispatch(() =>
             {
                 var mainPage = Application.Current?.MainPage;
                 if (mainPage != null)

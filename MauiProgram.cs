@@ -232,11 +232,13 @@ namespace NetworkMonitorAgent
                     var configuration = provider.GetRequiredService<IConfiguration>();
                     string appDataDirectory = FileSystem.AppDataDirectory;
                     string nativeLibDir = string.Empty;
+                    var browserHost= provider.GetRequiredService<IBrowserHost>();
+
 #if ANDROID
                     nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
 #endif
                     var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
-                    return new ApiService(loggerFactory, configuration, cmdProcessorProvider, appDataDirectory, nativeLibDir);
+                    return new ApiService(loggerFactory, configuration, cmdProcessorProvider, appDataDirectory, nativeLibDir, browserHost);
                 });
 
             builder.Services.AddSingleton<IAuthService>(provider =>

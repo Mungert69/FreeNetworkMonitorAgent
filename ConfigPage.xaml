@@ -54,6 +54,28 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="20"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Need to start again?"
+                           FontSize="18"
+                           TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                    <Label Text="Resetting removes the agent's appsettings.json and .env, disables the agent, and requires you to close and reopen the app."
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"
+                           LineBreakMode="WordWrap" />
+                    <Button Text="Reset To Factory Defaults"
+                            Command="{Binding ResetCommand}"
+                            BackgroundColor="#B00020"
+                            TextColor="White"
+                            CornerRadius="6"
+                            Padding="12,10"
+                            FontAttributes="Bold" />
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

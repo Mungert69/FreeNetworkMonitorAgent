@@ -7,6 +7,7 @@ using NetworkMonitor.Processor.Services;
 using NetworkMonitor.Api.Services;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui;
+using NetworkMonitor.Security;
 using NetworkMonitor.Maui.Helpers;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Maui.ViewModels;
@@ -97,7 +98,7 @@ namespace NetworkMonitorAgent
             ServiceProvider = app.Services;
             return app;
         }
-       
+
         private static void LoadAssets(MauiAppBuilder builder, string os)
         {
             try
@@ -150,37 +151,60 @@ namespace NetworkMonitorAgent
         }
         private static void BuildRepoAndConfig(MauiAppBuilder builder)
         {
+            string appDataDirectory = FileSystem.AppDataDirectory;
+            builder.Services.AddSingleton<IFileRepo>(provider =>
+            {
+                try
+                {
+                    bool isRunningOnMauiAndroid = true;
+                    var fileRepo = new FileRepo(isRunningOnMauiAndroid, appDataDirectory);
+                    return fileRepo;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
+                    return new FileRepo();
+                }
+            });
+            builder.Services.AddSingleton<IEnvironmentStore>(provider =>
+           {
+               var envPath = Path.Combine(appDataDirectory, ".env");
+               var logger = provider.GetRequiredService<ILogger<EnvFileStore>>();
+               var envStore = new EnvFileStore(envPath, logger);
+               envStore.LoadIntoProcess();
+               return envStore;
+           });
+            builder.Services.AddSingleton<IProtectedConfigManager>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var envStore = provider.GetRequiredService<IEnvironmentStore>();
+                var fileRepo = provider.GetRequiredService<IFileRepo>();
+                var logger = provider.GetRequiredService<ILogger<ProtectedConfigManager>>();
+                return new ProtectedConfigManager(configuration, envStore, fileRepo, logger);
+            });
             builder.Services.AddSingleton<NetConnectConfig>(provider =>
-               {
-                   // Assuming Configuration is properly set up
-                   var configuration = provider.GetRequiredService<IConfiguration>();
-                   string appDataDirectory = FileSystem.AppDataDirectory;
-                   string nativeLibDir = string.Empty;
+            {
+                // Assuming Configuration is properly set up
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                // Ensure environment variables from .env are loaded before building NetConnectConfig.
+                _ = provider.GetRequiredService<IEnvironmentStore>();
+                var protectedConfigManager = provider.GetRequiredService<IProtectedConfigManager>();
+                string nativeLibDir = string.Empty;
 #if ANDROID
                 nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
 #endif
-
-                   return new NetConnectConfig(configuration, appDataDirectory, nativeLibDir);
-               });
+                var netConfig = new NetConnectConfig(configuration, appDataDirectory, nativeLibDir);
+                protectedConfigManager
+                    .SynchronizeSensitiveValuesAsync(netConfig, ProtectedConfigurationParameters.All)
+                    .GetAwaiter()
+                    .GetResult();
+                return netConfig;
+            });
             builder.Services.AddSingleton<LocalProcessorStates>(provider =>
-                {
-                    return new LocalProcessorStates();
-                });
-            builder.Services.AddSingleton<IFileRepo>(provider =>
-                {
-                    try
-                    {
-                        bool isRunningOnMauiAndroid = true;
-                        string prefixPath = FileSystem.AppDataDirectory;
-                        var fileRepo = new FileRepo(isRunningOnMauiAndroid, prefixPath);
-                        return fileRepo;
-                    }
-                    catch (Exception ex)
-                    {
-                        ExceptionHelper.HandleGlobalException(ex, "Error : initializing FileRepo");
-                        return new FileRepo();
-                    }
-                });
+            {
+                return new LocalProcessorStates();
+            });
+
             builder.Services.AddSingleton<IRabbitRepo>(provider =>
                 {
                     var logger = provider.GetRequiredService<ILogger<RabbitRepo>>();
@@ -193,7 +217,17 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
-            builder.Services.AddSingleton<IBrowserHost, BrowserHost>();
+            builder.Services.AddSingleton<IDialogService, DialogService>();
+
+            builder.Services.AddScoped<IBrowserHost>(provider =>
+            {
+                var launchHelper = provider.GetRequiredService<ILaunchHelper>();
+                var logger = provider.GetRequiredService<ILogger<BrowserHost>>();
+                var netConfig = provider.GetRequiredService<NetConnectConfig>();
+
+                return new BrowserHost(launchHelper, netConfig, logger, maxConcurrentPages: 1);
+            });
+
             builder.Services.AddScoped<ILLMService>(provider =>
             {
                 return new LLMService(
@@ -223,11 +257,13 @@ namespace NetworkMonitorAgent
                     var configuration = provider.GetRequiredService<IConfiguration>();
                     string appDataDirectory = FileSystem.AppDataDirectory;
                     string nativeLibDir = string.Empty;
+                    var browserHost = provider.GetRequiredService<IBrowserHost>();
+
 #if ANDROID
                     nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
 #endif
                     var cmdProcessorProvider = provider.GetRequiredService<ICmdProcessorProvider>();
-                    return new ApiService(loggerFactory, configuration, cmdProcessorProvider, appDataDirectory, nativeLibDir);
+                    return new ApiService(loggerFactory, configuration, cmdProcessorProvider, appDataDirectory, nativeLibDir, browserHost);
                 });
 
             builder.Services.AddSingleton<IAuthService>(provider =>
@@ -285,6 +321,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<ScanProcessorStatesViewModel>();
             builder.Services.AddSingleton<MainPageViewModel>();
             builder.Services.AddSingleton<ConfigPageViewModel>();
+            builder.Services.AddSingleton<ExitPageViewModel>();
         }
         private static void BuildPages(MauiAppBuilder builder)
         {
@@ -292,13 +329,15 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<NetworkMonitorPage>();
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<ConfigPage>();
+            builder.Services.AddSingleton<ExitPage>();
             builder.Services.AddSingleton<DataViewPage>();
             builder.Services.AddSingleton<ChatPage>();
         }
         private static void ShowAlertBlocking(string title, string? message)
         {
             var fullMessage = string.IsNullOrWhiteSpace(message) ? title : $"{title}\n{message}";
-            MainThread.BeginInvokeOnMainThread(() =>
+            var dispatcher = ServiceInitializer.Dispatcher;
+            dispatcher.Dispatch(() =>
             {
                 var mainPage = Application.Current?.MainPage;
                 if (mainPage != null)
@@ -312,7 +351,7 @@ namespace NetworkMonitorAgent
                 }
             });
         }
-        
+
 
     }
 }

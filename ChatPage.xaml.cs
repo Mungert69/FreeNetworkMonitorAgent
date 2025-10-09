@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Components.WebView.Maui;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.Services;
@@ -12,45 +11,44 @@ namespace NetworkMonitorAgent
     {
         private readonly ILogger<ChatPage> _logger;
         private readonly IPlatformService _platformService;
+        private readonly IUiDispatcher _dispatcher;
 
         public ChatPage(ILogger<ChatPage> logger, IPlatformService platformService)
         {
             _logger = logger;
             InitializeComponent();
             _platformService = platformService;
+            _dispatcher = ServiceInitializer.Dispatcher;
 
-
-            if (this.Content is BlazorWebView bw)
+            if (Content is BlazorWebView bw)
             {
                 bw.BlazorWebViewInitialized += (sender, args) =>
                 {
 #if ANDROID
-            // Enable WebView2 features for Android
-            var webView = args.WebView;
-            var settings = webView.Settings;
-            settings.JavaScriptEnabled = true;
-            settings.MediaPlaybackRequiresUserGesture = false;
-            settings.AllowFileAccess = true;
-            settings.AllowContentAccess = true;
+                    // Enable WebView2 features for Android
+                    var webView = args.WebView;
+                    var settings = webView.Settings;
+                    settings.JavaScriptEnabled = true;
+                    settings.MediaPlaybackRequiresUserGesture = false;
+                    settings.AllowFileAccess = true;
+                    settings.AllowContentAccess = true;
 #endif
                 };
             }
-
         }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
             // Update _isAgentEnabled when the page appears
             UpdateVisibility();
-
-
         }
 
         public void UpdateVisibility()
         {
             try
             {
-                MainThread.BeginInvokeOnMainThread(() =>
+                _dispatcher.Dispatch(() =>
                 {
                     ChatView.IsVisible = _platformService.IsAuthorised;
                     AgentDisabledMessage.IsVisible = !_platformService.IsAuthorised;
@@ -58,10 +56,10 @@ namespace NetworkMonitorAgent
             }
             catch (Exception ex)
             {
-                if (_logger != null) _logger.LogError($" Error : in UpdateVisibility on ScanPage. Error was: {ex.Message}");
+                _logger?.LogError($" Error : in UpdateVisibility on ScanPage. Error was: {ex.Message}");
             }
-
         }
+
         private async void OnGoHomeClicked(object sender, EventArgs e)
         {
             try
@@ -70,9 +68,8 @@ namespace NetworkMonitorAgent
             }
             catch (Exception ex)
             {
-                if (_logger != null) _logger.LogError($" Error : in OnGoHomeClicked on LogsPage. Error was: {ex.Message}");
+                _logger?.LogError($" Error : in OnGoHomeClicked on LogsPage. Error was: {ex.Message}");
             }
         }
-
     }
 }

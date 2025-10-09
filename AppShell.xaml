@@ -30,6 +30,11 @@
                      ContentTemplate="{DataTemplate local:SetupGuidePage}" />
     </FlyoutItem>
 
+    <FlyoutItem Title="Exit Agent">
+        <ShellContent Route="Exit" 
+                      ContentTemplate="{DataTemplate local:ExitPage}" />
+    </FlyoutItem>
+
     <!-- Optional: Additional routes that aren't in the main flyout menu -->
     <ShellContent Route="DetailsPage" 
                   ContentTemplate="{DataTemplate local:DetailsPage}" />

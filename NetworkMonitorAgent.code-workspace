@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../NetworkMonitorLib"
+		},
+		{
+			"path": "../NetworkMonitorQuantumSecure"
 		}
 	],
 	"settings": {}

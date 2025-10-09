@@ -186,6 +186,8 @@ namespace NetworkMonitorAgent
             {
                 // Assuming Configuration is properly set up
                 var configuration = provider.GetRequiredService<IConfiguration>();
+                // Ensure environment variables from .env are loaded before building NetConnectConfig.
+                _ = provider.GetRequiredService<IEnvironmentStore>();
                 string nativeLibDir = string.Empty;
 #if ANDROID
                 nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 

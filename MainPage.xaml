@@ -66,7 +66,7 @@
                                TextColor="{DynamicResource Primary}"
                                Padding="0,0,5,0"/>
 
-                        <Switch  Toggled="OnSwitchToggled"/>
+                        <Switch x:Name="AgentToggle" Toggled="OnSwitchToggled"/>
 
                     </StackLayout>
                        <Grid HorizontalOptions="CenterAndExpand">

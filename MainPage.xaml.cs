@@ -12,21 +12,26 @@ public partial class MainPage : ContentPage
     private readonly MainPageViewModel _mainPageViewModel;
     private readonly ILogger _logger;
     private readonly IUiDispatcher _dispatcher;
+    private readonly IPlatformService _platformService;
     private bool _isUpdatingSwitch = false;
     private bool _isNavigating = false;
 
-    public MainPage(ILogger<MainPage> logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel)
+    public MainPage(ILogger<MainPage> logger, MainPageViewModel mainPageViewModel, ProcessorStatesViewModel processorStatesViewModel, IPlatformService platformService)
     {
         InitializeComponent();
         _logger = logger;
         _mainPageViewModel = mainPageViewModel;
         _dispatcher = ServiceInitializer.Dispatcher;
+        _platformService = platformService;
         BindingContext = _mainPageViewModel;
         CustomPopupView.BindingContext = processorStatesViewModel;
         ProcessorStatesView.BindingContext = processorStatesViewModel;
         TaskCollectionView.ItemsSource = _mainPageViewModel.Tasks;
         _cancellationTokenSource = new CancellationTokenSource();
         _mainPageViewModel.PollingCts = _cancellationTokenSource;
+
+        _platformService.ServiceStateChanged += PlatformServiceOnServiceStateChanged;
+        SyncAgentToggle();
 
         _mainPageViewModel.ShowLoadingMessage += (sender, args) =>
         {
@@ -66,6 +71,36 @@ public partial class MainPage : ContentPage
                 }
             });
         };
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        SyncAgentToggle();
+    }
+
+    private void PlatformServiceOnServiceStateChanged(object? sender, EventArgs e)
+    {
+        SyncAgentToggle();
+    }
+
+    private void SyncAgentToggle()
+    {
+        _dispatcher.Dispatch(() =>
+        {
+            try
+            {
+                _isUpdatingSwitch = true;
+                AgentToggle.IsToggled = _platformService.IsServiceStarted;
+            }
+            finally
+            {
+                _isUpdatingSwitch = false;
+            }
+
+            _mainPageViewModel.ServiceMessage = _platformService.ServiceMessage;
+            _mainPageViewModel.ShowTasks = _platformService.IsServiceStarted;
+        });
     }
 
     private async void OnSwitchToggled(object sender, ToggledEventArgs e)

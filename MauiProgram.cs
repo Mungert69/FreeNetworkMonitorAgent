@@ -188,11 +188,17 @@ namespace NetworkMonitorAgent
                 var configuration = provider.GetRequiredService<IConfiguration>();
                 // Ensure environment variables from .env are loaded before building NetConnectConfig.
                 _ = provider.GetRequiredService<IEnvironmentStore>();
+                var protectedConfigManager = provider.GetRequiredService<IProtectedConfigManager>();
                 string nativeLibDir = string.Empty;
 #if ANDROID
                 nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
 #endif
-                return new NetConnectConfig(configuration, appDataDirectory, nativeLibDir);
+                var netConfig = new NetConnectConfig(configuration, appDataDirectory, nativeLibDir);
+                protectedConfigManager
+                    .SynchronizeSensitiveValuesAsync(netConfig, ProtectedConfigurationParameters.All)
+                    .GetAwaiter()
+                    .GetResult();
+                return netConfig;
             });
             builder.Services.AddSingleton<LocalProcessorStates>(provider =>
             {
@@ -211,6 +217,7 @@ namespace NetworkMonitorAgent
         {
 
             builder.Services.AddSingleton<ILaunchHelper, LaunchHelper>();
+            builder.Services.AddSingleton<IDialogService, DialogService>();
 
             builder.Services.AddScoped<IBrowserHost>(provider =>
             {

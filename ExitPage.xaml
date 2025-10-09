@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:NetworkMonitor.Maui.ViewModels;assembly=NetworkMonitorMaui"
+             x:Class="NetworkMonitorAgent.ExitPage"
+             x:DataType="vm:ExitPageViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="5" VerticalOptions="Center">
+
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="20"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="10">
+                    <Image Source="logo.png"
+                           SemanticProperties.Description="Quantum Network Monitor Agent Logo."
+                           HeightRequest="100"
+                           HorizontalOptions="Center" />
+                    <Label Text="Exit Agent"
+                           FontSize="22"
+                           HorizontalOptions="Center"
+                           TextColor="#607466" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                   Padding="20"
+                   CornerRadius="10"
+                   HorizontalOptions="FillAndExpand"
+                   Margin="0,0,0,10">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Choose how you would like to leave the agent UI."
+                           FontSize="16"
+                           TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+
+                    <Button Text="Exit Agent UI"
+                            Command="{Binding ExitUiCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#1976D2, Dark=#90CAF9}"
+                            TextColor="White"
+                            CornerRadius="6"
+                            Padding="12,10"
+                            FontAttributes="Bold" />
+
+                    <Button Text="Disable Agent &amp; Exit"
+                            Command="{Binding DisableAndExitCommand}"
+                            BackgroundColor="#B00020"
+                            TextColor="White"
+                            CornerRadius="6"
+                            Padding="12,10"
+                            FontAttributes="Bold" />
+
+                    <Label Text="{Binding StatusMessage}"
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"
+                           LineBreakMode="WordWrap" />
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

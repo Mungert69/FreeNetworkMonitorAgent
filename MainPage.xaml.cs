@@ -135,7 +135,7 @@ public partial class MainPage : ContentPage
             {
                 // Disable the switch temporarily while the service is starting
                 switchControl.IsEnabled = false;
-                _mainPageViewModel.ServiceMessage = "Starting service...";
+                _mainPageViewModel.ServiceMessage = e.Value ? "Starting agent..." : "Stopping agent...";
                 ShowLoading(true);
 
                 // Attempt to start/stop the service

@@ -321,6 +321,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<ScanProcessorStatesViewModel>();
             builder.Services.AddSingleton<MainPageViewModel>();
             builder.Services.AddSingleton<ConfigPageViewModel>();
+            builder.Services.AddSingleton<ExitPageViewModel>();
         }
         private static void BuildPages(MauiAppBuilder builder)
         {
@@ -328,6 +329,7 @@ namespace NetworkMonitorAgent
             builder.Services.AddSingleton<NetworkMonitorPage>();
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<ConfigPage>();
+            builder.Services.AddSingleton<ExitPage>();
             builder.Services.AddSingleton<DataViewPage>();
             builder.Services.AddSingleton<ChatPage>();
         }

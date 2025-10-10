@@ -12,7 +12,7 @@
                                    Padding="20">
                      <!-- Logo and Title -->
                      <Image Source="logo.png"
-                            SemanticProperties.Description="Quantum Network Monitor Agent Logo"
+                            SemanticProperties.Description="Quantum Network Monitor Logo"
                             HeightRequest="100"
                             HorizontalOptions="Center"/>
                      <Label Text="Quantum Network Monitor Agent"
@@ -33,13 +33,11 @@
                                    <Picker x:Name="EndpointTypePicker"
                                            Title="Select Default Endpoint Type"
                                            ItemsSource="{Binding EndpointTypes}"
-                                           SelectedItem="{Binding DefaultEndpointType}"
-                                            FontSize="18"/>
+                                           SelectedItem="{Binding DefaultEndpointType}"/>
                                    <Picker x:Name="NetworkInterfacePicker"
                                            Title="Select Network Interface"
                                            ItemsSource="{Binding NetworkInterfaces}"
-                                           SelectedItem="{Binding SelectedNetworkInterface}"                                 
-                                            FontSize="18"
+                                           SelectedItem="{Binding SelectedNetworkInterface}"
                                            ItemDisplayBinding="{Binding .}"/>
                                    <StackLayout Orientation="Horizontal"
                                                 HorizontalOptions="Center">

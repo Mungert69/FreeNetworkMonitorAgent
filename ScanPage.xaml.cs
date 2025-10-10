@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Maui.Services;
 using NetworkMonitor.Maui.ViewModels;
@@ -38,6 +39,7 @@ public partial class ScanPage : ContentPage
         base.OnAppearing();
         // Update _isAgentEnabled when the page appears
         UpdateVisibility();
+        _scanProcessorStatesViewModel.Refresh();
     }
 
     public void UpdateVisibility()
@@ -48,6 +50,11 @@ public partial class ScanPage : ContentPage
             {
                 ScanView.IsVisible = _platformService.IsAuthorised;
                 AgentDisabledMessage.IsVisible = !_platformService.IsAuthorised;
+
+                if (_platformService.IsAuthorised && EndpointTypePicker.SelectedItem == null && _scanProcessorStatesViewModel.EndpointTypes.Any())
+                {
+                    EndpointTypePicker.SelectedItem = _scanProcessorStatesViewModel.DefaultEndpointType;
+                }
             });
         }
         catch (Exception ex)

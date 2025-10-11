@@ -1,122 +1,153 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:NetworkMonitor.Maui.Controls;assembly=NetworkMonitorMaui"
              xmlns:view="clr-namespace:NetworkMonitorAgent.Views"
              xmlns:vm="clr-namespace:NetworkMonitor.Maui.ViewModels;assembly=NetworkMonitorMaui"
-             x:Class="NetworkMonitorAgent.MainPage">
+             x:Class="NetworkMonitorAgent.MainPage"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightBackground}, Dark={StaticResource DarkBackground}}">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="5"
-                             Padding="5"
-                             VerticalOptions="Center">
+    <ContentPage.Resources>
+        <Style x:Key="CardFrameStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"/>
+            <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="HasShadow" Value="True"/>
+        </Style>
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                   CornerRadius="10"
-                   HorizontalOptions="FillAndExpand">
-                <VerticalStackLayout Spacing="10">
+        <Style x:Key="SectionTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{DynamicResource Secondary}"/>
+        </Style>
+
+        <Style x:Key="SectionCaptionStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="24"
+                                 Padding="24,32,24,48">
+
+                <!-- Header -->
+                <VerticalStackLayout Spacing="8"
+                                     HorizontalOptions="Center">
                     <Image Source="logo.png"
-                           SemanticProperties.Description="Quantum Network Monitor Agent Logo. "
-                           HeightRequest="100"
+                           SemanticProperties.Description="Quantum Network Monitor Agent logo"
+                           HeightRequest="96"
                            HorizontalOptions="Center"/>
                     <Label Text="Quantum Network Monitor Agent"
-                           FontSize="22"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource Primary}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Monitor, scan, and manage your network endpoints from a single command center."
+                           Style="{StaticResource SectionCaptionStyle}"
                            HorizontalOptions="Center"
-                           TextColor="{DynamicResource Primary}"/>
+                           HorizontalTextAlignment="Center"
+                           WidthRequest="360"/>
                 </VerticalStackLayout>
-            </Frame>
 
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                   Padding="20"
-                   CornerRadius="10"
-                   HorizontalOptions="FillAndExpand"
-                   Margin="0,0,0,10">
-                <Label Text="Welcome to Quantum Network Monitor Agent"
-                       FontSize="16"
-                       HorizontalOptions="Center"
-                       TextColor="{DynamicResource Primary}"/>
-            </Frame>
-            <!-- Processor States View -->
-            <view:ProcessorStatesView x:Name="ProcessorStatesView"
-                                      HorizontalOptions="FillAndExpand"
-                                      VerticalOptions="FillAndExpand"/>
-            <view:CustomPopupView x:Name="CustomPopupView"
-                                  AbsoluteLayout.LayoutBounds="0,0,1,1"
-                                  AbsoluteLayout.LayoutFlags="All"/>
-            <!-- Add this inside your Grid or another layout -->
-            <ActivityIndicator x:Name="ProgressIndicator"
-                               IsVisible="False"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
-            <Button x:Name="CancelButton"
-                    Text="Cancel"
-                    IsVisible="False"
-                    Clicked="OnCancelClicked"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"/>
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                   Padding="0"
-                   CornerRadius="10"
-                   HorizontalOptions="FillAndExpand">
-                <VerticalStackLayout Spacing="10">
-                    <StackLayout Orientation="Horizontal"
-                                 HorizontalOptions="CenterAndExpand">
-                        <Label Text="Enable Agent "
-                               VerticalOptions="Center"
-                               TextColor="{DynamicResource Primary}"
-                               Padding="0,0,5,0"/>
+                <!-- Processor status -->
+                <Frame Style="{StaticResource CardFrameStyle}">
+                    <VerticalStackLayout Spacing="18">
+                        <Label Text="Processor status"
+                               Style="{StaticResource SectionTitleStyle}"/>
+                        <Label Text="Review task queues, processor health, and key telemetry."
+                               Style="{StaticResource SectionCaptionStyle}"/>
+                        <view:ProcessorStatesView x:Name="ProcessorStatesView"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"/>
+                    </VerticalStackLayout>
+                </Frame>
 
-                        <Switch x:Name="AgentToggle" Toggled="OnSwitchToggled"/>
+                <!-- Agent toggle -->
+                <Frame Style="{StaticResource CardFrameStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <StackLayout Grid.Column="0"
+                                         Spacing="4">
+                                <Label Text="Enable agent"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource Primary}"/>
+                                <Label Text="Authorise the agent to keep collecting host telemetry."
+                                       Style="{StaticResource SectionCaptionStyle}"/>
+                            </StackLayout>
+                            <Switch x:Name="AgentToggle"
+                                    Grid.Column="1"
+                                    Toggled="OnSwitchToggled"
+                                    VerticalOptions="Center"/>
+                        </Grid>
 
-                    </StackLayout>
-                       <Grid HorizontalOptions="CenterAndExpand">
-        <Label Text="{Binding ServiceMessage}"
-               TextColor="{DynamicResource Secondary}"
-               LineBreakMode="WordWrap"
-               HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Center"
-               WidthRequest="300" />
+                        <Label Text="{Binding ServiceMessage}"
+                               TextColor="{DynamicResource Secondary}"
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="WordWrap"/>
+
+                        <StackLayout Spacing="12"
+                                     IsVisible="{Binding Source={x:Reference ProgressIndicator}, Path=IsVisible}">
+                            <ActivityIndicator x:Name="ProgressIndicator"
+                                               IsVisible="False"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                            <Button x:Name="CancelButton"
+                                    Text="Cancel"
+                                    IsVisible="False"
+                                    HorizontalOptions="Center"
+                                    Clicked="OnCancelClicked"/>
+                        </StackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Task list -->
+                <Frame Style="{StaticResource CardFrameStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Tasks"
+                               Style="{StaticResource SectionTitleStyle}"/>
+                        <Label Text="Complete these quick steps to finish onboarding."
+                               Style="{StaticResource SectionCaptionStyle}"/>
+
+                        <CollectionView x:Name="TaskCollectionView"
+                                        IsVisible="{Binding ShowTasks}">
+                            <CollectionView.EmptyView>
+                                <Label Text="No tasks pending right now."
+                                       Style="{StaticResource SectionCaptionStyle}"
+                                       HorizontalOptions="Center"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TaskItem">
+                                    <Grid Padding="12"
+                                          ColumnDefinitions="Auto,*"
+                                          ColumnSpacing="12">
+                                        <CheckBox Grid.Column="0"
+                                                  IsChecked="{Binding IsCompleted}"
+                                                  IsEnabled="False"
+                                                  VerticalOptions="Center"/>
+                                        <controls:AnimatedButton Grid.Column="1"
+                                                                 Text="{Binding ButtonText}"
+                                                                 Command="{Binding TaskAction}"
+                                                                 BackgroundColor="{Binding ButtonBackgroundColor}"
+                                                                 TextColor="{Binding ButtonTextColor}"
+                                                                 CornerRadius="12"
+                                                                 Padding="14,10"
+                                                                 FontSize="16"
+                                                                 VerticalOptions="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <view:CustomPopupView x:Name="CustomPopupView"/>
     </Grid>
-                </VerticalStackLayout>
-            </Frame>
-
-
-
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                   Padding="0"
-                   CornerRadius="10"
-                   HorizontalOptions="FillAndExpand"
-                   Margin="0,0,0,10">
-                <CollectionView x:Name="TaskCollectionView"
-                                IsVisible="{Binding ShowTasks}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="vm:TaskItem">
-                            <Grid Padding="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <!-- Example: A checkbox for completion -->
-                                <CheckBox Grid.Column="0"
-                                          IsChecked="{Binding IsCompleted}"
-                                          IsEnabled="False"
-                                          VerticalOptions="Center"/>
-
-                                <controls:AnimatedButton Grid.Column="1"
-                                                         Text="{Binding ButtonText}"
-                                                         Command="{Binding TaskAction}"
-                                                         BackgroundColor="{Binding ButtonBackgroundColor}"
-                                                         TextColor="{Binding ButtonTextColor}"
-                                                         CornerRadius="5"
-                                                         Padding="10"
-                                                         FontSize="16"
-                                                         VerticalOptions="Center"/>
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Frame>
-        </VerticalStackLayout>
-    </ScrollView>
 </ContentPage>

@@ -1,80 +1,194 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls"
              x:Class="NetworkMonitorAgent.DetailsPage"
-             xmlns:controls="clr-namespace:NetworkMonitor.Maui.Controls"
-            >
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightBackground}, Dark={StaticResource DarkBackground}}">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="10" Padding="5">
-            <!-- Title -->
-            <Label Text="Host Monitoring Details" FontSize="24" HorizontalOptions="Center" />
+    <ContentPage.Resources>
+        <Style x:Key="CardFrameStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"/>
+            <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="HasShadow" Value="True"/>
+        </Style>
 
-            <!-- Details -->
-            <StackLayout Spacing="10" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
-                <Label Text="Address:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.Address}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+        <Style x:Key="SectionTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{DynamicResource Secondary}"/>
+        </Style>
 
-                <Label Text="Port:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.Port}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+        <Style x:Key="KeyLabelStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+        </Style>
 
-                <Label Text="UserID:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.UserID}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+        <Style x:Key="ValueLabelStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"/>
+        </Style>
+    </ContentPage.Resources>
 
-                <Label Text="Username:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.Username}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="24"
+                                 Padding="24,32,24,48">
 
-                <Label Text="Password:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.Password}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                <VerticalStackLayout Spacing="6"
+                                     HorizontalOptions="Center">
+                    <Label Text="Host Monitoring Details"
+                           Style="{StaticResource SectionTitleStyle}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Review the latest metrics, connection history, and status flags gathered for this host."
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           WidthRequest="360"/>
+                </VerticalStackLayout>
 
-                <Label Text="EndPointType:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.EndPointType}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                <Frame Style="{StaticResource CardFrameStyle}">
+                    <VerticalStackLayout Spacing="22">
 
-                <Label Text="Monitor Status Message:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.Message}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="18"
+                              RowSpacing="14">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Text="Address" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.Address}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Monitor Status IsUp:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.IsUp}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="Port" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.Port}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Monitor Status DownCount:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.DownCount}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="User ID" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.UserID}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Monitor Status AlertFlag:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.AlertFlag}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="3" Grid.Column="0" Text="Username" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.Username}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Monitor Status AlertSent:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.MonitorStatus.AlertSent}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="4" Grid.Column="0" Text="Password" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="4" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.Password}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Connections Initiated:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.PacketsSent}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="5" Grid.Column="0" Text="Endpoint type" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="5" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.EndPointType}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Connections Successful:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.PacketsRecieved}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="6" Grid.Column="0" Text="Monitor message" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="6" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.MonitorStatus.Message}" Style="{StaticResource ValueLabelStyle}" LineBreakMode="WordWrap"/>
 
-                <Label Text="Connections Failed:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.PacketsLost}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="7" Grid.Column="0" Text="Status" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="7" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.MonitorStatus.IsUp}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Connections Failed Percentage:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.PacketsLostPercentage, StringFormat='{0:F2}%'}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="8" Grid.Column="0" Text="Down count" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="8" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.MonitorStatus.DownCount}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Round Trip Time Maximum:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeMaximum}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="9" Grid.Column="0" Text="Alert flag" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="9" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.MonitorStatus.AlertFlag}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Round Trip Time Average:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeAverage, StringFormat='{0:F2}'}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                            <Label Grid.Row="10" Grid.Column="0" Text="Alert sent" Style="{StaticResource KeyLabelStyle}"/>
+                            <Label Grid.Row="10" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.MonitorStatus.AlertSent}" Style="{StaticResource ValueLabelStyle}"/>
+                        </Grid>
 
-                <Label Text="Round Trip Time Total:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeTotal}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                        <Border StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                Background="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
+                                Padding="18">
+                            <Border.StrokeShape>
+                                <shapes:RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="18"
+                                  RowSpacing="12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Text="Connections initiated" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.PacketsSent}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Round Trip Time Minimum:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.RoundTripTimeMinimum}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                                <Label Grid.Row="1" Grid.Column="0" Text="Connections successful" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.PacketsRecieved}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Date Started:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.DateStarted}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
+                                <Label Grid.Row="2" Grid.Column="0" Text="Connections failed" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.PacketsLost}" Style="{StaticResource ValueLabelStyle}"/>
 
-                <Label Text="Date Ended:" FontSize="20" FontAttributes="Bold" BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark={StaticResource Gray950}}" Padding="5"/>
-                <Label Text="{Binding SelectedMonitorPingInfo.DateEnded}" FontSize="18" TextColor="{AppThemeBinding Light=#333333, Dark=#EEEEEE}" />
-            </StackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+                                <Label Grid.Row="3" Grid.Column="0" Text="Failure percentage" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="3" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.PacketsLostPercentage, StringFormat='{0:F2}%'}" Style="{StaticResource ValueLabelStyle}"/>
+                            </Grid>
+                        </Border>
+
+                        <Border StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                Background="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
+                                Padding="18">
+                            <Border.StrokeShape>
+                                <shapes:RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="18"
+                                  RowSpacing="12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Text="RTT maximum" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.RoundTripTimeMaximum}" Style="{StaticResource ValueLabelStyle}"/>
+
+                                <Label Grid.Row="1" Grid.Column="0" Text="RTT average" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.RoundTripTimeAverage, StringFormat='{0:F2}'}" Style="{StaticResource ValueLabelStyle}"/>
+
+                                <Label Grid.Row="2" Grid.Column="0" Text="RTT total" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.RoundTripTimeTotal}" Style="{StaticResource ValueLabelStyle}"/>
+
+                                <Label Grid.Row="3" Grid.Column="0" Text="RTT minimum" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="3" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.RoundTripTimeMinimum}" Style="{StaticResource ValueLabelStyle}"/>
+                            </Grid>
+                        </Border>
+
+                        <Border StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                Background="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
+                                Padding="18">
+                            <Border.StrokeShape>
+                                <shapes:RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="18"
+                                  RowSpacing="12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Text="Date started" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.DateStarted}" Style="{StaticResource ValueLabelStyle}"/>
+
+                                <Label Grid.Row="1" Grid.Column="0" Text="Date ended" Style="{StaticResource KeyLabelStyle}"/>
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding SelectedMonitorPingInfo.DateEnded}" Style="{StaticResource ValueLabelStyle}"/>
+                            </Grid>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

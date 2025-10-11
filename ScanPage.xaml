@@ -1,164 +1,334 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:NetworkMonitor.Maui.Controls;assembly=NetworkMonitorMaui"
+             xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls"
              xmlns:view="clr-namespace:NetworkMonitorAgent.Views"
-             xmlns:vm="clr-namespace:NetworkMonitor.Maui.ViewModels;assembly=NetworkMonitorMaui"
              x:Class="NetworkMonitorAgent.ScanPage"
-             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightBackground}, Dark={StaticResource DarkBackground}}">
 
-       <ScrollView>
-              <VerticalStackLayout Spacing="20"
-                                   Padding="20">
-                     <!-- Logo and Title -->
-                     <Image Source="logo.png"
-                            SemanticProperties.Description="Quantum Network Monitor Logo"
-                            HeightRequest="100"
-                            HorizontalOptions="Center"/>
-                     <Label Text="Quantum Network Monitor Agent"
-                            FontSize="24"
-                            FontAttributes="Bold"
-                            HorizontalOptions="Center"
-                            TextColor="{DynamicResource Primary}"/>
+    <ContentPage.Resources>
+        <Style x:Key="CardFrameStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"/>
+            <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="HasShadow" Value="True"/>
+        </Style>
 
-                     <!-- Conditional Content -->
-                     <StackLayout x:Name="ScanView">
-                            <!-- Scan Section -->
-                            <StackLayout x:Name="ScanSection"
-                                         Spacing="10">
-                                   <Label Text="Scan For Local Hosts"
-                                          FontSize="20"
-                                          HorizontalOptions="Center"
-                                          TextColor="{DynamicResource Secondary}"/>
-                                   <Picker x:Name="EndpointTypePicker"
-                                           Title="Select Default Endpoint Type"
-                                           ItemsSource="{Binding EndpointTypes}"
-                                           SelectedItem="{Binding DefaultEndpointType}"/>
-                                   <Picker x:Name="NetworkInterfacePicker"
-                                           Title="Select Network Interface"
-                                           ItemsSource="{Binding NetworkInterfaces}"
-                                           SelectedItem="{Binding SelectedNetworkInterface}"
-                                           ItemDisplayBinding="{Binding .}"/>
-                                   <StackLayout Orientation="Horizontal"
-                                                HorizontalOptions="Center">
-                                          <CheckBox x:Name="UseDefaultEndpointTypeCheckBox"
-                                                    IsChecked="{Binding UseDefaultEndpointType}"/>
-                                          <Label Text="Use Default Endpoint Type"
-                                                 VerticalOptions="Center"/>
-                                   </StackLayout>
-                                   <StackLayout Orientation="Horizontal"
-                                                HorizontalOptions="Center">
+        <Style x:Key="SectionTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{DynamicResource Secondary}"/>
+        </Style>
 
-                                          <StackLayout Orientation="Horizontal"
-                                                       HorizontalOptions="Center">
-                                                 <CheckBox x:Name="UseFastScanCheckBox"
-                                                           IsChecked="{Binding UseFastScan}"/>
-                                                 <Label Text="Use Fast Scan"
-                                                        VerticalOptions="Center"/>
-                                          </StackLayout>
-                                          <StackLayout Orientation="Horizontal"
-                                                       HorizontalOptions="Center">
-                                                 <CheckBox x:Name="LimitPortsCheckBox"
-                                                           IsChecked="{Binding LimitPorts}"/>
-                                                 <Label Text="Limit Ports"
-                                                        VerticalOptions="Center"/>
-                                          </StackLayout>
-                                   </StackLayout>
+        <Style x:Key="SectionCaptionStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"/>
+        </Style>
 
-                                   <Button x:Name="ScanButton"
-                                           Text="Scan"
-                                           Clicked="OnScanClicked"
-                                           HorizontalOptions="Center"
-                                           WidthRequest="200"/>
-                            </StackLayout>
+        <Style x:Key="SubtleLabelStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}"/>
+        </Style>
+    </ContentPage.Resources>
 
-                            <!-- Loading Indicator -->
-                            <StackLayout x:Name="LoadingSection"
-                                         IsVisible="false"
-                                         Spacing="10">
-                                   <ActivityIndicator x:Name="ProgressIndicator"
-                                                      IsRunning="True"
-                                                      HorizontalOptions="Center"/>
-                                   <Button x:Name="CancelButton"
-                                           Text="Cancel"
-                                           Clicked="OnCancelClicked"
-                                           HorizontalOptions="Center"
-                                           WidthRequest="200"/>
-                            </StackLayout>
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="24"
+                                 Padding="24,32,24,48">
 
-                            <!-- Results Section -->
-                            <StackLayout x:Name="ResultsSection"
-                                         IsVisible="false"
-                                         Spacing="10">
-                                   <Label Text="Select the hosts you want to add:"
-                                          FontSize="18"
-                                          TextColor="{DynamicResource Secondary}"/>
-                                   <CollectionView x:Name="HostsCollectionView"
-                                                   SelectionMode="Multiple"
-                                                   SelectionChanged="OnHostsSelectionChanged">
-                                          <CollectionView.ItemTemplate>
-                                                 <DataTemplate>
-                                                        <StackLayout Orientation="Vertical">
-                                                               <Label Text="{Binding Address}"/>
-                                                               <Label Text="{Binding EndPointType}"
-                                                                      FontSize="Small"
-                                                                      TextColor="Gray"/>
-                                                               <Label Text="{Binding MessageForUser}"
-                                                                      FontSize="Small"
-                                                                      TextColor="Gray"/>
-                                                        </StackLayout>
-                                                 </DataTemplate>
-                                          </CollectionView.ItemTemplate>
-                                   </CollectionView>
-                                   <Button x:Name="CheckButton"
-                                           Text="Check Services"
-                                           Clicked="OnCheckServicesClicked"
-                                           HorizontalOptions="Center"
-                                           WidthRequest="200"/>
-                                   <Button x:Name="AddButton"
-                                           Text="Monitor Services"
-                                           Clicked="OnAddServicesClicked"
-                                           HorizontalOptions="Center"
-                                           WidthRequest="200"/>
-                                   <Button x:Name="ClearButton"
-                                           Text="Clear Services"
-                                           Clicked="OnClearServicesClicked"
-                                           HorizontalOptions="Center"
-                                           WidthRequest="200"/>
+                <VerticalStackLayout Spacing="6"
+                                     HorizontalOptions="Center">
+                    <Image Source="logo.png"
+                           SemanticProperties.Description="Quantum Network Monitor Agent logo"
+                           HeightRequest="96"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Quantum Network Monitor Agent"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="{DynamicResource Primary}"/>
+                    <Label Text="Discover and onboard hosts with a streamlined network scan."
+                           Style="{StaticResource SectionCaptionStyle}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           WidthRequest="320"/>
+                </VerticalStackLayout>
 
-                            </StackLayout>
-                            <StackLayout Spacing="10"
-                                         HorizontalOptions="Center"
-                                         VerticalOptions="Center">
-                                   <Label Text="Result Output"
-                                          FontSize="18"
-                                          TextColor="{DynamicResource Secondary}"
-                                          HorizontalOptions="Center"
-                                          HorizontalTextAlignment="Center"/>
-                                   <view:CustomPopupView x:Name="CustomPopupView"
-                                                         AbsoluteLayout.LayoutBounds="0,0,1,1"
-                                                         AbsoluteLayout.LayoutFlags="All"/>
-                            </StackLayout>
+                <StackLayout x:Name="ScanView"
+                             Spacing="24">
 
-                     </StackLayout>
+                    <StackLayout x:Name="ScanSection"
+                                 Spacing="24">
+                        <!-- Scan options -->
+                        <Frame Style="{StaticResource CardFrameStyle}">
+                            <VerticalStackLayout Spacing="18">
+                                <Label Text="Scan your network"
+                                       Style="{StaticResource SectionTitleStyle}"/>
+                                <Label Text="Select the preferred endpoint type, network interface, and scan depth before you begin."
+                                       Style="{StaticResource SectionCaptionStyle}"/>
 
-                     <!-- Agent Disabled Message -->
-                     <StackLayout x:Name="AgentDisabledMessage">
-                            <StackLayout Spacing="10"
-                                         HorizontalOptions="Center"
-                                         VerticalOptions="Center">
-                                   <Label Text="The Agent must be enabled and authorized to add scanned host services"
-                                          FontSize="18"
-                                          TextColor="{DynamicResource Secondary}"
-                                          HorizontalOptions="Center"
-                                          HorizontalTextAlignment="Center"/>
-                                   <Button Text="Go to Home"
-                                           Clicked="OnGoHomeClicked"
-                                           HorizontalOptions="Center"
-                                           WidthRequest="200"/>
-                            </StackLayout>
-                     </StackLayout>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Default endpoint type"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"/>
+                                    <Picker x:Name="EndpointTypePicker"
+                                            Title="Select default endpoint type"
+                                            ItemsSource="{Binding EndpointTypes}"
+                                            SelectedItem="{Binding DefaultEndpointType}"
+                                            HorizontalOptions="Fill"/>
+                                </VerticalStackLayout>
 
-              </VerticalStackLayout>
-       </ScrollView>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Network interface"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"/>
+                                    <Picker x:Name="NetworkInterfacePicker"
+                                            Title="Select network interface"
+                                            ItemsSource="{Binding NetworkInterfaces}"
+                                            SelectedItem="{Binding SelectedNetworkInterface}"
+                                            ItemDisplayBinding="{Binding .}"
+                                            HorizontalOptions="Fill"/>
+                                </VerticalStackLayout>
+
+                                <Grid RowSpacing="12"
+                                      ColumnSpacing="12">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Grid.Row="0"
+                                           Grid.Column="0"
+                                           Text="Use default endpoint type"
+                                           VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"/>
+                                    <Switch x:Name="UseDefaultEndpointTypeSwitch"
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            IsToggled="{Binding UseDefaultEndpointType}"
+                                            HorizontalOptions="End"/>
+
+                                    <Label Grid.Row="1"
+                                           Grid.Column="0"
+                                           Text="Use fast scan"
+                                           VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"/>
+                                    <Switch x:Name="UseFastScanSwitch"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            IsToggled="{Binding UseFastScan}"
+                                            HorizontalOptions="End"/>
+
+                                    <Label Grid.Row="2"
+                                           Grid.Column="0"
+                                           Text="Limit ports"
+                                           VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"/>
+                                    <Switch x:Name="LimitPortsSwitch"
+                                            Grid.Row="2"
+                                            Grid.Column="1"
+                                            IsToggled="{Binding LimitPorts}"
+                                            HorizontalOptions="End"/>
+                                </Grid>
+
+                                <Button x:Name="ScanButton"
+                                        Text="Start Scan"
+                                        Clicked="OnScanClicked"
+                                        HorizontalOptions="Fill"
+                                        FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <Frame Style="{StaticResource CardFrameStyle}">
+                            <VerticalStackLayout Spacing="16"
+                                                 HorizontalOptions="Fill">
+                                <Label Text="You're ready to scan"
+                                       Style="{StaticResource SectionTitleStyle}"/>
+                                <Label Text="Optimise your configuration above, then start the discovery."
+                                       Style="{StaticResource SectionCaptionStyle}"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </StackLayout>
+
+                    <!-- Loading indicator -->
+                    <StackLayout x:Name="LoadingSection"
+                                 IsVisible="false">
+                        <Frame Style="{StaticResource CardFrameStyle}">
+                            <VerticalStackLayout Spacing="16"
+                                                 HorizontalOptions="Fill">
+                                <Label Text="Scanning in progress"
+                                       Style="{StaticResource SectionTitleStyle}"/>
+                                <Label Text="{Binding RunningMessage}"
+                                       Style="{StaticResource SectionCaptionStyle}"/>
+                                <ActivityIndicator x:Name="ProgressIndicator"
+                                                   IsRunning="True"
+                                                   HorizontalOptions="Center"/>
+                                <Button x:Name="CancelButton"
+                                        Text="Cancel scan"
+                                        Clicked="OnCancelClicked"
+                                        HorizontalOptions="Fill"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </StackLayout>
+
+                    <!-- Results -->
+                    <StackLayout x:Name="ResultsSection"
+                                 IsVisible="false">
+                        <Frame Style="{StaticResource CardFrameStyle}">
+                            <VerticalStackLayout Spacing="18">
+                                <Label Text="Discovered hosts"
+                                       Style="{StaticResource SectionTitleStyle}"/>
+                                <Label Text="Select the hosts you want to monitor before adding them."
+                                       Style="{StaticResource SectionCaptionStyle}"/>
+
+                                <CollectionView x:Name="HostsCollectionView"
+                                                SelectionMode="Multiple"
+                                                SelectionChanged="OnHostsSelectionChanged"
+                                                HeightRequest="280">
+                                    <CollectionView.EmptyView>
+                                        <Label Text="No hosts detected yet. Run a scan to populate this list."
+                                               Style="{StaticResource SectionCaptionStyle}"
+                                               HorizontalTextAlignment="Center"
+                                               Margin="12"/>
+                                    </CollectionView.EmptyView>
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border StrokeThickness="1"
+                                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                                    Background="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
+                                                    Padding="12"
+                                                    Margin="0,0,0,12">
+                                                <Border.StrokeShape>
+                                                    <shapes:RoundRectangle CornerRadius="12"/>
+                                                </Border.StrokeShape>
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup Name="CommonStates">
+                                                        <VisualState Name="Normal"/>
+                                                        <VisualState Name="Selected">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="Border.Stroke"
+                                                                        Value="{DynamicResource Secondary}"/>
+                                                                <Setter Property="Border.Background"
+                                                                        Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray600}}"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                                <VerticalStackLayout Spacing="4">
+                                                    <Label Text="{Binding Address}"
+                                                           FontAttributes="Bold"
+                                                           FontSize="16"
+                                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
+                                                    <Label FontSize="12"
+                                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="Endpoint: "
+                                                                      FontAttributes="Bold"/>
+                                                                <Span Text="{Binding EndPointType}"/>
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                    <Label FontSize="12"
+                                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="Port: "
+                                                                      FontAttributes="Bold"/>
+                                                                <Span Text="{Binding Port}"/>
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                    <Label Text="{Binding MessageForUser}"
+                                                           Style="{StaticResource SubtleLabelStyle}"
+                                                           LineBreakMode="WordWrap"/>
+                                                </VerticalStackLayout>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <Label Text="Result output"
+                                       Style="{StaticResource SectionCaptionStyle}"
+                                       FontAttributes="Bold"
+                                       Margin="0,4,0,0"/>
+
+                                <Border StrokeThickness="1"
+                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                        Background="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
+                                        Padding="12"
+                                        Margin="0,0,0,4">
+                                    <Border.StrokeShape>
+                                        <shapes:RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
+                                    <ScrollView x:Name="OutputScrollView"
+                                                HeightRequest="160">
+                                        <Label x:Name="CompletedMessageLabel"
+                                               Text="{Binding CompletedMessage}"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"
+                                               LineBreakMode="WordWrap"/>
+                                    </ScrollView>
+                                </Border>
+
+                                <Grid ColumnSpacing="12"
+                                      RowSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button x:Name="CheckButton"
+                                            Text="Check services"
+                                            Clicked="OnCheckServicesClicked"
+                                            HorizontalOptions="Fill"
+                                            FontAttributes="Bold"/>
+                                    <Button x:Name="AddButton"
+                                            Grid.Column="1"
+                                            Text="Monitor services"
+                                            Clicked="OnAddServicesClicked"
+                                            HorizontalOptions="Fill"
+                                            FontAttributes="Bold"/>
+                                    <Button x:Name="ClearButton"
+                                            Grid.Column="2"
+                                            Text="Clear selection"
+                                            Clicked="OnClearServicesClicked"
+                                            HorizontalOptions="Fill"/>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </StackLayout>
+
+                </StackLayout>
+
+                <!-- Agent disabled state -->
+                <StackLayout x:Name="AgentDisabledMessage"
+                             IsVisible="False">
+                    <Frame Style="{StaticResource CardFrameStyle}">
+                        <VerticalStackLayout Spacing="14"
+                                             HorizontalOptions="Fill">
+                            <Label Text="Agent authorisation required"
+                                   Style="{StaticResource SectionTitleStyle}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="Enable and authorise the agent to scan your network and add any discovered services."
+                                   Style="{StaticResource SectionCaptionStyle}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Button Text="Go to Home"
+                                    Clicked="OnGoHomeClicked"
+                                    HorizontalOptions="Fill"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </StackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <view:CustomPopupView x:Name="CustomPopupView"/>
+    </Grid>
 </ContentPage>

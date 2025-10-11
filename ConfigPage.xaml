@@ -101,7 +101,7 @@
                             <Label Grid.Row="6" Grid.Column="1" Text="{Binding ClientAuthUrl}" Style="{StaticResource ValueLabelStyle}" LineBreakMode="WordWrap"/>
 
                             <Label Grid.Row="7" Grid.Column="0" Text="Auth key" Style="{StaticResource KeyLabelStyle}"/>
-                            <Label Grid.Row="7" Grid.Column="1" Text="{Binding AuthKeyDisplay}" Style="{StaticResource ValueLabelStyle}" LineBreakMode="TailTruncation"/>
+                            <Label Grid.Row="7" Grid.Column="1" Text="{Binding AuthKey}" Style="{StaticResource ValueLabelStyle}" LineBreakMode="TailTruncation"/>
                         </Grid>
                     </VerticalStackLayout>
                 </Frame>

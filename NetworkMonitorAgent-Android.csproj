@@ -84,6 +84,9 @@
   </ItemGroup>
 
   <ItemGroup>
+  <AndroidNativeLibrary Include="Platforms/Android/jniLibs/armeabi-v7a/libprocwrapper.so">
+    <Abi>armeabi-v7a</Abi>
+  </AndroidNativeLibrary>
   <AndroidNativeLibrary Include="Platforms/Android/jniLibs/armeabi-v7a/libc++_shared.so">
     <Abi>armeabi-v7a</Abi>
   </AndroidNativeLibrary>

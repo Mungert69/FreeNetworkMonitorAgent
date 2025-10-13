@@ -15,8 +15,8 @@
                 <ApplicationId>click.freenetworkmonitor.networkmonitormaui</ApplicationId>
                 <ApplicationIdGuid>d4f21b0e-2c97-4c50-b003-dca43bd9a888</ApplicationIdGuid>
                 <!-- Versions -->
-                <ApplicationDisplayVersion>0.6.9</ApplicationDisplayVersion>
-                <ApplicationVersion>609</ApplicationVersion>
+                <ApplicationDisplayVersion>0.6.11</ApplicationDisplayVersion>
+                <ApplicationVersion>611</ApplicationVersion>
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
                 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;</RuntimeIdentifiers>
@@ -84,6 +84,9 @@
   </ItemGroup>
 
   <ItemGroup>
+  <AndroidNativeLibrary Include="Platforms/Android/jniLibs/armeabi-v7a/libprocwrapper.so">
+    <Abi>armeabi-v7a</Abi>
+  </AndroidNativeLibrary>
   <AndroidNativeLibrary Include="Platforms/Android/jniLibs/armeabi-v7a/libc++_shared.so">
     <Abi>armeabi-v7a</Abi>
   </AndroidNativeLibrary>

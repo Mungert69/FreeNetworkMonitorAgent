@@ -17,6 +17,7 @@ using CommunityToolkit.Maui;
 using Microsoft.JSInterop;
 using System.Xml;
 using System.Text.Json;
+using System.IO;
 
 namespace NetworkMonitorAgent
 {
@@ -194,6 +195,27 @@ namespace NetworkMonitorAgent
                 nativeLibDir = Android.App.Application.Context.ApplicationInfo.NativeLibraryDir; 
 #endif
                 var netConfig = new NetConnectConfig(configuration, appDataDirectory, nativeLibDir);
+#if ANDROID
+                try
+                {
+                    netConfig.LocalSystemUrl.AndroidVersion = global::Android.OS.Build.VERSION.Release ?? string.Empty;
+                    netConfig.LocalSystemUrl.AndroidSdkLevel = (int)global::Android.OS.Build.VERSION.SdkInt;
+                    const string legacyRootCertFile = "isrgrootx1.cer";
+                    var rootCertPath = Path.Combine(appDataDirectory, legacyRootCertFile);
+                    netConfig.LocalSystemUrl.LegacyAndroidRootCertPath = rootCertPath;
+                    if (!File.Exists(rootCertPath))
+                    {
+                        using var assetStream = FileSystem.OpenAppPackageFileAsync(legacyRootCertFile).GetAwaiter().GetResult();
+                        using var destination = File.Create(rootCertPath);
+                        assetStream.CopyTo(destination);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var logger = provider.GetService<ILogger<NetConnectConfig>>();
+                    logger?.LogWarning(ex, "Failed to populate Android version information.");
+                }
+#endif
                 protectedConfigManager
                     .SynchronizeSensitiveValuesAsync(netConfig, ProtectedConfigurationParameters.All)
                     .GetAwaiter()

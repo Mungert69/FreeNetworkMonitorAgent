@@ -7,22 +7,6 @@ namespace NetworkMonitorAgent.Views
         public StatusDetailsPopup()
         {
             InitializeComponent();
-             var rootWrapper = new Grid
-            {
-                BackgroundColor = Application.Current.RequestedTheme == AppTheme.Dark
-            ? Color.FromArgb("#1E1E1E") // Dark theme
-            : Colors.White,             // Light theme
-                Padding = new Thickness(0),    // Add padding around the popup content
-                Margin = new Thickness(0)
-            };
-
-            // Wrap the popup content
-            if (Content != null)
-            {
-                rootWrapper.Children.Add(Content);
-                Content = rootWrapper;
-            }
-
         }
         public async void OnDetailsButtonClicked(object? sender, EventArgs e)
         {

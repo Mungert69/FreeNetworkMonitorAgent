@@ -2,7 +2,7 @@
         <PropertyGroup>
                 <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
                 <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-                <TargetFrameworks>net9.0-android</TargetFrameworks>
+                <TargetFramework>net9.0-android</TargetFramework>
                 <OutputType>Exe</OutputType>
                 <RootNamespace>NetworkMonitorAgent</RootNamespace>
                 <UseMaui>true</UseMaui>
@@ -20,6 +20,7 @@
                 <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
                 <AndroidSdkDirectory>/usr/lib/android-sdk</AndroidSdkDirectory>
                 <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;</RuntimeIdentifiers>
+                <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**</DefaultItemExcludes>
         </PropertyGroup>
         <PropertyGroup Condition="'$(Configuration)'=='Release-Dev'">
                 <DefineConstants>DEV</DefineConstants>

@@ -1,0 +1,4 @@
+sudo rm -r /home/mahadeva/code/NetworkMonitorLib/bin
+sudo rm -r /home/mahadeva/code/NetworkMonitorLib/obj
+sudo rm -r /home/mahadeva/code/NetworkMonitorData/bin
+sudo rm -r /home/mahadeva/code/NetworkMonitorData/obj

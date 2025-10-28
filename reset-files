@@ -1,0 +1,10 @@
+rm -r /home/mahadeva/code/NetworkMonitorLib/obj
+rm -r /home/mahadeva/code/NetworkMonitorLib/bin
+rm -r /home/mahadeva/code/NetworkMonitorProcessor/obj
+rm -r /home/mahadeva/code/NetworkMonitorProcessor/bin
+rm -r /home/mahadeva/code/NetworkMonitorData/obj
+rm -r /home/mahadeva/code/NetworkMonitorData/bin
+rm -r /home/mahadeva/code/NetworkMonitorChatRazorLib/obj
+rm -r /home/mahadeva/code/NetworkMonitorChatRazorLib/bin
+rm -r /home/mahadeva/code/NetworkMonitorMaui/obj
+rm -r /home/mahadeva/code/NetworkMonitorMaui/bin

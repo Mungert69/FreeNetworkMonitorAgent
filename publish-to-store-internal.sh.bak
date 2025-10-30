@@ -30,13 +30,12 @@ fi
 # 2. .NET build pipeline                #
 ########################################
 
+
 dotnet clean NetworkMonitorAgent-Android.csproj
 
-# Run make-dlls in its own directory so logging & paths are correct
-MAKE_DIR="$HOME/code/NetworkMonitorLib"
-if ! ( cd "$MAKE_DIR" && ./make-dlls ); then
-  echo "make-dlls failed — check $MAKE_DIR/script_debug.log" >&2
-  exit 1
+if ! "$HOME/code/NetworkMonitorLib/make-dlls"; then
+  echo "make-dlls failed — check $HOME/code/NetworkMonitorLib/script_debug.log" >&2
+  exit 1   # or: just warn and continue by removing this line
 fi
 
 cp ./Resources/Raw/appsettings-live.json ./Resources/Raw/appsettings.json

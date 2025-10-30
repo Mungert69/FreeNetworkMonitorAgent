@@ -30,16 +30,14 @@ fi
 # 2. .NET build pipeline                #
 ########################################
 
-
 dotnet clean NetworkMonitorAgent-Android.csproj
 
-dotnet publish "$HOME/code/NetworkMonitorLib/NetworkMonitor-Maui-Android.csproj" \
-  -c Release -r android --self-contained true
-
-cp --no-clobber \
-  "$HOME/code/NetworkMonitorLib/bin/Release/net9.0-android/android/NetworkMonitor.dll" \
-  "$HOME/code/FreeNetworkMonitorAgent/Resources/Raw/dlls/NetworkMonitor.dll"
-
+# Run make-dlls in its own directory so logging & paths are correct
+MAKE_DIR="$HOME/code/NetworkMonitorLib"
+if ! ( cd "$MAKE_DIR" && ./make-dlls ); then
+  echo "make-dlls failed — check $MAKE_DIR/script_debug.log" >&2
+  exit 1
+fi
 
 cp ./Resources/Raw/appsettings-live.json ./Resources/Raw/appsettings.json
 

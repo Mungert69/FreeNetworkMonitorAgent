@@ -22,6 +22,10 @@
 ./Microsoft.Extensions.DependencyInjection.dll
 ./Microsoft.Extensions.Diagnostics.Abstractions.dll
 ./Microsoft.Extensions.Diagnostics.dll
+./Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+./Microsoft.Extensions.Diagnostics.HealthChecks.dll
+./Microsoft.Extensions.FileProviders.Abstractions.dll
+./Microsoft.Extensions.Hosting.Abstractions.dll
 ./Microsoft.Extensions.Http.dll
 ./Microsoft.Extensions.Logging.Abstractions.dll
 ./Microsoft.Extensions.Logging.dll
@@ -68,6 +72,8 @@
 ./System.Diagnostics.Contracts.dll
 ./System.Diagnostics.Debug.dll
 ./System.Diagnostics.DiagnosticSource.dll
+./System.Diagnostics.EventLog.dll
+./System.Diagnostics.EventLog.Messages.dll
 ./System.Diagnostics.FileVersionInfo.dll
 ./System.Diagnostics.Process.dll
 ./System.Diagnostics.StackTrace.dll
@@ -101,6 +107,7 @@
 ./System.IO.Pipes.AccessControl.dll
 ./System.IO.Pipes.dll
 ./System.IO.UnmanagedMemoryStream.dll
+./System.Linq.AsyncEnumerable.dll
 ./System.Linq.dll
 ./System.Linq.Expressions.dll
 ./System.Linq.Parallel.dll
@@ -118,6 +125,7 @@
 ./System.Net.Quic.dll
 ./System.Net.Requests.dll
 ./System.Net.Security.dll
+./System.Net.ServerSentEvents.dll
 ./System.Net.ServicePoint.dll
 ./System.Net.Sockets.dll
 ./System.Net.WebClient.dll
@@ -183,6 +191,7 @@
 ./System.Text.Encodings.Web.dll
 ./System.Text.Json.dll
 ./System.Text.RegularExpressions.dll
+./System.Threading.AccessControl.dll
 ./System.Threading.Channels.dll
 ./System.Threading.dll
 ./System.Threading.Overlapped.dll

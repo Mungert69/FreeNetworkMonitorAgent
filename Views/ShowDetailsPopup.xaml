@@ -4,7 +4,8 @@
                xmlns:dto="clr-namespace:NetworkMonitor.Objects;assembly=NetworkMonitor"
                x:Class="NetworkMonitorAgent.Views.StatusDetailsPopup"
                x:DataType="dto:MonitorPingInfo"
-               Color="#80212121">
+               x:TypeArguments="x:Boolean"
+               BackgroundColor="Transparent">
 
     <Grid Padding="24"
           HorizontalOptions="Fill"

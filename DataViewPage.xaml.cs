@@ -18,8 +18,11 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Layouts;
 using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Core;
 
 namespace NetworkMonitorAgent;
+
 public partial class DataViewPage : ContentPage
 {
 
@@ -35,7 +38,7 @@ public partial class DataViewPage : ContentPage
         }
         catch (Exception ex)
         {
-             _logger?.LogError($" Error : Unable to load DataViewPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : Unable to load DataViewPage. Error was: {ex.Message}");
         }
 
     }
@@ -56,7 +59,7 @@ public partial class DataViewPage : ContentPage
         }
         catch (Exception ex)
         {
-             _logger?.LogError($" Error : in OnStatusIndicatorTapped on DataViewPage. Error was: {ex.Message}");
+            _logger?.LogError($" Error : in OnStatusIndicatorTapped on DataViewPage. Error was: {ex.Message}");
         }
     }
 
@@ -69,24 +72,20 @@ public partial class DataViewPage : ContentPage
                 BindingContext = info
             };
 
-            var result = await this.ShowPopupAsync(popup, CancellationToken.None);
+            // Use IPopupResult<bool> with the generic type parameter
+            IPopupResult<bool> popupResult = await this.ShowPopupAsync<bool>(popup);
 
-            if (result is bool boolResult)
+            // Check if dismissed by tapping outside
+            if (!popupResult.WasDismissedByTappingOutsideOfPopup && popupResult.Result == true)
             {
-                if (boolResult)
-                {
-
-                    var detailsPage = new DetailsPage(_monitorPingInfoView);
-                    await Shell.Current.Navigation.PushAsync(detailsPage);
-
-                }
-
+                var detailsPage = new DetailsPage(_monitorPingInfoView);
+                await Shell.Current.Navigation.PushAsync(detailsPage);
             }
         }
         catch (Exception e)
         {
-             _logger?.LogError($" Error: Could not navigate to page {nameof(DetailsPage)}. Error was: {e.ToString()}");
-        }// Yes was tapped
+            _logger?.LogError($" Error: Could not navigate to page {nameof(DetailsPage)}. Error was: {e.ToString()}");
+        }
     }
 }
 

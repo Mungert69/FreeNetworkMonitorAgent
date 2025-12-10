@@ -37,12 +37,12 @@ dotnet publish "$HOME/code/NetworkMonitorLib/NetworkMonitor-Maui-Android.csproj"
   -c Release -r android --self-contained true
 
 cp --no-clobber \
-  "$HOME/code/NetworkMonitorLib/bin/Release/net9.0-android/android/NetworkMonitor-Maui-Android.dll" \
+  "$HOME/code/NetworkMonitorLib/bin/Release/net10.0-android/android/NetworkMonitor-Maui-Android.dll" \
   "$HOME/code/NetworkMonitorQuantumSecure/Resources/Raw/dlls/NetworkMonitor.dll"
 
 cp ./Resources/Raw/appsettings-live.json ./Resources/Raw/appsettings.json
 
-dotnet build -c Release -f net9.0-android NetworkMonitorAgent-Android.csproj
+dotnet build -c Release -f net10.0-android NetworkMonitorAgent-Android.csproj
 
 ########################################
 # 3. Upload to Google Play              #
@@ -51,6 +51,6 @@ dotnet build -c Release -f net9.0-android NetworkMonitorAgent-Android.csproj
 python3 publish_to_store.py \
   --service-account-file "$HOME/code/securefiles/gaccount.json" \
   --package-name click.freenetworkmonitor.networkmonitormaui \
-  --aab "$HOME/code/FreeNetworkMonitorAgent/bin/Release/net9.0-android/click.freenetworkmonitor.networkmonitormaui-Signed.aab" \
+  --aab "$HOME/code/FreeNetworkMonitorAgent/bin/Release/net10.0-android/click.freenetworkmonitor.networkmonitormaui-Signed.aab" \
   --track beta
 

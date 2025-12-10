@@ -7,7 +7,7 @@ Example:
     python upload_play.py \
         --service-account-file /home/mahadeva/code/securefiles/gaccount.json \
         --package-name click.freenetworkmonitor.quantumsecure \
-        --aab /home/mahadeva/code/NetworkMonitorQuantumSecure/bin/Release/net9.0-android/click.freenetworkmonitor.quantumsecure-Signed.aab \
+        --aab /home/mahadeva/code/NetworkMonitorQuantumSecure/bin/Release/net10.0-android/click.freenetworkmonitor.quantumsecure-Signed.aab \
         --track beta \
         --notes "Automated nightly build"
 """

@@ -12,4 +12,4 @@ fi
 # Proceed with the rest of the commands
 dotnet clean NetworkMonitorAgent-Android.csproj
 cp ./Resources/Raw/appsettings-dev.json ./Resources/Raw/appsettings.json
-dotnet build -c Release-Dev -f net9.0-android NetworkMonitorAgent-Android.csproj
+dotnet build -c Release-Dev -f net10.0-android NetworkMonitorAgent-Android.csproj

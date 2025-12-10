@@ -41,6 +41,7 @@
 ./System.ComponentModel.Annotations.dll
 ./System.IO.Pipes.dll
 ./Betalgo.Ranul.OpenAI.dll
+./System.Threading.AccessControl.dll
 ./System.ComponentModel.DataAnnotations.dll
 ./Nito.AsyncEx.Context.dll
 ./Nito.AsyncEx.Interop.WaitHandles.dll
@@ -84,6 +85,7 @@
 ./NetworkMonitor.dll
 ./System.Runtime.CompilerServices.VisualC.dll
 ./System.Net.WebSockets.dll
+./System.Linq.AsyncEnumerable.dll
 ./System.Net.ServicePoint.dll
 ./System.Numerics.Vectors.dll
 ./Microsoft.Extensions.Diagnostics.Abstractions.dll
@@ -218,3 +220,4 @@
 ./System.Security.Claims.dll
 ./System.ServiceProcess.dll
 ./System.Net.NameResolution.dll
+./System.Net.ServerSentEvents.dll
